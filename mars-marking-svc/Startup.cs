@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Net.Http;
+using mars_marking_svc.Clients.Metadata;
+using mars_marking_svc.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using Newtonsoft.Json.Serialization;
 
 namespace mars_marking_svc
 {
@@ -23,7 +21,17 @@ namespace mars_marking_svc
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
+            services.AddMvc()
+                .AddJsonOptions(options =>
+                {
+                    // TODO: Figure out why this does nothing!
+                    options.SerializerSettings.ContractResolver =
+                        new CamelCasePropertyNamesContractResolver();
+                });
+
+            services.AddSingleton<HttpClient>();
+            services.AddTransient<IHttpService, HttpService>();
+            services.AddTransient<IMetadataServiceClient, MetadataServiceClient>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

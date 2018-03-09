@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using mars_marking_svc.Clients.Metadata;
+using mars_marking_svc.Clients.Scenario;
 using Microsoft.AspNetCore.Mvc;
 
 namespace mars_marking_svc.Controllers
@@ -8,10 +9,15 @@ namespace mars_marking_svc.Controllers
     public class MarkController : Controller
     {
         private readonly IMetadataServiceClient _metadataServiceClient;
+        private readonly IScenarioServiceClient _scenarioServiceClient;
 
-        public MarkController(IMetadataServiceClient metadataServiceClient)
+        public MarkController(
+            IMetadataServiceClient metadataServiceClient,
+            IScenarioServiceClient scenarioServiceClient
+        )
         {
             _metadataServiceClient = metadataServiceClient;
+            _scenarioServiceClient = scenarioServiceClient;
         }
 
         [HttpGet("{resourceType}/{resourceId}")]
@@ -21,13 +27,20 @@ namespace mars_marking_svc.Controllers
             {
                 case "project_contents":
                 {
-                    var result = await _metadataServiceClient.GetMetadataForProject(resourceId);
+                    //var metadataResult = await _metadataServiceClient.GetMetadataForProject(resourceId);
+                    var scenarioResult = await _scenarioServiceClient.GetScenariosForProject(resourceId);
 
-                    return result.Count > 0 ? (IActionResult) Ok(result) : BadRequest();
+                    return Ok(scenarioResult);
                 }
                 case "metadata":
                 {
                     var result = await _metadataServiceClient.MarkMetadata(resourceId);
+
+                    return Ok(result);
+                }
+                case "scenario":
+                {
+                    var result = await _scenarioServiceClient.MarkScenario(resourceId);
 
                     return Ok(result);
                 }

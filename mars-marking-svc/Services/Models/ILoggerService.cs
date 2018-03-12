@@ -7,6 +7,8 @@ namespace mars_marking_svc.Services.Models
     {
         void LogMarkedResource(MarkedResourceModel model);
 
-        void LogError(Exception error);
+        void LogExceptionMessage(Exception error);
+
+        void LogExceptionMessageWithStackTrace(Exception error);
     }
 }

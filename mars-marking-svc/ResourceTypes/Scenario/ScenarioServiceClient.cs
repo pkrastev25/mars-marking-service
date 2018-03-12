@@ -25,7 +25,7 @@ namespace mars_marking_svc.ResourceTypes.Scenario
 
         public async Task<ScenarioModel> GetScenario(string scenarioId)
         {
-            var response = await _httpService.GetAsync($"http://localhost:8080/scenarios/{scenarioId}");
+            var response = await _httpService.GetAsync($"http://scenario-svc/scenarios/{scenarioId}");
 
             if (response.StatusCode != HttpStatusCode.OK)
             {
@@ -41,7 +41,7 @@ namespace mars_marking_svc.ResourceTypes.Scenario
 
         public async Task<MarkedResourceModel> MarkScenario(string scenarioId)
         {
-            var scenario = GetScenario(scenarioId).Result;
+            var scenario = await GetScenario(scenarioId);
             scenario.ScenarioId = scenarioId;
 
             return await MarkScenario(scenario);
@@ -59,7 +59,7 @@ namespace mars_marking_svc.ResourceTypes.Scenario
             scenarioModel.ToBeDeleted = true;
 
             var response = await _httpService.PatchAsync(
-                $"http://localhost:8080/scenarios/{scenarioModel.ScenarioId}/metadata",
+                $"http://scenario-svc/scenarios/{scenarioModel.ScenarioId}/metadata",
                 scenarioModel
             );
 
@@ -82,7 +82,7 @@ namespace mars_marking_svc.ResourceTypes.Scenario
 
         public async Task<List<ScenarioModel>> GetScenariosForMetadata(string metadataId)
         {
-            var response = await _httpService.GetAsync($"http://localhost:8080/scenarios?DataId={metadataId}");
+            var response = await _httpService.GetAsync($"http://scenario-svc/scenarios?DataId={metadataId}");
 
             if (response.StatusCode != HttpStatusCode.OK)
             {
@@ -98,7 +98,7 @@ namespace mars_marking_svc.ResourceTypes.Scenario
 
         public async Task<List<ScenarioModel>> GetScenariosForProject(string projectId)
         {
-            var response = await _httpService.GetAsync($"http://localhost:8080/scenarios?Project={projectId}");
+            var response = await _httpService.GetAsync($"http://scenario-svc/scenarios?Project={projectId}");
 
             if (response.StatusCode != HttpStatusCode.OK)
             {

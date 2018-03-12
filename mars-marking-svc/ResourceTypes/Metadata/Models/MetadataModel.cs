@@ -1,4 +1,6 @@
-﻿namespace mars_marking_svc.ResourceTypes.Metadata.Models
+﻿using Newtonsoft.Json;
+
+namespace mars_marking_svc.ResourceTypes.Metadata.Models
 {
     public class MetadataModel
     {
@@ -6,8 +8,10 @@
 
         public const string ToBeDeletedState = "TO_BE_DELETED";
 
-        public string dataId { get; set; }
+        [JsonProperty("dataId")]
+        public string DataId { get; set; }
 
-        public string state { get; set; }
+        [JsonProperty("state")]
+        public string State { get; set; }
     }
 }

@@ -9,15 +9,21 @@ namespace mars_marking_svc.Services
         public void LogMarkedResource(MarkedResourceModel model)
         {
             Console.WriteLine(
-                $"[SUCCESS] Marked resource with resource type: {model.resourceType} and id: {model.resourceId}!"
+                $"[SUCCESS] Marked resource type: {model.resourceType} with id: {model.resourceId}"
             );
         }
 
-        public void LogError(Exception error)
+        public void LogExceptionMessage(Exception error)
         {
             Console.Error.WriteLine(
-                $"[ERROR] {error.Message}, stack trace:\n {error.StackTrace}!"
+                $"[ERROR] {error.Message}"
             );
+        }
+
+        public void LogExceptionMessageWithStackTrace(Exception error)
+        {
+            Console.Error.WriteLine($"[ERROR] {error.Message}");
+            Console.Error.WriteLine(error.StackTrace);
         }
     }
 }

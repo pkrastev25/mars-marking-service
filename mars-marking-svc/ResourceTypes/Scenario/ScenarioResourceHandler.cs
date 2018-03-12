@@ -9,12 +9,12 @@ using Microsoft.AspNetCore.Server.Kestrel.Internal.System.Collections.Sequences;
 
 namespace mars_marking_svc.ResourceTypes.Scenario
 {
-    public class ScenarioResourceHandlerService : IScenarioResourceHandlerService
+    public class ScenarioResourceHandler : IScenarioResourceHandler
     {
         private readonly ILoggerService _loggerService;
         private readonly IScenarioServiceClient _scenarioServiceClient;
 
-        public ScenarioResourceHandlerService(
+        public ScenarioResourceHandler(
             IScenarioServiceClient scenarioServiceClient,
             ILoggerService loggerService
         )
@@ -30,37 +30,38 @@ namespace mars_marking_svc.ResourceTypes.Scenario
             try
             {
                 var sourceScenario = await _scenarioServiceClient.MarkScenario(scenarioId);
-                
+                markedResources.Add(sourceScenario);
+
                 return new OkObjectResult(markedResources);
             }
             catch (FailedToGetResourceException e)
             {
                 // TODO: Remove the marks
-                _loggerService.LogError(e);
+                _loggerService.LogExceptionMessage(e);
                 return new StatusCodeResult(503);
             }
             catch (FailedToUpdateResourceException e)
             {
                 // TODO: Remove the marks
-                _loggerService.LogError(e);
+                _loggerService.LogExceptionMessage(e);
                 return new StatusCodeResult(503);
             }
             catch (ResourceAlreadyMarkedException e)
             {
                 // TODO: Remove the marks
-                _loggerService.LogError(e);
+                _loggerService.LogExceptionMessage(e);
                 return new StatusCodeResult(503);
             }
             catch (CannotMarkResourceException e)
             {
                 // TODO: Remove the marks
-                _loggerService.LogError(e);
+                _loggerService.LogExceptionMessage(e);
                 return new StatusCodeResult(409);
             }
             catch (Exception e)
             {
                 // TODO: Remove the marks
-                _loggerService.LogError(e);
+                _loggerService.LogExceptionMessageWithStackTrace(e);
                 return new StatusCodeResult(503);
             }
         }

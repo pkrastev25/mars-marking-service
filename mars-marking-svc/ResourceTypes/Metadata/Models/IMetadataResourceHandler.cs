@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace mars_marking_svc.ResourceTypes.Metadata.Models
 {
-    public interface IMetadataResourceHandlerService
+    public interface IMetadataResourceHandler
     {
         Task<IActionResult> MarkMetadataDependantResources(string metadataId);
     }

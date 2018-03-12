@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using mars_marking_svc.ResourceTypes.Metadata.Models;
+using mars_marking_svc.ResourceTypes.ResultConfig.Models;
 using mars_marking_svc.ResourceTypes.Scenario.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,16 +9,19 @@ namespace mars_marking_svc.Controllers
     [Route("api/[controller]")]
     public class MarkController : Controller
     {
-        private readonly IMetadataResourceHandlerService _metadataResourceHandlerService;
-        private readonly IScenarioResourceHandlerService _scenarioResourceHandlerService;
+        private readonly IMetadataResourceHandler _metadataResourceHandler;
+        private readonly IScenarioResourceHandler _scenarioResourceHandler;
+        private readonly IResultConfigResourceHandler _resultConfigResourceHandler;
 
         public MarkController(
-            IMetadataResourceHandlerService metadataResourceHandlerService,
-            IScenarioResourceHandlerService scenarioResourceHandlerService
+            IMetadataResourceHandler metadataResourceHandler,
+            IScenarioResourceHandler scenarioResourceHandler,
+            IResultConfigResourceHandler resultConfigResourceHandler
         )
         {
-            _metadataResourceHandlerService = metadataResourceHandlerService;
-            _scenarioResourceHandlerService = scenarioResourceHandlerService;
+            _metadataResourceHandler = metadataResourceHandler;
+            _scenarioResourceHandler = scenarioResourceHandler;
+            _resultConfigResourceHandler = resultConfigResourceHandler;
         }
 
         [HttpGet("{resourceType}/{resourceId}")]
@@ -31,11 +35,15 @@ namespace mars_marking_svc.Controllers
                 }
                 case "metadata":
                 {
-                    return await _metadataResourceHandlerService.MarkMetadataDependantResources(resourceId);
+                    return await _metadataResourceHandler.MarkMetadataDependantResources(resourceId);
                 }
                 case "scenario":
                 {
-                    return await _scenarioResourceHandlerService.MarkScenarioDependantResources(resourceId);
+                    return await _scenarioResourceHandler.MarkScenarioDependantResources(resourceId);
+                }
+                case "result-config":
+                {
+                    return await _resultConfigResourceHandler.MarkResultConfigDependantResources(resourceId);
                 }
                 default:
                 {

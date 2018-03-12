@@ -25,7 +25,7 @@ namespace mars_marking_svc.ResourceTypes.Metadata
 
         public async Task<MetadataModel> GetMetadata(string metadataId)
         {
-            var response = await _httpService.GetAsync($"http://localhost:8080/metadata/{metadataId}");
+            var response = await _httpService.GetAsync($"http://metadata-svc/metadata/{metadataId}");
 
             if (response.StatusCode != HttpStatusCode.OK)
             {
@@ -41,45 +41,45 @@ namespace mars_marking_svc.ResourceTypes.Metadata
 
         public async Task<MarkedResourceModel> MarkMetadata(string metadataId)
         {
-            var metadata = GetMetadata(metadataId).Result;
+            var metadata = await GetMetadata(metadataId);
 
             return await MarkMetadata(metadata);
         }
 
         public async Task<MarkedResourceModel> MarkMetadata(MetadataModel metadataModel)
         {
-            if (MetadataModel.ToBeDeletedState.Equals(metadataModel.state))
+            if (MetadataModel.ToBeDeletedState.Equals(metadataModel.State))
             {
                 throw new ResourceAlreadyMarkedException(
-                    $"Cannot mark metadata resource with id: {metadataModel.dataId}, it is already marked!"
+                    $"Cannot mark metadata resource with id: {metadataModel.DataId}, it is already marked!"
                 );
             }
 
-            if (!MetadataModel.FinishedState.Equals(metadataModel.state))
+            if (!MetadataModel.FinishedState.Equals(metadataModel.State))
             {
                 throw new CannotMarkResourceException(
-                    $"Cannot mark metadata resource with id: {metadataModel.dataId}, it must be in state: {MetadataModel.FinishedState} beforehand!"
+                    $"Cannot mark metadata resource with id: {metadataModel.DataId}, it must be in state: {MetadataModel.FinishedState} beforehand!"
                 );
             }
 
-            metadataModel.state = MetadataModel.ToBeDeletedState;
+            metadataModel.State = MetadataModel.ToBeDeletedState;
 
             var response = await _httpService.PutAsync(
-                $"http://localhost:8080/metadata/{metadataModel.dataId}?state={MetadataModel.ToBeDeletedState}",
+                $"http://metadata-svc/metadata/{metadataModel.DataId}?state={MetadataModel.ToBeDeletedState}",
                 metadataModel
             );
 
             if (response.StatusCode != HttpStatusCode.OK)
             {
                 throw new FailedToUpdateResourceException(
-                    $"Failed to update metadata resource with id: {metadataModel.dataId} from metadata-svc!"
+                    $"Failed to update metadata resource with id: {metadataModel.DataId} from metadata-svc!"
                 );
             }
 
             var markedResource = new MarkedResourceModel
             {
                 resourceType = "metadata",
-                resourceId = metadataModel.dataId
+                resourceId = metadataModel.DataId
             };
             _loggerService.LogMarkedResource(markedResource);
 
@@ -88,7 +88,7 @@ namespace mars_marking_svc.ResourceTypes.Metadata
 
         public async Task<List<MetadataModel>> GetMetadataForProject(string projectId)
         {
-            var response = await _httpService.GetAsync($"http://localhost:8080/metadata?project={projectId}");
+            var response = await _httpService.GetAsync($"http://metadata-svc/metadata?project={projectId}");
 
             if (response.StatusCode != HttpStatusCode.OK)
             {

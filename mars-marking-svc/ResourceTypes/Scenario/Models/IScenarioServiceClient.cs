@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using mars_marking_svc.Models;
 
-namespace mars_marking_svc.Clients.Scenario
+namespace mars_marking_svc.ResourceTypes.Scenario.Models
 {
     public interface IScenarioServiceClient
     {

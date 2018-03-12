@@ -1,6 +1,7 @@
 ﻿using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using mars_marking_svc.Services.Models;
 using Newtonsoft.Json;
 
 namespace mars_marking_svc.Services

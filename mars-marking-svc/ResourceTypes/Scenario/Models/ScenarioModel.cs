@@ -1,4 +1,4 @@
-﻿namespace mars_marking_svc.Models
+﻿namespace mars_marking_svc.ResourceTypes.Scenario.Models
 {
     public class ScenarioModel
     {

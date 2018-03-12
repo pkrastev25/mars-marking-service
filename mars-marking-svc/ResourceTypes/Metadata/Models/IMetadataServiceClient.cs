@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using mars_marking_svc.Models;
 
-namespace mars_marking_svc.Clients.Metadata
+namespace mars_marking_svc.ResourceTypes.Metadata.Models
 {
     public interface IMetadataServiceClient
     {

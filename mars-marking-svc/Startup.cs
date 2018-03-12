@@ -1,7 +1,10 @@
 ﻿using System.Net.Http;
-using mars_marking_svc.Clients.Metadata;
-using mars_marking_svc.Clients.Scenario;
+using mars_marking_svc.ResourceTypes.Metadata;
+using mars_marking_svc.ResourceTypes.Metadata.Models;
+using mars_marking_svc.ResourceTypes.Scenario;
+using mars_marking_svc.ResourceTypes.Scenario.Models;
 using mars_marking_svc.Services;
+using mars_marking_svc.Services.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -32,8 +35,11 @@ namespace mars_marking_svc
 
             services.AddSingleton<HttpClient>();
             services.AddTransient<IHttpService, HttpService>();
+            services.AddTransient<ILoggerService, LoggerService>();
             services.AddTransient<IMetadataServiceClient, MetadataServiceClient>();
+            services.AddTransient<IMetadataResourceHandlerService, MetadataResourceHandlerService>();
             services.AddTransient<IScenarioServiceClient, ScenarioServiceClient>();
+            services.AddTransient<IScenarioResourceHandlerService, ScenarioResourceHandlerService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

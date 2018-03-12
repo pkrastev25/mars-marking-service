@@ -1,20 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using mars_marking_svc.Exceptions;
 using mars_marking_svc.Models;
-using mars_marking_svc.Services;
+using mars_marking_svc.ResourceTypes.Scenario.Models;
+using mars_marking_svc.Services.Models;
 using Newtonsoft.Json;
 
-namespace mars_marking_svc.Clients.Scenario
+namespace mars_marking_svc.ResourceTypes.Scenario
 {
     public class ScenarioServiceClient : IScenarioServiceClient
     {
         private readonly IHttpService _httpService;
+        private readonly ILoggerService _loggerService;
 
-        public ScenarioServiceClient(IHttpService httpService)
+        public ScenarioServiceClient(
+            IHttpService httpService,
+            ILoggerService loggerService
+        )
         {
             _httpService = httpService;
+            _loggerService = loggerService;
         }
 
         public async Task<ScenarioModel> GetScenario(string scenarioId)
@@ -23,8 +29,9 @@ namespace mars_marking_svc.Clients.Scenario
 
             if (response.StatusCode != HttpStatusCode.OK)
             {
-                // TODO: Revert the process
-                throw new Exception();
+                throw new FailedToGetResourceException(
+                    $"Failed to get scenario resource with id: {scenarioId} from scenario-svc!"
+                );
             }
 
             var jsonResponse = await response.Content.ReadAsStringAsync();
@@ -44,8 +51,9 @@ namespace mars_marking_svc.Clients.Scenario
         {
             if (scenarioModel.ToBeDeleted)
             {
-                // TODO: revert the process
-                throw new Exception();
+                throw new ResourceAlreadyMarkedException(
+                    $"Cannot mark scenario resource with id: {scenarioModel.ScenarioId}, it is already marked!"
+                );
             }
 
             scenarioModel.ToBeDeleted = true;
@@ -55,17 +63,21 @@ namespace mars_marking_svc.Clients.Scenario
                 scenarioModel
             );
 
-            if (response.StatusCode == HttpStatusCode.NoContent)
+            if (response.StatusCode != HttpStatusCode.NoContent)
             {
-                return new MarkedResourceModel
-                {
-                    resourceType = "scenario",
-                    resourceId = scenarioModel.ScenarioId
-                };
+                throw new FailedToUpdateResourceException(
+                    $"Failed to update scenario resource with id: {scenarioModel.ScenarioId} from scenario-svc!"
+                );
             }
 
-            // TODO: Revert the process
-            throw new Exception();
+            var markedResource = new MarkedResourceModel
+            {
+                resourceType = "scenario",
+                resourceId = scenarioModel.ScenarioId
+            };
+            _loggerService.LogMarkedResource(markedResource);
+
+            return markedResource;
         }
 
         public async Task<List<ScenarioModel>> GetScenariosForMetadata(string metadataId)
@@ -74,10 +86,11 @@ namespace mars_marking_svc.Clients.Scenario
 
             if (response.StatusCode != HttpStatusCode.OK)
             {
-                // TODO: Revert the process
-                throw new Exception();
+                throw new FailedToGetResourceException(
+                    $"Failed to get scenario resources for metadataId: {metadataId} from scenario-svc!"
+                );
             }
-            
+
             var jsonResponse = await response.Content.ReadAsStringAsync();
 
             return JsonConvert.DeserializeObject<List<ScenarioModel>>(jsonResponse);
@@ -89,8 +102,9 @@ namespace mars_marking_svc.Clients.Scenario
 
             if (response.StatusCode != HttpStatusCode.OK)
             {
-                // TODO: Revert the process
-                throw new Exception();
+                throw new FailedToGetResourceException(
+                    $"Failed to get scenario resources for projectId: {projectId} from scenario-svc!"
+                );
             }
 
             var jsonResponse = await response.Content.ReadAsStringAsync();

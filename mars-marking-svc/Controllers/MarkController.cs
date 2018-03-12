@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
-using mars_marking_svc.Clients.Metadata;
-using mars_marking_svc.Clients.Scenario;
+using mars_marking_svc.ResourceTypes.Metadata.Models;
+using mars_marking_svc.ResourceTypes.Scenario.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace mars_marking_svc.Controllers
@@ -8,16 +8,16 @@ namespace mars_marking_svc.Controllers
     [Route("api/[controller]")]
     public class MarkController : Controller
     {
-        private readonly IMetadataServiceClient _metadataServiceClient;
-        private readonly IScenarioServiceClient _scenarioServiceClient;
+        private readonly IMetadataResourceHandlerService _metadataResourceHandlerService;
+        private readonly IScenarioResourceHandlerService _scenarioResourceHandlerService;
 
         public MarkController(
-            IMetadataServiceClient metadataServiceClient,
-            IScenarioServiceClient scenarioServiceClient
+            IMetadataResourceHandlerService metadataResourceHandlerService,
+            IScenarioResourceHandlerService scenarioResourceHandlerService
         )
         {
-            _metadataServiceClient = metadataServiceClient;
-            _scenarioServiceClient = scenarioServiceClient;
+            _metadataResourceHandlerService = metadataResourceHandlerService;
+            _scenarioResourceHandlerService = scenarioResourceHandlerService;
         }
 
         [HttpGet("{resourceType}/{resourceId}")]
@@ -27,22 +27,15 @@ namespace mars_marking_svc.Controllers
             {
                 case "project_contents":
                 {
-                    //var metadataResult = await _metadataServiceClient.GetMetadataForProject(resourceId);
-                    var scenarioResult = await _scenarioServiceClient.GetScenariosForProject(resourceId);
-
-                    return Ok(scenarioResult);
+                    return BadRequest("To be implemented!");
                 }
                 case "metadata":
                 {
-                    var result = await _metadataServiceClient.MarkMetadata(resourceId);
-
-                    return Ok(result);
+                    return await _metadataResourceHandlerService.MarkMetadataDependantResources(resourceId);
                 }
                 case "scenario":
                 {
-                    var result = await _scenarioServiceClient.MarkScenario(resourceId);
-
-                    return Ok(result);
+                    return await _scenarioResourceHandlerService.MarkScenarioDependantResources(resourceId);
                 }
                 default:
                 {

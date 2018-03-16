@@ -1,22 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using mars_marking_svc.Exceptions;
 using mars_marking_svc.Models;
 using mars_marking_svc.ResourceTypes.Metadata.Interfaces;
+using mars_marking_svc.ResourceTypes.ProjectContents.Interfaces;
 using mars_marking_svc.ResourceTypes.ResultConfig.Interfaces;
+using mars_marking_svc.ResourceTypes.ResultConfig.Models;
 using mars_marking_svc.ResourceTypes.Scenario.Interfaces;
 using mars_marking_svc.ResourceTypes.SimPlan.Interfaces;
-using mars_marking_svc.ResourceTypes.SimPlan.Models;
 using mars_marking_svc.ResourceTypes.SimRun.Interfaces;
-using mars_marking_svc.ResourceTypes.SimRun.Models;
 using mars_marking_svc.Services.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Server.Kestrel.Internal.System.Collections.Sequences;
 
-namespace mars_marking_svc.ResourceTypes.Metadata
+namespace mars_marking_svc.ResourceTypes.ProjectContents
 {
-    public class MetadataResourceHandler : IMetadataResourceHandler
+    public class ProjectResourceHandler : IProjectResourceHandler
     {
         private readonly IMetadataServiceClient _metadataServiceClient;
         private readonly IScenarioServiceClient _scenarioServiceClient;
@@ -25,7 +25,7 @@ namespace mars_marking_svc.ResourceTypes.Metadata
         private readonly ISimRunServiceClient _simRunServiceClient;
         private readonly ILoggerService _loggerService;
 
-        public MetadataResourceHandler(
+        public ProjectResourceHandler(
             IMetadataServiceClient metadataServiceClient,
             IScenarioServiceClient scenarioServiceClient,
             IResultConfigServiceClient resultConfigServiceClient,
@@ -42,58 +42,56 @@ namespace mars_marking_svc.ResourceTypes.Metadata
             _loggerService = loggerService;
         }
 
-        public async Task<IActionResult> MarkMetadataDependantResources(string metadataId, string projectId)
+        public async Task<IActionResult> MarkProjectDependantResources(string projectId)
         {
             var markedResources = new List<MarkedResourceModel>();
 
             try
             {
-                var sourceMetadata = await _metadataServiceClient.MarkMetadata(metadataId);
-                markedResources.Add(sourceMetadata);
+                var metadataForProject = await _metadataServiceClient.GetMetadataForProject(projectId);
+                foreach (var metadataModel in metadataForProject)
+                {
+                    markedResources.Add(
+                        await _metadataServiceClient.MarkMetadata(metadataModel)
+                    );
+                }
 
-                var scenariosForMetadata = await _scenarioServiceClient.GetScenariosForMetadata(metadataId);
-                foreach (var scenarioModel in scenariosForMetadata)
+                var scenariosForProject = await _scenarioServiceClient.GetScenariosForProject(projectId);
+                foreach (var scenarioModel in scenariosForProject)
                 {
                     markedResources.Add(
                         await _scenarioServiceClient.MarkScenario(scenarioModel)
                     );
                 }
 
-                var resultConfigsForMetadata = await _resultConfigServiceClient.GetResultConfigsForMetadata(metadataId);
-                foreach (var resultConfigModel in resultConfigsForMetadata)
+                var resultConfigsForMetadata = new List<ResultConfigModel>();
+                foreach (var metadataModel in metadataForProject)
                 {
-                    // The resultConfigs obey the metadata mark!
-                    var markedResultConfig = new MarkedResourceModel
-                    {
-                        resourceType = "resultConfig",
-                        resourceId = resultConfigModel.ConfigId
-                    };
-                    _loggerService.LogMarkedResource(markedResultConfig);
-                    markedResources.Add(markedResultConfig);
-                }
-
-                var simPlansForScenarios = new List<SimPlanModel>();
-                foreach (var scenarioModel in scenariosForMetadata)
-                {
-                    simPlansForScenarios.AddRange(
-                        await _simPlanServiceClient.GetSimPlansForScenario(scenarioModel.ScenarioId, projectId)
+                    resultConfigsForMetadata.AddRange(
+                        await _resultConfigServiceClient.GetResultConfigsForMetadata(metadataModel.DataId)
                     );
                 }
-                foreach (var simPlanModel in simPlansForScenarios)
+                // ResultConfigs obey the mark of the metadata!
+                markedResources.AddRange(
+                    resultConfigsForMetadata.Select(
+                        resultConfigModel => new MarkedResourceModel
+                        {
+                            resourceType = "resultConfig",
+                            resourceId = resultConfigModel.ConfigId
+                        }
+                    )
+                );
+
+                var simPlansForProject = await _simPlanServiceClient.GetSimPlansForProject(projectId);
+                foreach (var simPlanModel in simPlansForProject)
                 {
                     markedResources.Add(
                         await _simPlanServiceClient.MarkSimPlan(simPlanModel, projectId)
                     );
                 }
 
-                var simRunsForSimPlans = new List<SimRunModel>();
-                foreach (var simPlanModel in simPlansForScenarios)
-                {
-                    simRunsForSimPlans.AddRange(
-                        await _simRunServiceClient.GetSimRunsForSimPlan(simPlanModel.Id, projectId)
-                    );
-                }
-                foreach (var simRunModel in simRunsForSimPlans)
+                var simRunsForProject = await _simRunServiceClient.GetSimRunsForProject(projectId);
+                foreach (var simRunModel in simRunsForProject)
                 {
                     markedResources.Add(
                         await _simRunServiceClient.MarkSimRun(simRunModel, projectId)

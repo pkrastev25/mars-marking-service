@@ -35,7 +35,7 @@ namespace mars_marking_svc.ResourceTypes.ResultConfig
 
         public async Task<IActionResult> MarkResultConfigDependantResources(string resultConfigId, string projectId)
         {
-            var markedResources = new ArrayList<MarkedResourceModel>();
+            var markedResources = new List<MarkedResourceModel>();
 
             try
             {

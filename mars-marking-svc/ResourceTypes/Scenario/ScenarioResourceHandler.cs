@@ -35,7 +35,7 @@ namespace mars_marking_svc.ResourceTypes.Scenario
 
         public async Task<IActionResult> MarkScenarioDependantResources(string scenarioId, string projectId)
         {
-            var markedResources = new ArrayList<MarkedResourceModel>();
+            var markedResources = new List<MarkedResourceModel>();
 
             try
             {

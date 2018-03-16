@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using mars_marking_svc.ResourceTypes.Metadata.Interfaces;
+using mars_marking_svc.ResourceTypes.ProjectContents.Interfaces;
 using mars_marking_svc.ResourceTypes.ResultConfig.Interfaces;
 using mars_marking_svc.ResourceTypes.Scenario.Interfaces;
 using mars_marking_svc.ResourceTypes.SimPlan.Interfaces;
@@ -11,6 +12,7 @@ namespace mars_marking_svc.Controllers
     [Route("api/[controller]")]
     public class MarkController : Controller
     {
+        private readonly IProjectResourceHandler _projectResourceHandler;
         private readonly IMetadataResourceHandler _metadataResourceHandler;
         private readonly IScenarioResourceHandler _scenarioResourceHandler;
         private readonly IResultConfigResourceHandler _resultConfigResourceHandler;
@@ -18,6 +20,7 @@ namespace mars_marking_svc.Controllers
         private readonly ISimRunResourceHandler _simRunResourceHandler;
 
         public MarkController(
+            IProjectResourceHandler projectResourceHandler,
             IMetadataResourceHandler metadataResourceHandler,
             IScenarioResourceHandler scenarioResourceHandler,
             IResultConfigResourceHandler resultConfigResourceHandler,
@@ -25,6 +28,7 @@ namespace mars_marking_svc.Controllers
             ISimRunResourceHandler simRunResourceHandler
         )
         {
+            _projectResourceHandler = projectResourceHandler;
             _metadataResourceHandler = metadataResourceHandler;
             _scenarioResourceHandler = scenarioResourceHandler;
             _resultConfigResourceHandler = resultConfigResourceHandler;
@@ -56,9 +60,9 @@ namespace mars_marking_svc.Controllers
 
             switch (resourceType)
             {
-                case "projectContents":
+                case "project":
                 {
-                    return BadRequest("To be implemented!");
+                    return await _projectResourceHandler.MarkProjectDependantResources(resourceId);
                 }
                 case "metadata":
                 {

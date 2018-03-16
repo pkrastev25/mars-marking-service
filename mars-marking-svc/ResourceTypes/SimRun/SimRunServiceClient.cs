@@ -32,7 +32,7 @@ namespace mars_marking_svc.ResourceTypes.SimRun
             if (response.StatusCode != HttpStatusCode.OK)
             {
                 throw new FailedToGetResourceException(
-                    $"Failed to get simRun resource with id: {simRunId} and projectId: {projectId} from sim-runner-svc!"
+                    $"Failed to get simRun with id: {simRunId} and projectId: {projectId} from sim-runner-svc!"
                 );
             }
 
@@ -50,7 +50,7 @@ namespace mars_marking_svc.ResourceTypes.SimRun
             if (response.StatusCode != HttpStatusCode.OK)
             {
                 throw new FailedToGetResourceException(
-                    $"Failed to get simRun resources for simPlanId: {simPlanId} and projectId: {projectId} from sim-runner-svc!"
+                    $"Failed to get simRuns for simPlanId: {simPlanId} and projectId: {projectId} from sim-runner-svc!"
                 );
             }
 
@@ -66,7 +66,7 @@ namespace mars_marking_svc.ResourceTypes.SimRun
             if (response.StatusCode != HttpStatusCode.OK)
             {
                 throw new FailedToGetResourceException(
-                    $"Failed to get simRun resources for projectId: {projectId} from sim-runner-svc!"
+                    $"Failed to get simRuns for projectId: {projectId} from sim-runner-svc!"
                 );
             }
 
@@ -85,8 +85,6 @@ namespace mars_marking_svc.ResourceTypes.SimRun
 
         public async Task<MarkedResourceModel> MarkSimRun(SimRunModel simRunModel, string projectId)
         {
-            // TODO: Consider the other states -> Running, Paused before Aborting
-
             var response = await _httpService.PutAsync(
                 "http://sim-runner-svc/simrun",
                 new SimRunUpdateModel
@@ -99,7 +97,7 @@ namespace mars_marking_svc.ResourceTypes.SimRun
             if (response.StatusCode != HttpStatusCode.OK)
             {
                 throw new FailedToUpdateResourceException(
-                    $"Failed to update simRun resource with id: {simRunModel.Id} and projectId: {projectId} from sim-runner-svc!"
+                    $"Failed to update simRun with id: {simRunModel.Id} and projectId: {projectId} from sim-runner-svc!"
                 );
             }
 

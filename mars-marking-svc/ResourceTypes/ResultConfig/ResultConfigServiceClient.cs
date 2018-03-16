@@ -4,7 +4,8 @@ using System.Net;
 using System.Threading.Tasks;
 using mars_marking_svc.Exceptions;
 using mars_marking_svc.Models;
-using mars_marking_svc.ResourceTypes.Metadata.Models;
+using mars_marking_svc.ResourceTypes.Metadata.Interfaces;
+using mars_marking_svc.ResourceTypes.ResultConfig.Interfaces;
 using mars_marking_svc.ResourceTypes.ResultConfig.Models;
 using mars_marking_svc.Services.Models;
 using Newtonsoft.Json;
@@ -35,13 +36,34 @@ namespace mars_marking_svc.ResourceTypes.ResultConfig
             if (response.StatusCode != HttpStatusCode.OK)
             {
                 throw new FailedToGetResourceException(
-                    $"Failed to get result config resource with id: {resultConfigId} from resultcfg-svc!"
+                    $"Failed to get resultConfig with id: {resultConfigId} from resultcfg-svc!"
                 );
             }
 
             var jsonResponse = await response.Content.ReadAsStringAsync();
 
             return JsonConvert.DeserializeObject<ResultConfigResponseModel>(jsonResponse).ResultConfigModel;
+        }
+
+        public async Task<List<ResultConfigModel>> GetResultConfigsForMetadata(string metadataId)
+        {
+            var response =
+                await _httpService.GetAsync($"http://resultcfg-svc/api/ResultConfigs?modelDataId={metadataId}");
+
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                throw new FailedToGetResourceException(
+                    $"Failed to get resultConfigs for metadataId: {metadataId} from resultcfg-svc!"
+                );
+            }
+
+            var jsonResponse = await response.Content.ReadAsStringAsync();
+            var resultConfigResponseModel =
+                JsonConvert.DeserializeObject<List<ResultConfigResponseModel>>(jsonResponse);
+
+            return resultConfigResponseModel
+                .Select(responseModel => responseModel.ResultConfigModel)
+                .ToList();
         }
 
         public async Task<MarkedResourceModel> MarkResultConfig(string resultConfigId)
@@ -58,33 +80,12 @@ namespace mars_marking_svc.ResourceTypes.ResultConfig
             var markedMetadataForResultConfig = await _metadataServiceClient.MarkMetadata(metadataForResultConfig);
             var markedResource = new MarkedResourceModel
             {
-                resourceType = "result-config",
+                resourceType = "resultConfig",
                 resourceId = resultConfigModel.ConfigId
             };
             _loggerService.LogMarkedResource(markedResource);
 
             return markedResource;
-        }
-
-        public async Task<List<ResultConfigModel>> GetResultConfigsForMetadata(string metadataId)
-        {
-            var response =
-                await _httpService.GetAsync($"http://resultcfg-svc/api/ResultConfigs?modelDataId={metadataId}");
-
-            if (response.StatusCode != HttpStatusCode.OK)
-            {
-                throw new FailedToGetResourceException(
-                    $"Failed to get result config resources for metadataId: {metadataId} from resultcfg-svc!"
-                );
-            }
-
-            var jsonResponse = await response.Content.ReadAsStringAsync();
-            var resultConfigResponseModel =
-                JsonConvert.DeserializeObject<List<ResultConfigResponseModel>>(jsonResponse);
-
-            return resultConfigResponseModel
-                .Select(responseModel => responseModel.ResultConfigModel)
-                .ToList();
         }
     }
 }

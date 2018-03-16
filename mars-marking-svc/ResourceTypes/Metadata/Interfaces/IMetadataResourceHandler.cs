@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
-namespace mars_marking_svc.ResourceTypes.Metadata.Models
+namespace mars_marking_svc.ResourceTypes.Metadata.Interfaces
 {
     public interface IMetadataResourceHandler
     {

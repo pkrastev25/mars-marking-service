@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using mars_marking_svc.Exceptions;
 using mars_marking_svc.Models;
-using mars_marking_svc.ResourceTypes.SimPlan.Models;
+using mars_marking_svc.ResourceTypes.SimPlan.Interfaces;
 using mars_marking_svc.ResourceTypes.SimRun.Interfaces;
 using mars_marking_svc.Services.Models;
 using Microsoft.AspNetCore.Mvc;

@@ -1,8 +1,8 @@
 ﻿using System.Threading.Tasks;
-using mars_marking_svc.ResourceTypes.Metadata.Models;
-using mars_marking_svc.ResourceTypes.ResultConfig.Models;
-using mars_marking_svc.ResourceTypes.Scenario.Models;
-using mars_marking_svc.ResourceTypes.SimPlan.Models;
+using mars_marking_svc.ResourceTypes.Metadata.Interfaces;
+using mars_marking_svc.ResourceTypes.ResultConfig.Interfaces;
+using mars_marking_svc.ResourceTypes.Scenario.Interfaces;
+using mars_marking_svc.ResourceTypes.SimPlan.Interfaces;
 using mars_marking_svc.ResourceTypes.SimRun.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -56,7 +56,7 @@ namespace mars_marking_svc.Controllers
 
             switch (resourceType)
             {
-                case "project_contents":
+                case "projectContents":
                 {
                     return BadRequest("To be implemented!");
                 }
@@ -68,7 +68,7 @@ namespace mars_marking_svc.Controllers
                 {
                     return await _scenarioResourceHandler.MarkScenarioDependantResources(resourceId, projectId);
                 }
-                case "result-config":
+                case "resultConfig":
                 {
                     return await _resultConfigResourceHandler.MarkResultConfigDependantResources(resourceId, projectId);
                 }

@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using mars_marking_svc.Exceptions;
 using mars_marking_svc.Models;
-using mars_marking_svc.ResourceTypes.Metadata.Models;
-using mars_marking_svc.ResourceTypes.ResultConfig.Models;
-using mars_marking_svc.ResourceTypes.Scenario.Models;
+using mars_marking_svc.ResourceTypes.Metadata.Interfaces;
+using mars_marking_svc.ResourceTypes.ResultConfig.Interfaces;
+using mars_marking_svc.ResourceTypes.Scenario.Interfaces;
+using mars_marking_svc.ResourceTypes.SimPlan.Interfaces;
 using mars_marking_svc.ResourceTypes.SimPlan.Models;
 using mars_marking_svc.ResourceTypes.SimRun.Interfaces;
 using mars_marking_svc.ResourceTypes.SimRun.Models;
@@ -61,10 +62,10 @@ namespace mars_marking_svc.ResourceTypes.Metadata
                 var resultConfigsForMetadata = await _resultConfigServiceClient.GetResultConfigsForMetadata(metadataId);
                 foreach (var resultConfigModel in resultConfigsForMetadata)
                 {
-                    // The result configs obey the metadata mark!
+                    // The resultConfigs obey the metadata mark!
                     var markedResultConfig = new MarkedResourceModel
                     {
-                        resourceType = "result-config",
+                        resourceType = "resultConfig",
                         resourceId = resultConfigModel.ConfigId
                     };
                     _loggerService.LogMarkedResource(markedResultConfig);

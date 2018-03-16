@@ -3,6 +3,7 @@ using System.Net;
 using System.Threading.Tasks;
 using mars_marking_svc.Exceptions;
 using mars_marking_svc.Models;
+using mars_marking_svc.ResourceTypes.Metadata.Interfaces;
 using mars_marking_svc.ResourceTypes.Metadata.Models;
 using mars_marking_svc.Services.Models;
 using Newtonsoft.Json;
@@ -30,7 +31,7 @@ namespace mars_marking_svc.ResourceTypes.Metadata
             if (response.StatusCode != HttpStatusCode.OK)
             {
                 throw new FailedToGetResourceException(
-                    $"Failed to get metadata resource with id: {metadataId} from metadata-svc!"
+                    $"Failed to get metadata with id: {metadataId} from metadata-svc!"
                 );
             }
 
@@ -39,6 +40,22 @@ namespace mars_marking_svc.ResourceTypes.Metadata
             return JsonConvert.DeserializeObject<MetadataModel>(jsonResponse);
         }
 
+        public async Task<List<MetadataModel>> GetMetadataForProject(string projectId)
+        {
+            var response = await _httpService.GetAsync($"http://metadata-svc/metadata?project={projectId}");
+
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                throw new FailedToGetResourceException(
+                    $"Failed to get metadata for projectId: {projectId} from metadata-svc!"
+                );
+            }
+
+            var jsonResponse = await response.Content.ReadAsStringAsync();
+
+            return JsonConvert.DeserializeObject<List<MetadataModel>>(jsonResponse);
+        }
+        
         public async Task<MarkedResourceModel> MarkMetadata(string metadataId)
         {
             var metadata = await GetMetadata(metadataId);
@@ -51,14 +68,14 @@ namespace mars_marking_svc.ResourceTypes.Metadata
             if (MetadataModel.ToBeDeletedState.Equals(metadataModel.State))
             {
                 throw new ResourceAlreadyMarkedException(
-                    $"Cannot mark metadata resource with id: {metadataModel.DataId}, it is already marked!"
+                    $"Cannot mark metadata with id: {metadataModel.DataId}, it is already marked!"
                 );
             }
 
             if (!MetadataModel.FinishedState.Equals(metadataModel.State))
             {
                 throw new CannotMarkResourceException(
-                    $"Cannot mark metadata resource with id: {metadataModel.DataId}, it must be in state: {MetadataModel.FinishedState} beforehand!"
+                    $"Cannot mark metadata with id: {metadataModel.DataId}, it must be in state: {MetadataModel.FinishedState} beforehand!"
                 );
             }
 
@@ -72,7 +89,7 @@ namespace mars_marking_svc.ResourceTypes.Metadata
             if (response.StatusCode != HttpStatusCode.OK)
             {
                 throw new FailedToUpdateResourceException(
-                    $"Failed to update metadata resource with id: {metadataModel.DataId} from metadata-svc!"
+                    $"Failed to update metadata with id: {metadataModel.DataId} from metadata-svc!"
                 );
             }
 
@@ -84,22 +101,6 @@ namespace mars_marking_svc.ResourceTypes.Metadata
             _loggerService.LogMarkedResource(markedResource);
 
             return markedResource;
-        }
-
-        public async Task<List<MetadataModel>> GetMetadataForProject(string projectId)
-        {
-            var response = await _httpService.GetAsync($"http://metadata-svc/metadata?project={projectId}");
-
-            if (response.StatusCode != HttpStatusCode.OK)
-            {
-                throw new FailedToGetResourceException(
-                    $"Failed to get metadata resources for projectId: {projectId} from metadata-svc!"
-                );
-            }
-
-            var jsonResponse = await response.Content.ReadAsStringAsync();
-
-            return JsonConvert.DeserializeObject<List<MetadataModel>>(jsonResponse);
         }
     }
 }

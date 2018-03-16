@@ -1,12 +1,12 @@
 ﻿using System.Net.Http;
 using mars_marking_svc.ResourceTypes.Metadata;
-using mars_marking_svc.ResourceTypes.Metadata.Models;
+using mars_marking_svc.ResourceTypes.Metadata.Interfaces;
 using mars_marking_svc.ResourceTypes.ResultConfig;
-using mars_marking_svc.ResourceTypes.ResultConfig.Models;
+using mars_marking_svc.ResourceTypes.ResultConfig.Interfaces;
 using mars_marking_svc.ResourceTypes.Scenario;
-using mars_marking_svc.ResourceTypes.Scenario.Models;
+using mars_marking_svc.ResourceTypes.Scenario.Interfaces;
 using mars_marking_svc.ResourceTypes.SimPlan;
-using mars_marking_svc.ResourceTypes.SimPlan.Models;
+using mars_marking_svc.ResourceTypes.SimPlan.Interfaces;
 using mars_marking_svc.ResourceTypes.SimRun;
 using mars_marking_svc.ResourceTypes.SimRun.Interfaces;
 using mars_marking_svc.Services;

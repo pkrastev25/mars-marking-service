@@ -5,6 +5,6 @@ namespace mars_marking_svc.ResourceTypes.Scenario.Models
 {
     public interface IScenarioResourceHandler
     {
-        Task<IActionResult> MarkScenarioDependantResources(string scenarioId);
+        Task<IActionResult> MarkScenarioDependantResources(string scenarioId, string projectId);
     }
 }

@@ -1,48 +1,36 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using mars_marking_svc.Exceptions;
 using mars_marking_svc.Models;
-using mars_marking_svc.ResourceTypes.Scenario.Models;
 using mars_marking_svc.ResourceTypes.SimPlan.Models;
 using mars_marking_svc.Services.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Server.Kestrel.Internal.System.Collections.Sequences;
 
-namespace mars_marking_svc.ResourceTypes.Scenario
+namespace mars_marking_svc.ResourceTypes.SimPlan
 {
-    public class ScenarioResourceHandler : IScenarioResourceHandler
+    public class SimPlanResourceHandler : ISimPlanResourceHandler
     {
-        private readonly ILoggerService _loggerService;
-        private readonly IScenarioServiceClient _scenarioServiceClient;
         private readonly ISimPlanServiceClient _simPlanServiceClient;
+        private readonly ILoggerService _loggerService;
 
-        public ScenarioResourceHandler(
-            IScenarioServiceClient scenarioServiceClient,
+        public SimPlanResourceHandler(
             ISimPlanServiceClient simPlanServiceClient,
             ILoggerService loggerService
         )
         {
-            _scenarioServiceClient = scenarioServiceClient;
             _simPlanServiceClient = simPlanServiceClient;
             _loggerService = loggerService;
         }
 
-        public async Task<IActionResult> MarkScenarioDependantResources(string scenarioId, string projectId)
+        public async Task<IActionResult> MarkSimPlanDependantResources(string simPlanId, string projectId)
         {
-            var markedResources = new ArrayList<MarkedResourceModel>();
+            var markedResources = new List<MarkedResourceModel>();
 
             try
             {
-                var sourceScenario = await _scenarioServiceClient.MarkScenario(scenarioId);
-                markedResources.Add(sourceScenario);
-
-                var simPlansForScenario = await _simPlanServiceClient.GetSimPlansForScenario(scenarioId, projectId);
-                foreach (var simPlanModel in simPlansForScenario)
-                {
-                    markedResources.Add(
-                        await _simPlanServiceClient.MarkSimPlan(simPlanModel, projectId)
-                    );
-                }
+                var sourceSimPlan = await _simPlanServiceClient.MarkSimPlan(simPlanId, projectId);
+                markedResources.Add(sourceSimPlan);
 
                 return new OkObjectResult(markedResources);
             }

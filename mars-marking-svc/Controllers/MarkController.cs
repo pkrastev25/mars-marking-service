@@ -2,6 +2,7 @@
 using mars_marking_svc.ResourceTypes.Metadata.Models;
 using mars_marking_svc.ResourceTypes.ResultConfig.Models;
 using mars_marking_svc.ResourceTypes.Scenario.Models;
+using mars_marking_svc.ResourceTypes.SimPlan.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace mars_marking_svc.Controllers
@@ -12,21 +13,43 @@ namespace mars_marking_svc.Controllers
         private readonly IMetadataResourceHandler _metadataResourceHandler;
         private readonly IScenarioResourceHandler _scenarioResourceHandler;
         private readonly IResultConfigResourceHandler _resultConfigResourceHandler;
+        private readonly ISimPlanResourceHandler _simPlanResourceHandler;
 
         public MarkController(
             IMetadataResourceHandler metadataResourceHandler,
             IScenarioResourceHandler scenarioResourceHandler,
-            IResultConfigResourceHandler resultConfigResourceHandler
+            IResultConfigResourceHandler resultConfigResourceHandler,
+            ISimPlanResourceHandler simPlanResourceHandler
         )
         {
             _metadataResourceHandler = metadataResourceHandler;
             _scenarioResourceHandler = scenarioResourceHandler;
             _resultConfigResourceHandler = resultConfigResourceHandler;
+            _simPlanResourceHandler = simPlanResourceHandler;
         }
 
         [HttpGet("{resourceType}/{resourceId}")]
-        public async Task<IActionResult> MarkResources(string resourceType, string resourceId)
+        public async Task<IActionResult> MarkResources(
+            string resourceType,
+            string resourceId,
+            [FromQuery(Name = "projectId")] string projectId
+        )
         {
+            if (string.IsNullOrEmpty(resourceType))
+            {
+                return BadRequest("resourceType is not specified!");
+            }
+
+            if (string.IsNullOrEmpty(resourceId))
+            {
+                return BadRequest("resourceId is not specified!");
+            }
+            
+            if (string.IsNullOrEmpty(projectId))
+            {
+                return BadRequest("projectId is not specified!");
+            }
+
             switch (resourceType)
             {
                 case "project_contents":
@@ -35,19 +58,23 @@ namespace mars_marking_svc.Controllers
                 }
                 case "metadata":
                 {
-                    return await _metadataResourceHandler.MarkMetadataDependantResources(resourceId);
+                    return await _metadataResourceHandler.MarkMetadataDependantResources(resourceId, projectId);
                 }
                 case "scenario":
                 {
-                    return await _scenarioResourceHandler.MarkScenarioDependantResources(resourceId);
+                    return await _scenarioResourceHandler.MarkScenarioDependantResources(resourceId, projectId);
                 }
                 case "result-config":
                 {
-                    return await _resultConfigResourceHandler.MarkResultConfigDependantResources(resourceId);
+                    return await _resultConfigResourceHandler.MarkResultConfigDependantResources(resourceId, projectId);
+                }
+                case "simPlan":
+                {
+                    return await _simPlanResourceHandler.MarkSimPlanDependantResources(resourceId, projectId);
                 }
                 default:
                 {
-                    return BadRequest("Specified resource resourceType is unknown!");
+                    return BadRequest("resourceType is unknown!");
                 }
             }
         }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using mars_marking_svc.Exceptions;
 using mars_marking_svc.Models;
+using mars_marking_svc.ResourceTypes.ResultData.Interfaces;
 using mars_marking_svc.ResourceTypes.SimPlan.Interfaces;
 using mars_marking_svc.ResourceTypes.SimRun.Interfaces;
 using mars_marking_svc.Services.Models;
@@ -14,16 +15,19 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
     {
         private readonly ISimPlanServiceClient _simPlanServiceClient;
         private readonly ISimRunServiceClient _simRunServiceClient;
+        private readonly IResultDataServiceClient _resultDataServiceClient;
         private readonly ILoggerService _loggerService;
 
         public SimPlanResourceHandler(
             ISimPlanServiceClient simPlanServiceClient,
             ISimRunServiceClient simRunServiceClient,
+            IResultDataServiceClient resultDataServiceClient,
             ILoggerService loggerService
         )
         {
             _simPlanServiceClient = simPlanServiceClient;
             _simRunServiceClient = simRunServiceClient;
+            _resultDataServiceClient = resultDataServiceClient;
             _loggerService = loggerService;
         }
 
@@ -41,6 +45,13 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
                 {
                     markedResources.Add(
                         await _simRunServiceClient.MarkSimRun(simRunModel, projectId)
+                    );
+                }
+                
+                foreach (var simRunModel in simRunsForSimPlan)
+                {
+                    markedResources.Add(
+                        await _resultDataServiceClient.MarkResultData(simRunModel)
                     );
                 }
 

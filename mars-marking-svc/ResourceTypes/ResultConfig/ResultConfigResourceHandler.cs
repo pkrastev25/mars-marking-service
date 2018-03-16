@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using mars_marking_svc.Exceptions;
 using mars_marking_svc.Models;
 using mars_marking_svc.ResourceTypes.ResultConfig.Interfaces;
+using mars_marking_svc.ResourceTypes.ResultData.Interfaces;
 using mars_marking_svc.ResourceTypes.SimPlan.Interfaces;
 using mars_marking_svc.ResourceTypes.SimRun.Interfaces;
 using mars_marking_svc.ResourceTypes.SimRun.Models;
@@ -17,18 +18,21 @@ namespace mars_marking_svc.ResourceTypes.ResultConfig
         private readonly IResultConfigServiceClient _resultConfigServiceClient;
         private readonly ISimPlanServiceClient _simPlanServiceClient;
         private readonly ISimRunServiceClient _simRunServiceClient;
+        private readonly IResultDataServiceClient _resultDataServiceClient;
         private readonly ILoggerService _loggerService;
 
         public ResultConfigResourceHandler(
             IResultConfigServiceClient resultConfigServiceClient,
             ISimPlanServiceClient simPlanServiceClient,
             ISimRunServiceClient simRunServiceClient,
+            IResultDataServiceClient resultDataServiceClient,
             ILoggerService loggerService
         )
         {
             _resultConfigServiceClient = resultConfigServiceClient;
             _simPlanServiceClient = simPlanServiceClient;
             _simRunServiceClient = simRunServiceClient;
+            _resultDataServiceClient = resultDataServiceClient;
             _loggerService = loggerService;
         }
 
@@ -61,6 +65,13 @@ namespace mars_marking_svc.ResourceTypes.ResultConfig
                 {
                     markedResources.Add(
                         await _simRunServiceClient.MarkSimRun(simRunModel, projectId)
+                    );
+                }
+
+                foreach (var simRunModel in simRunsForSimPlans)
+                {
+                    markedResources.Add(
+                        await _resultDataServiceClient.MarkResultData(simRunModel)
                     );
                 }
 

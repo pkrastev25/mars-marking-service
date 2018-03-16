@@ -8,6 +8,7 @@ using mars_marking_svc.ResourceTypes.Metadata.Interfaces;
 using mars_marking_svc.ResourceTypes.ProjectContents.Interfaces;
 using mars_marking_svc.ResourceTypes.ResultConfig.Interfaces;
 using mars_marking_svc.ResourceTypes.ResultConfig.Models;
+using mars_marking_svc.ResourceTypes.ResultData.Interfaces;
 using mars_marking_svc.ResourceTypes.Scenario.Interfaces;
 using mars_marking_svc.ResourceTypes.SimPlan.Interfaces;
 using mars_marking_svc.ResourceTypes.SimRun.Interfaces;
@@ -23,6 +24,7 @@ namespace mars_marking_svc.ResourceTypes.ProjectContents
         private readonly IResultConfigServiceClient _resultConfigServiceClient;
         private readonly ISimPlanServiceClient _simPlanServiceClient;
         private readonly ISimRunServiceClient _simRunServiceClient;
+        private readonly IResultDataServiceClient _resultDataServiceClient;
         private readonly ILoggerService _loggerService;
 
         public ProjectResourceHandler(
@@ -31,6 +33,7 @@ namespace mars_marking_svc.ResourceTypes.ProjectContents
             IResultConfigServiceClient resultConfigServiceClient,
             ISimPlanServiceClient simPlanServiceClient,
             ISimRunServiceClient simRunServiceClient,
+            IResultDataServiceClient resultDataServiceClient,
             ILoggerService loggerService
         )
         {
@@ -39,6 +42,7 @@ namespace mars_marking_svc.ResourceTypes.ProjectContents
             _resultConfigServiceClient = resultConfigServiceClient;
             _simPlanServiceClient = simPlanServiceClient;
             _simRunServiceClient = simRunServiceClient;
+            _resultDataServiceClient = resultDataServiceClient;
             _loggerService = loggerService;
         }
 
@@ -95,6 +99,13 @@ namespace mars_marking_svc.ResourceTypes.ProjectContents
                 {
                     markedResources.Add(
                         await _simRunServiceClient.MarkSimRun(simRunModel, projectId)
+                    );
+                }
+
+                foreach (var simRunModel in simRunsForProject)
+                {
+                    markedResources.Add(
+                        await _resultDataServiceClient.MarkResultData(simRunModel)
                     );
                 }
 

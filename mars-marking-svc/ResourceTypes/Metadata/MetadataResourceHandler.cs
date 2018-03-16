@@ -5,6 +5,7 @@ using mars_marking_svc.Exceptions;
 using mars_marking_svc.Models;
 using mars_marking_svc.ResourceTypes.Metadata.Interfaces;
 using mars_marking_svc.ResourceTypes.ResultConfig.Interfaces;
+using mars_marking_svc.ResourceTypes.ResultData.Interfaces;
 using mars_marking_svc.ResourceTypes.Scenario.Interfaces;
 using mars_marking_svc.ResourceTypes.SimPlan.Interfaces;
 using mars_marking_svc.ResourceTypes.SimPlan.Models;
@@ -22,6 +23,7 @@ namespace mars_marking_svc.ResourceTypes.Metadata
         private readonly IResultConfigServiceClient _resultConfigServiceClient;
         private readonly ISimPlanServiceClient _simPlanServiceClient;
         private readonly ISimRunServiceClient _simRunServiceClient;
+        private readonly IResultDataServiceClient _resultDataServiceClient;
         private readonly ILoggerService _loggerService;
 
         public MetadataResourceHandler(
@@ -30,6 +32,7 @@ namespace mars_marking_svc.ResourceTypes.Metadata
             IResultConfigServiceClient resultConfigServiceClient,
             ISimPlanServiceClient simPlanServiceClient,
             ISimRunServiceClient simRunServiceClient,
+            IResultDataServiceClient resultDataServiceClient,
             ILoggerService loggerService
         )
         {
@@ -38,6 +41,7 @@ namespace mars_marking_svc.ResourceTypes.Metadata
             _resultConfigServiceClient = resultConfigServiceClient;
             _simPlanServiceClient = simPlanServiceClient;
             _simRunServiceClient = simRunServiceClient;
+            _resultDataServiceClient = resultDataServiceClient;
             _loggerService = loggerService;
         }
 
@@ -61,7 +65,7 @@ namespace mars_marking_svc.ResourceTypes.Metadata
                 var resultConfigsForMetadata = await _resultConfigServiceClient.GetResultConfigsForMetadata(metadataId);
                 foreach (var resultConfigModel in resultConfigsForMetadata)
                 {
-                    // The resultConfigs obey the metadata mark!
+                    // ResultConfigs obey the metadata mark!
                     var markedResultConfig = new MarkedResourceModel
                     {
                         ResourceType = "resultConfig",
@@ -96,6 +100,13 @@ namespace mars_marking_svc.ResourceTypes.Metadata
                 {
                     markedResources.Add(
                         await _simRunServiceClient.MarkSimRun(simRunModel, projectId)
+                    );
+                }
+
+                foreach (var simRunModel in simRunsForSimPlans)
+                {
+                    markedResources.Add(
+                        await _resultDataServiceClient.MarkResultData(simRunModel)
                     );
                 }
 

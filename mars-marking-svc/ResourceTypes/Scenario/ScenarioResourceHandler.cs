@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using mars_marking_svc.Exceptions;
 using mars_marking_svc.Models;
+using mars_marking_svc.ResourceTypes.ResultData.Interfaces;
 using mars_marking_svc.ResourceTypes.Scenario.Interfaces;
 using mars_marking_svc.ResourceTypes.SimPlan.Interfaces;
 using mars_marking_svc.ResourceTypes.SimRun.Interfaces;
@@ -18,17 +19,20 @@ namespace mars_marking_svc.ResourceTypes.Scenario
         private readonly IScenarioServiceClient _scenarioServiceClient;
         private readonly ISimPlanServiceClient _simPlanServiceClient;
         private readonly ISimRunServiceClient _simRunServiceClient;
+        private readonly IResultDataServiceClient _resultDataServiceClient;
 
         public ScenarioResourceHandler(
             IScenarioServiceClient scenarioServiceClient,
             ISimPlanServiceClient simPlanServiceClient,
             ISimRunServiceClient simRunServiceClient,
+            IResultDataServiceClient resultDataServiceClient,
             ILoggerService loggerService
         )
         {
             _scenarioServiceClient = scenarioServiceClient;
             _simPlanServiceClient = simPlanServiceClient;
             _simRunServiceClient = simRunServiceClient;
+            _resultDataServiceClient = resultDataServiceClient;
             _loggerService = loggerService;
         }
 
@@ -60,6 +64,13 @@ namespace mars_marking_svc.ResourceTypes.Scenario
                 {
                     markedResources.Add(
                         await _simRunServiceClient.MarkSimRun(simRunModel.Id, projectId)
+                    );
+                }
+                
+                foreach (var simRunModel in simRunsForSimPlans)
+                {
+                    markedResources.Add(
+                        await _resultDataServiceClient.MarkResultData(simRunModel)
                     );
                 }
 

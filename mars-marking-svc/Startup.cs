@@ -5,6 +5,8 @@ using mars_marking_svc.ResourceTypes.ProjectContents;
 using mars_marking_svc.ResourceTypes.ProjectContents.Interfaces;
 using mars_marking_svc.ResourceTypes.ResultConfig;
 using mars_marking_svc.ResourceTypes.ResultConfig.Interfaces;
+using mars_marking_svc.ResourceTypes.ResultData;
+using mars_marking_svc.ResourceTypes.ResultData.Interfaces;
 using mars_marking_svc.ResourceTypes.Scenario;
 using mars_marking_svc.ResourceTypes.Scenario.Interfaces;
 using mars_marking_svc.ResourceTypes.SimPlan;
@@ -47,6 +49,8 @@ namespace mars_marking_svc
             services.AddTransient<ISimRunServiceClient, SimRunServiceClient>();
             services.AddTransient<ISimRunResourceHandler, SimRunResourceHandler>();
             services.AddTransient<IProjectResourceHandler, ProjectResourceHandler>();
+            services.AddTransient<IResultDataServiceClient, ResultDataServiceClient>();
+            services.AddTransient<IResultDataResourceHandler, ResultDataResourceHandler>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

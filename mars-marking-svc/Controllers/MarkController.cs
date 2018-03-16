@@ -3,6 +3,7 @@ using mars_marking_svc.ResourceTypes.Metadata.Models;
 using mars_marking_svc.ResourceTypes.ResultConfig.Models;
 using mars_marking_svc.ResourceTypes.Scenario.Models;
 using mars_marking_svc.ResourceTypes.SimPlan.Models;
+using mars_marking_svc.ResourceTypes.SimRun.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace mars_marking_svc.Controllers
@@ -14,18 +15,21 @@ namespace mars_marking_svc.Controllers
         private readonly IScenarioResourceHandler _scenarioResourceHandler;
         private readonly IResultConfigResourceHandler _resultConfigResourceHandler;
         private readonly ISimPlanResourceHandler _simPlanResourceHandler;
+        private readonly ISimRunResourceHandler _simRunResourceHandler;
 
         public MarkController(
             IMetadataResourceHandler metadataResourceHandler,
             IScenarioResourceHandler scenarioResourceHandler,
             IResultConfigResourceHandler resultConfigResourceHandler,
-            ISimPlanResourceHandler simPlanResourceHandler
+            ISimPlanResourceHandler simPlanResourceHandler,
+            ISimRunResourceHandler simRunResourceHandler
         )
         {
             _metadataResourceHandler = metadataResourceHandler;
             _scenarioResourceHandler = scenarioResourceHandler;
             _resultConfigResourceHandler = resultConfigResourceHandler;
             _simPlanResourceHandler = simPlanResourceHandler;
+            _simRunResourceHandler = simRunResourceHandler;
         }
 
         [HttpGet("{resourceType}/{resourceId}")]
@@ -44,7 +48,7 @@ namespace mars_marking_svc.Controllers
             {
                 return BadRequest("resourceId is not specified!");
             }
-            
+
             if (string.IsNullOrEmpty(projectId))
             {
                 return BadRequest("projectId is not specified!");
@@ -71,6 +75,10 @@ namespace mars_marking_svc.Controllers
                 case "simPlan":
                 {
                     return await _simPlanResourceHandler.MarkSimPlanDependantResources(resourceId, projectId);
+                }
+                case "simRun":
+                {
+                    return await _simRunResourceHandler.MarkSimRunDependantResources(resourceId, projectId);
                 }
                 default:
                 {

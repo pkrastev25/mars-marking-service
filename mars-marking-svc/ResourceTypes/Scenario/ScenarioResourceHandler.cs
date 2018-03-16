@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using mars_marking_svc.Exceptions;
 using mars_marking_svc.Models;
 using mars_marking_svc.ResourceTypes.Scenario.Models;
 using mars_marking_svc.ResourceTypes.SimPlan.Models;
+using mars_marking_svc.ResourceTypes.SimRun.Interfaces;
+using mars_marking_svc.ResourceTypes.SimRun.Models;
 using mars_marking_svc.Services.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Server.Kestrel.Internal.System.Collections.Sequences;
@@ -15,15 +18,18 @@ namespace mars_marking_svc.ResourceTypes.Scenario
         private readonly ILoggerService _loggerService;
         private readonly IScenarioServiceClient _scenarioServiceClient;
         private readonly ISimPlanServiceClient _simPlanServiceClient;
+        private readonly ISimRunServiceClient _simRunServiceClient;
 
         public ScenarioResourceHandler(
             IScenarioServiceClient scenarioServiceClient,
             ISimPlanServiceClient simPlanServiceClient,
+            ISimRunServiceClient simRunServiceClient,
             ILoggerService loggerService
         )
         {
             _scenarioServiceClient = scenarioServiceClient;
             _simPlanServiceClient = simPlanServiceClient;
+            _simRunServiceClient = simRunServiceClient;
             _loggerService = loggerService;
         }
 
@@ -41,6 +47,20 @@ namespace mars_marking_svc.ResourceTypes.Scenario
                 {
                     markedResources.Add(
                         await _simPlanServiceClient.MarkSimPlan(simPlanModel, projectId)
+                    );
+                }
+
+                var simRunsForSimPlans = new List<SimRunModel>();
+                foreach (var simPlanModel in simPlansForScenario)
+                {
+                    simRunsForSimPlans.AddRange(
+                        await _simRunServiceClient.GetSimRunsForSimPlan(simPlanModel.Id, projectId)
+                    );
+                }
+                foreach (var simRunModel in simRunsForSimPlans)
+                {
+                    markedResources.Add(
+                        await _simRunServiceClient.MarkSimRun(simRunModel.Id, projectId)
                     );
                 }
 

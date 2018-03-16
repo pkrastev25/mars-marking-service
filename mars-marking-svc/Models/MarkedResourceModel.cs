@@ -1,9 +1,13 @@
-﻿namespace mars_marking_svc.Models
+﻿using Newtonsoft.Json;
+
+namespace mars_marking_svc.Models
 {
     public class MarkedResourceModel
     {
-        public string resourceType { get; set; }
+        [JsonProperty("ResourceType")]
+        public string ResourceType { get; set; }
 
-        public string resourceId { get; set; }
+        [JsonProperty("ResourceId")]
+        public string ResourceId { get; set; }
     }
 }

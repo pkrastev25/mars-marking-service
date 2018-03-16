@@ -77,11 +77,11 @@ namespace mars_marking_svc.ResourceTypes.ResultConfig
         {
             var metadataForResultConfig = await _metadataServiceClient.GetMetadata(resultConfigModel.ModelId);
             // TODO: Do not forget to remove the marks later!
-            var markedMetadataForResultConfig = await _metadataServiceClient.MarkMetadata(metadataForResultConfig);
+            await _metadataServiceClient.MarkMetadata(metadataForResultConfig);
             var markedResource = new MarkedResourceModel
             {
-                resourceType = "resultConfig",
-                resourceId = resultConfigModel.ConfigId
+                ResourceType = "resultConfig",
+                ResourceId = resultConfigModel.ConfigId
             };
             _loggerService.LogMarkedResource(markedResource);
 

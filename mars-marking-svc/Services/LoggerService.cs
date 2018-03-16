@@ -9,7 +9,7 @@ namespace mars_marking_svc.Services
         public void LogMarkedResource(MarkedResourceModel model)
         {
             Console.WriteLine(
-                $"[SUCCESS] Marked {model.resourceType} with id: {model.resourceId}"
+                $"[SUCCESS] Marked {model.ResourceType} with id: {model.ResourceId}"
             );
         }
 

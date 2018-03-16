@@ -105,8 +105,8 @@ namespace mars_marking_svc.ResourceTypes.Scenario
 
             var markedResource = new MarkedResourceModel
             {
-                resourceType = "scenario",
-                resourceId = scenarioModel.ScenarioId
+                ResourceType = "scenario",
+                ResourceId = scenarioModel.ScenarioId
             };
             _loggerService.LogMarkedResource(markedResource);
 

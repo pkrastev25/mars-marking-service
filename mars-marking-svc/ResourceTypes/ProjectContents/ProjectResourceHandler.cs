@@ -76,8 +76,8 @@ namespace mars_marking_svc.ResourceTypes.ProjectContents
                     resultConfigsForMetadata.Select(
                         resultConfigModel => new MarkedResourceModel
                         {
-                            resourceType = "resultConfig",
-                            resourceId = resultConfigModel.ConfigId
+                            ResourceType = "resultConfig",
+                            ResourceId = resultConfigModel.ConfigId
                         }
                     )
                 );

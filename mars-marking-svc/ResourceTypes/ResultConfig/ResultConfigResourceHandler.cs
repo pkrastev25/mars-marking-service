@@ -9,7 +9,6 @@ using mars_marking_svc.ResourceTypes.SimRun.Interfaces;
 using mars_marking_svc.ResourceTypes.SimRun.Models;
 using mars_marking_svc.Services.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Server.Kestrel.Internal.System.Collections.Sequences;
 
 namespace mars_marking_svc.ResourceTypes.ResultConfig
 {

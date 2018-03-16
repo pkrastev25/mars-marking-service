@@ -126,8 +126,8 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
 
             var markedResource = new MarkedResourceModel
             {
-                resourceType = "simPlan",
-                resourceId = simPlanModel.Id
+                ResourceType = "simPlan",
+                ResourceId = simPlanModel.Id
             };
             _loggerService.LogMarkedResource(markedResource);
 

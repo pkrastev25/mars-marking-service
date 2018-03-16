@@ -95,8 +95,8 @@ namespace mars_marking_svc.ResourceTypes.Metadata
 
             var markedResource = new MarkedResourceModel
             {
-                resourceType = "metadata",
-                resourceId = metadataModel.DataId
+                ResourceType = "metadata",
+                ResourceId = metadataModel.DataId
             };
             _loggerService.LogMarkedResource(markedResource);
 

@@ -103,8 +103,8 @@ namespace mars_marking_svc.ResourceTypes.SimRun
 
             var markedResource = new MarkedResourceModel
             {
-                resourceType = "simRun",
-                resourceId = simRunModel.Id
+                ResourceType = "simRun",
+                ResourceId = simRunModel.Id
             };
             _loggerService.LogMarkedResource(markedResource);
 

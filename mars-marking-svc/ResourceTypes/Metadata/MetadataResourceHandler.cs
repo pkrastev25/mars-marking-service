@@ -12,7 +12,6 @@ using mars_marking_svc.ResourceTypes.SimRun.Interfaces;
 using mars_marking_svc.ResourceTypes.SimRun.Models;
 using mars_marking_svc.Services.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Server.Kestrel.Internal.System.Collections.Sequences;
 
 namespace mars_marking_svc.ResourceTypes.Metadata
 {
@@ -65,8 +64,8 @@ namespace mars_marking_svc.ResourceTypes.Metadata
                     // The resultConfigs obey the metadata mark!
                     var markedResultConfig = new MarkedResourceModel
                     {
-                        resourceType = "resultConfig",
-                        resourceId = resultConfigModel.ConfigId
+                        ResourceType = "resultConfig",
+                        ResourceId = resultConfigModel.ConfigId
                     };
                     _loggerService.LogMarkedResource(markedResultConfig);
                     markedResources.Add(markedResultConfig);

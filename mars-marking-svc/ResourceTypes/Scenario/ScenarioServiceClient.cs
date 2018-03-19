@@ -2,7 +2,7 @@
 using System.Net;
 using System.Threading.Tasks;
 using mars_marking_svc.Exceptions;
-using mars_marking_svc.Models;
+using mars_marking_svc.MarkedResource.Models;
 using mars_marking_svc.ResourceTypes.Scenario.Interfaces;
 using mars_marking_svc.ResourceTypes.Scenario.Models;
 using mars_marking_svc.Services.Models;
@@ -111,6 +111,29 @@ namespace mars_marking_svc.ResourceTypes.Scenario
             _loggerService.LogMarkedResource(markedResource);
 
             return markedResource;
+        }
+
+        public async Task UnmarkScenario(string scenarioId)
+        {
+            var scenarioModel = new ScenarioModel
+            {
+                ScenarioId = scenarioId,
+                ToBeDeleted = false
+            };
+
+            var response = await _httpService.PatchAsync(
+                $"http://scenario-svc/scenarios/{scenarioModel.ScenarioId}/metadata",
+                scenarioModel
+            );
+
+            if (response.StatusCode != HttpStatusCode.NoContent)
+            {
+                throw new FailedToUpdateResourceException(
+                    $"Failed to update scenario with id: {scenarioModel.ScenarioId} from scenario-svc!"
+                );
+            }
+
+            _loggerService.LogUnmarkResource("scenario", scenarioId);
         }
     }
 }

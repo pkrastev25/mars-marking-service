@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using mars_marking_svc.Exceptions;
-using mars_marking_svc.Models;
+using mars_marking_svc.MarkedResource.Models;
+using mars_marking_svc.ResourceTypes.MarkedResource.Interfaces;
 using mars_marking_svc.ResourceTypes.ResultData.Interfaces;
 using mars_marking_svc.ResourceTypes.Scenario.Interfaces;
 using mars_marking_svc.ResourceTypes.SimPlan.Interfaces;
@@ -20,12 +21,14 @@ namespace mars_marking_svc.ResourceTypes.Scenario
         private readonly ISimPlanServiceClient _simPlanServiceClient;
         private readonly ISimRunServiceClient _simRunServiceClient;
         private readonly IResultDataServiceClient _resultDataServiceClient;
+        private readonly IMarkedResourceHandler _markedResourceHandler;
 
         public ScenarioResourceHandler(
             IScenarioServiceClient scenarioServiceClient,
             ISimPlanServiceClient simPlanServiceClient,
             ISimRunServiceClient simRunServiceClient,
             IResultDataServiceClient resultDataServiceClient,
+            IMarkedResourceHandler markedResourceHandler,
             ILoggerService loggerService
         )
         {
@@ -33,6 +36,7 @@ namespace mars_marking_svc.ResourceTypes.Scenario
             _simPlanServiceClient = simPlanServiceClient;
             _simRunServiceClient = simRunServiceClient;
             _resultDataServiceClient = resultDataServiceClient;
+            _markedResourceHandler = markedResourceHandler;
             _loggerService = loggerService;
         }
 
@@ -66,7 +70,7 @@ namespace mars_marking_svc.ResourceTypes.Scenario
                         await _simRunServiceClient.MarkSimRun(simRunModel.Id, projectId)
                     );
                 }
-                
+
                 foreach (var simRunModel in simRunsForSimPlans)
                 {
                     markedResources.Add(
@@ -78,32 +82,37 @@ namespace mars_marking_svc.ResourceTypes.Scenario
             }
             catch (FailedToGetResourceException e)
             {
-                // TODO: Remove the marks
                 _loggerService.LogExceptionMessage(e);
+                var unused = _markedResourceHandler.UnmarkMarkedResources(markedResources, projectId);
+
                 return new StatusCodeResult(503);
             }
             catch (FailedToUpdateResourceException e)
             {
-                // TODO: Remove the marks
                 _loggerService.LogExceptionMessage(e);
+                var unused = _markedResourceHandler.UnmarkMarkedResources(markedResources, projectId);
+
                 return new StatusCodeResult(503);
             }
             catch (ResourceAlreadyMarkedException e)
             {
-                // TODO: Remove the marks
                 _loggerService.LogExceptionMessage(e);
+                var unused = _markedResourceHandler.UnmarkMarkedResources(markedResources, projectId);
+
                 return new StatusCodeResult(503);
             }
             catch (CannotMarkResourceException e)
             {
-                // TODO: Remove the marks
                 _loggerService.LogExceptionMessage(e);
+                var unused = _markedResourceHandler.UnmarkMarkedResources(markedResources, projectId);
+
                 return new StatusCodeResult(409);
             }
             catch (Exception e)
             {
-                // TODO: Remove the marks
                 _loggerService.LogExceptionMessageWithStackTrace(e);
+                var unused = _markedResourceHandler.UnmarkMarkedResources(markedResources, projectId);
+
                 return new StatusCodeResult(503);
             }
         }

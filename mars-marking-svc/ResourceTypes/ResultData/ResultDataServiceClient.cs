@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using mars_marking_svc.Models;
+using mars_marking_svc.MarkedResource.Models;
 using mars_marking_svc.ResourceTypes.ResultData.Interfaces;
 using mars_marking_svc.ResourceTypes.SimRun.Models;
 using mars_marking_svc.Services.Models;
@@ -35,6 +35,11 @@ namespace mars_marking_svc.ResourceTypes.ResultData
         public async Task<MarkedResourceModel> MarkResultData(SimRunModel simRunModel)
         {
             return await MarkResultData(simRunModel.SimulationId);
+        }
+
+        public async Task UnmarkResultData(string resultDataId)
+        {
+            await Task.Run(() => { _loggerService.LogUnmarkResource("resultData", resultDataId); });
         }
     }
 }

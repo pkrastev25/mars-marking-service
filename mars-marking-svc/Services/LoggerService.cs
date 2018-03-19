@@ -1,5 +1,5 @@
 ﻿using System;
-using mars_marking_svc.Models;
+using mars_marking_svc.MarkedResource.Models;
 using mars_marking_svc.Services.Models;
 
 namespace mars_marking_svc.Services
@@ -13,16 +13,28 @@ namespace mars_marking_svc.Services
             );
         }
 
-        public void LogExceptionMessage(Exception error)
+        public void LogUnmarkResource(string resourceType, string resourceId)
+        {
+            Console.WriteLine(
+                $"[SUCCESS] Unmarked {resourceType} with id: {resourceId}"
+            );
+        }
+
+        public void LogExceptionMessage(string exceptionMessage)
         {
             Console.Error.WriteLine(
-                $"[ERROR] {error.Message}"
+                $"[ERROR] {exceptionMessage}"
             );
+        }
+
+        public void LogExceptionMessage(Exception error)
+        {
+            LogExceptionMessage(error.Message);
         }
 
         public void LogExceptionMessageWithStackTrace(Exception error)
         {
-            Console.Error.WriteLine($"[ERROR] {error.Message}");
+            LogExceptionMessage(error.Message);
             Console.Error.WriteLine(error.StackTrace);
         }
     }

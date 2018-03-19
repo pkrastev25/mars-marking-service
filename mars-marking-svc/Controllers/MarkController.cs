@@ -90,7 +90,7 @@ namespace mars_marking_svc.Controllers
                 }
                 case "resultData":
                 {
-                    return await _resultDataResourceHandler.MarkResultDataDependantResources(resourceId);
+                    return await _resultDataResourceHandler.MarkResultDataDependantResources(resourceId, projectId);
                 }
                 default:
                 {

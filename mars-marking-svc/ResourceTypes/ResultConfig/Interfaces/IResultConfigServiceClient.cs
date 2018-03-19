@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using mars_marking_svc.Models;
+using mars_marking_svc.MarkedResource.Models;
 using mars_marking_svc.ResourceTypes.ResultConfig.Models;
 
 namespace mars_marking_svc.ResourceTypes.ResultConfig.Interfaces
@@ -14,5 +14,7 @@ namespace mars_marking_svc.ResourceTypes.ResultConfig.Interfaces
         Task<MarkedResourceModel> MarkResultConfig(string resultConfigId);
 
         Task<MarkedResourceModel> MarkResultConfig(ResultConfigModel resultConfigModel);
+
+        Task UnmarkResultConfig(string resultConfigId);
     }
 }

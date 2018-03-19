@@ -3,7 +3,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using mars_marking_svc.Exceptions;
-using mars_marking_svc.Models;
+using mars_marking_svc.MarkedResource.Models;
 using mars_marking_svc.ResourceTypes.Metadata.Interfaces;
 using mars_marking_svc.ResourceTypes.ResultConfig.Interfaces;
 using mars_marking_svc.ResourceTypes.ResultConfig.Models;
@@ -86,6 +86,14 @@ namespace mars_marking_svc.ResourceTypes.ResultConfig
             _loggerService.LogMarkedResource(markedResource);
 
             return markedResource;
+        }
+
+        public async Task UnmarkResultConfig(string resultConfigId)
+        {
+            var resultConfigModel = await GetResultConfig(resultConfigId);
+            var metadataForResultConfig = await _metadataServiceClient.GetMetadata(resultConfigModel.ModelId);
+            await _metadataServiceClient.UnmarkMetadata(metadataForResultConfig.DataId);
+            _loggerService.LogUnmarkResource("resultConfig", resultConfigId);
         }
     }
 }

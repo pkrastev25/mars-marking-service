@@ -2,7 +2,7 @@
 using System.Net;
 using System.Threading.Tasks;
 using mars_marking_svc.Exceptions;
-using mars_marking_svc.Models;
+using mars_marking_svc.MarkedResource.Models;
 using mars_marking_svc.ResourceTypes.Metadata.Interfaces;
 using mars_marking_svc.ResourceTypes.Metadata.Models;
 using mars_marking_svc.Services.Models;
@@ -55,7 +55,7 @@ namespace mars_marking_svc.ResourceTypes.Metadata
 
             return JsonConvert.DeserializeObject<List<MetadataModel>>(jsonResponse);
         }
-        
+
         public async Task<MarkedResourceModel> MarkMetadata(string metadataId)
         {
             var metadata = await GetMetadata(metadataId);
@@ -101,6 +101,29 @@ namespace mars_marking_svc.ResourceTypes.Metadata
             _loggerService.LogMarkedResource(markedResource);
 
             return markedResource;
+        }
+
+        public async Task UnmarkMetadata(string metadataId)
+        {
+            var metadataModel = new MetadataModel
+            {
+                DataId = metadataId,
+                State = MetadataModel.FinishedState
+            };
+
+            var response = await _httpService.PutAsync(
+                $"http://metadata-svc/metadata/{metadataModel.DataId}?state={MetadataModel.FinishedState}",
+                metadataModel
+            );
+
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                throw new FailedToUpdateResourceException(
+                    $"Failed to update metadata with id: {metadataModel.DataId} from metadata-svc!"
+                );
+            }
+
+            _loggerService.LogUnmarkResource("metadata", metadataId);
         }
     }
 }

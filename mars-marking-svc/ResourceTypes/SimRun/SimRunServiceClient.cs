@@ -2,7 +2,7 @@
 using System.Net;
 using System.Threading.Tasks;
 using mars_marking_svc.Exceptions;
-using mars_marking_svc.Models;
+using mars_marking_svc.MarkedResource.Models;
 using mars_marking_svc.ResourceTypes.SimRun.Interfaces;
 using mars_marking_svc.ResourceTypes.SimRun.Models;
 using mars_marking_svc.Services.Models;
@@ -109,6 +109,11 @@ namespace mars_marking_svc.ResourceTypes.SimRun
             _loggerService.LogMarkedResource(markedResource);
 
             return markedResource;
+        }
+
+        public async Task UnmarkSimRun(string simRunId, string projectId)
+        {
+            await Task.Run(() => { _loggerService.LogUnmarkResource("simRun", simRunId); });
         }
     }
 }

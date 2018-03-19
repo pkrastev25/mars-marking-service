@@ -1,4 +1,6 @@
 ﻿using System.Net.Http;
+using mars_marking_svc.ResourceTypes.MarkedResource;
+using mars_marking_svc.ResourceTypes.MarkedResource.Interfaces;
 using mars_marking_svc.ResourceTypes.Metadata;
 using mars_marking_svc.ResourceTypes.Metadata.Interfaces;
 using mars_marking_svc.ResourceTypes.ProjectContents;
@@ -51,6 +53,7 @@ namespace mars_marking_svc
             services.AddTransient<IProjectResourceHandler, ProjectResourceHandler>();
             services.AddTransient<IResultDataServiceClient, ResultDataServiceClient>();
             services.AddTransient<IResultDataResourceHandler, ResultDataResourceHandler>();
+            services.AddTransient<IMarkedResourceHandler, MarkedResourceHandler>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

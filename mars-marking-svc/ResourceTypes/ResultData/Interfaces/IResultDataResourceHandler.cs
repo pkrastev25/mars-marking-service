@@ -5,6 +5,6 @@ namespace mars_marking_svc.ResourceTypes.ResultData.Interfaces
 {
     public interface IResultDataResourceHandler
     {
-        Task<IActionResult> MarkResultDataDependantResources(string resultDataId);
+        Task<IActionResult> MarkResultDataDependantResources(string resultDataId, string projectId);
     }
 }

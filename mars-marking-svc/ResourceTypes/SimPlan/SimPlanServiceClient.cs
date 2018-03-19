@@ -2,7 +2,7 @@
 using System.Net;
 using System.Threading.Tasks;
 using mars_marking_svc.Exceptions;
-using mars_marking_svc.Models;
+using mars_marking_svc.MarkedResource.Models;
 using mars_marking_svc.ResourceTypes.SimPlan.Interfaces;
 using mars_marking_svc.ResourceTypes.SimPlan.Models;
 using mars_marking_svc.Services.Models;
@@ -40,7 +40,7 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
 
             return JsonConvert.DeserializeObject<SimPlanModel>(jsonResponse);
         }
-        
+
         public async Task<List<SimPlanModel>> GetSimPlansForScenario(string scenarioId, string projectId)
         {
             var response =
@@ -76,7 +76,7 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
 
             return JsonConvert.DeserializeObject<List<SimPlanModel>>(jsonResponse);
         }
-        
+
         public async Task<List<SimPlanModel>> GetSimPlansForProject(string projectId)
         {
             var response = await _httpService.GetAsync($"http://sim-runner-svc/simplan?projectid={projectId}");
@@ -132,6 +132,26 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
             _loggerService.LogMarkedResource(markedResource);
 
             return markedResource;
+        }
+
+        public async Task UnmarkSimPlan(string simPlanId, string projectId)
+        {
+            var simPlanModel = await GetSimPlan(simPlanId, projectId);
+            simPlanModel.ToBeDeleted = false;
+
+            var response = await _httpService.PutAsync(
+                $"http://sim-runner-svc/simplan?id={simPlanModel.Id}&projectid={projectId}",
+                simPlanModel
+            );
+
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                throw new FailedToUpdateResourceException(
+                    $"Failed to update simPlan with id: {simPlanModel.Id} and projectId: {projectId} from sim-runner-svc!"
+                );
+            }
+
+            _loggerService.LogUnmarkResource("simPlan", simPlanId);
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace mars_marking_svc.Models
+namespace mars_marking_svc.MarkedResource.Models
 {
     public class MarkedResourceModel
     {

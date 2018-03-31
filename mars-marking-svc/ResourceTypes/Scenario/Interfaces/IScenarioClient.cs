@@ -5,7 +5,7 @@ using mars_marking_svc.ResourceTypes.Scenario.Models;
 
 namespace mars_marking_svc.ResourceTypes.Scenario.Interfaces
 {
-    public interface IScenarioServiceClient
+    public interface IScenarioClient
     {
         Task<ScenarioModel> GetScenario(string scenarioId);
 

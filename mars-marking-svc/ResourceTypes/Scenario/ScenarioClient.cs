@@ -10,12 +10,12 @@ using Newtonsoft.Json;
 
 namespace mars_marking_svc.ResourceTypes.Scenario
 {
-    public class ScenarioServiceClient : IScenarioServiceClient
+    public class ScenarioClient : IScenarioClient
     {
         private readonly IHttpService _httpService;
         private readonly ILoggerService _loggerService;
 
-        public ScenarioServiceClient(
+        public ScenarioClient(
             IHttpService httpService,
             ILoggerService loggerService
         )

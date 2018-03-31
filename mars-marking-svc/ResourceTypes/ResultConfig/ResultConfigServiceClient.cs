@@ -11,12 +11,12 @@ using Newtonsoft.Json;
 
 namespace mars_marking_svc.ResourceTypes.ResultConfig
 {
-    public class ResultConfigServiceClient : IResultConfigServiceClient
+    public class ResultConfigClient : IResultConfigClient
     {
         private readonly IHttpService _httpService;
         private readonly ILoggerService _loggerService;
 
-        public ResultConfigServiceClient(
+        public ResultConfigClient(
             IHttpService httpService,
             ILoggerService loggerService
         )

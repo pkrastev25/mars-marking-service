@@ -11,26 +11,26 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
 {
     public class SimPlanResourceHandler : ISimPlanResourceHandler
     {
-        private readonly ISimPlanServiceClient _simPlanServiceClient;
-        private readonly ISimRunServiceClient _simRunServiceClient;
-        private readonly IResultDataServiceClient _resultDataServiceClient;
-        private readonly IDbService _dbService;
+        private readonly ISimPlanClient _simPlanClient;
+        private readonly ISimRunClient _simRunClient;
+        private readonly IResultDataClient _resultDataClient;
+        private readonly IDbMarkSessionClient _dbMarkSessionClient;
         private readonly ILoggerService _loggerService;
         private readonly IErrorHandlerService _errorHandlerService;
 
         public SimPlanResourceHandler(
-            ISimPlanServiceClient simPlanServiceClient,
-            ISimRunServiceClient simRunServiceClient,
-            IResultDataServiceClient resultDataServiceClient,
-            IDbService dbService,
+            ISimPlanClient simPlanClient,
+            ISimRunClient simRunClient,
+            IResultDataClient resultDataClient,
+            IDbMarkSessionClient dbMarkSessionClient,
             ILoggerService loggerService,
             IErrorHandlerService errorHandlerService
         )
         {
-            _simPlanServiceClient = simPlanServiceClient;
-            _simRunServiceClient = simRunServiceClient;
-            _resultDataServiceClient = resultDataServiceClient;
-            _dbService = dbService;
+            _simPlanClient = simPlanClient;
+            _simRunClient = simRunClient;
+            _resultDataClient = resultDataClient;
+            _dbMarkSessionClient = dbMarkSessionClient;
             _loggerService = loggerService;
             _errorHandlerService = errorHandlerService;
         }
@@ -41,29 +41,29 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
 
             try
             {
-                await _dbService.InsertNewMarkSession(markSessionModel);
+                await _dbMarkSessionClient.Create(markSessionModel);
 
-                var markedSourceSimPlan = await _simPlanServiceClient.MarkSimPlan(simPlanId, projectId);
+                var markedSourceSimPlan = await _simPlanClient.MarkSimPlan(simPlanId, projectId);
                 markSessionModel.DependantResources.Add(markedSourceSimPlan);
-                await _dbService.UpdateMarkSession(markSessionModel);
+                await _dbMarkSessionClient.Update(markSessionModel);
 
-                var simRunsForSimPlan = await _simRunServiceClient.GetSimRunsForSimPlan(simPlanId, projectId);
+                var simRunsForSimPlan = await _simRunClient.GetSimRunsForSimPlan(simPlanId, projectId);
                 foreach (var simRunModel in simRunsForSimPlan)
                 {
-                    var markedSimRun = await _simRunServiceClient.StopSimRun(simRunModel, projectId);
+                    var markedSimRun = await _simRunClient.StopSimRun(simRunModel, projectId);
                     markSessionModel.DependantResources.Add(markedSimRun);
-                    await _dbService.UpdateMarkSession(markSessionModel);
+                    await _dbMarkSessionClient.Update(markSessionModel);
                 }
 
                 foreach (var simRunModel in simRunsForSimPlan)
                 {
-                    var markedResultData = await _resultDataServiceClient.CreateMarkedResultData(simRunModel);
+                    var markedResultData = await _resultDataClient.CreateMarkedResultData(simRunModel);
                     markSessionModel.DependantResources.Add(markedResultData);
-                    await _dbService.UpdateMarkSession(markSessionModel);
+                    await _dbMarkSessionClient.Update(markSessionModel);
                 }
 
                 markSessionModel.State = DbMarkSessionModel.DoneState;
-                await _dbService.UpdateMarkSession(markSessionModel);
+                await _dbMarkSessionClient.Update(markSessionModel);
                 _loggerService.LogUpdateEvent(markSessionModel.ToString());
 
                 return new OkObjectResult(markSessionModel.DependantResources);

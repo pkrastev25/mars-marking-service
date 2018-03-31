@@ -4,7 +4,7 @@ using mars_marking_svc.ResourceTypes.SimRun.Models;
 
 namespace mars_marking_svc.ResourceTypes.ResultData.Interfaces
 {
-    public interface IResultDataServiceClient
+    public interface IResultDataClient
     {
         Task<MarkedResourceModel> CreateMarkedResultData(string resultDataId);
 

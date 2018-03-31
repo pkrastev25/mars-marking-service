@@ -6,11 +6,11 @@ using mars_marking_svc.Services.Models;
 
 namespace mars_marking_svc.ResourceTypes.ResultData
 {
-    public class ResultDataServiceClient : IResultDataServiceClient
+    public class ResultDataClient : IResultDataClient
     {
         private readonly ILoggerService _loggerService;
 
-        public ResultDataServiceClient(
+        public ResultDataClient(
             ILoggerService loggerService
         )
         {

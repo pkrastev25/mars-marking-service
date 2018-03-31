@@ -10,12 +10,12 @@ using Newtonsoft.Json;
 
 namespace mars_marking_svc.ResourceTypes.Metadata
 {
-    public class MetadataServiceClient : IMetadataServiceClient
+    public class MetadataClient : IMetadataClient
     {
         private readonly IHttpService _httpService;
         private readonly ILoggerService _loggerService;
 
-        public MetadataServiceClient(
+        public MetadataClient(
             IHttpService httpService,
             ILoggerService loggerService
         )

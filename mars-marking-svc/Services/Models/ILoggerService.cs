@@ -1,5 +1,4 @@
 ﻿using System;
-using mars_marking_svc.MarkedResource.Models;
 
 namespace mars_marking_svc.Services.Models
 {

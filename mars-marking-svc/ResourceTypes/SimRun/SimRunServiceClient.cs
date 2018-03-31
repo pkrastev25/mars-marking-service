@@ -10,12 +10,12 @@ using Newtonsoft.Json;
 
 namespace mars_marking_svc.ResourceTypes.SimRun
 {
-    public class SimRunServiceClient : ISimRunServiceClient
+    public class SimRunClient : ISimRunClient
     {
         private readonly IHttpService _httpService;
         private readonly ILoggerService _loggerService;
 
-        public SimRunServiceClient(
+        public SimRunClient(
             IHttpService httpService,
             ILoggerService loggerService
         )

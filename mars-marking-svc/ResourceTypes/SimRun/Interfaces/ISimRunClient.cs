@@ -5,7 +5,7 @@ using mars_marking_svc.ResourceTypes.SimRun.Models;
 
 namespace mars_marking_svc.ResourceTypes.SimRun.Interfaces
 {
-    public interface ISimRunServiceClient
+    public interface ISimRunClient
     {
         Task<SimRunModel> GetSimRun(string simRunId, string projectId);
 

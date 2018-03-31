@@ -5,7 +5,7 @@ using mars_marking_svc.ResourceTypes.ResultConfig.Models;
 
 namespace mars_marking_svc.ResourceTypes.ResultConfig.Interfaces
 {
-    public interface IResultConfigServiceClient
+    public interface IResultConfigClient
     {
         Task<ResultConfigModel> GetResultConfig(string resultConfigId);
 

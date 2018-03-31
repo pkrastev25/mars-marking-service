@@ -5,7 +5,7 @@ using mars_marking_svc.ResourceTypes.SimPlan.Models;
 
 namespace mars_marking_svc.ResourceTypes.SimPlan.Interfaces
 {
-    public interface ISimPlanServiceClient
+    public interface ISimPlanClient
     {
         Task<SimPlanModel> GetSimPlan(string simPlanId, string projectId);
 

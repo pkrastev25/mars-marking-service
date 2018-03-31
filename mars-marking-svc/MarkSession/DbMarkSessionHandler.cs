@@ -12,24 +12,24 @@ namespace mars_marking_svc.ResourceTypes.MarkedResource
 {
     public class DbMarkSessionHandler : IDbMarkSessionHandler
     {
-        private readonly IMetadataServiceClient _metadataServiceClient;
-        private readonly IScenarioServiceClient _scenarioServiceClient;
-        private readonly ISimPlanServiceClient _simPlanServiceClient;
-        private readonly IDbService _dbService;
+        private readonly IMetadataClient _metadataClient;
+        private readonly IScenarioClient _scenarioClient;
+        private readonly ISimPlanClient _simPlanClient;
+        private readonly IDbMarkSessionClient _dbMarkSessionClient;
         private readonly ILoggerService _loggerService;
 
         public DbMarkSessionHandler(
-            IMetadataServiceClient metadataServiceClient,
-            IScenarioServiceClient scenarioServiceClient,
-            ISimPlanServiceClient simPlanServiceClient,
-            IDbService dbService,
+            IMetadataClient metadataClient,
+            IScenarioClient scenarioClient,
+            ISimPlanClient simPlanClient,
+            IDbMarkSessionClient dbMarkSessionClient,
             ILoggerService loggerService
         )
         {
-            _metadataServiceClient = metadataServiceClient;
-            _scenarioServiceClient = scenarioServiceClient;
-            _simPlanServiceClient = simPlanServiceClient;
-            _dbService = dbService;
+            _metadataClient = metadataClient;
+            _scenarioClient = scenarioClient;
+            _simPlanClient = simPlanClient;
+            _dbMarkSessionClient = dbMarkSessionClient;
             _loggerService = loggerService;
         }
 
@@ -38,14 +38,14 @@ namespace mars_marking_svc.ResourceTypes.MarkedResource
             try
             {
                 markSessionModel.State = DbMarkSessionModel.AbortingState;
-                await _dbService.UpdateMarkSession(markSessionModel);
+                await _dbMarkSessionClient.Update(markSessionModel);
                 _loggerService.LogUpdateEvent(markSessionModel.ToString());
 
                 if (markSessionModel.SourceDependency != null)
                 {
                     await UnmarkMarkedResource(markSessionModel.SourceDependency, markSessionModel.ProjectId);
                     markSessionModel.SourceDependency = null;
-                    await _dbService.UpdateMarkSession(markSessionModel);
+                    await _dbMarkSessionClient.Update(markSessionModel);
                 }
 
                 var markedDependantResources = new List<MarkedResourceModel>(markSessionModel.DependantResources);
@@ -57,10 +57,10 @@ namespace mars_marking_svc.ResourceTypes.MarkedResource
                     var index = markSessionModel.DependantResources.FindIndex(m =>
                         m.ResourceId == unmarkedResourceModel.ResourceId);
                     markSessionModel.DependantResources.RemoveAt(index);
-                    await _dbService.UpdateMarkSession(markSessionModel);
+                    await _dbMarkSessionClient.Update(markSessionModel);
                 }
 
-                await _dbService.DeleteMarkSession(markSessionModel);
+                await _dbMarkSessionClient.Delete(markSessionModel);
             }
             catch (Exception e)
             {
@@ -77,12 +77,12 @@ namespace mars_marking_svc.ResourceTypes.MarkedResource
             {
                 case "metadata":
                 {
-                    await _metadataServiceClient.UnmarkMetadata(markedResourceModel);
+                    await _metadataClient.UnmarkMetadata(markedResourceModel);
                     return markedResourceModel;
                 }
                 case "scenario":
                 {
-                    await _scenarioServiceClient.UnmarkScenario(markedResourceModel);
+                    await _scenarioClient.UnmarkScenario(markedResourceModel);
                     return markedResourceModel;
                 }
                 case "resultConfig":
@@ -92,7 +92,7 @@ namespace mars_marking_svc.ResourceTypes.MarkedResource
                 }
                 case "simPlan":
                 {
-                    await _simPlanServiceClient.UnmarkSimPlan(markedResourceModel, projectId);
+                    await _simPlanClient.UnmarkSimPlan(markedResourceModel, projectId);
                     return markedResourceModel;
                 }
                 case "simRun":

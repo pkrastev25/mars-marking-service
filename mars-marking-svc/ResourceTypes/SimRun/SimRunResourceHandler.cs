@@ -11,20 +11,20 @@ namespace mars_marking_svc.ResourceTypes.SimRun
 {
     public class SimRunResourceHandler : ISimRunResourceHandler
     {
-        private readonly ISimRunServiceClient _simRunServiceClient;
-        private readonly IResultDataServiceClient _resultDataServiceClient;
+        private readonly ISimRunClient _simRunClient;
+        private readonly IResultDataClient _resultDataClient;
         private readonly ILoggerService _loggerService;
         private readonly IErrorHandlerService _errorHandlerService;
 
         public SimRunResourceHandler(
-            ISimRunServiceClient simRunServiceClient,
-            IResultDataServiceClient resultDataServiceClient,
+            ISimRunClient simRunClient,
+            IResultDataClient resultDataClient,
             ILoggerService loggerService,
             IErrorHandlerService errorHandlerService
         )
         {
-            _simRunServiceClient = simRunServiceClient;
-            _resultDataServiceClient = resultDataServiceClient;
+            _simRunClient = simRunClient;
+            _resultDataClient = resultDataClient;
             _loggerService = loggerService;
             _errorHandlerService = errorHandlerService;
         }
@@ -38,11 +38,11 @@ namespace mars_marking_svc.ResourceTypes.SimRun
 
             try
             {
-                var sourceSimRun = await _simRunServiceClient.GetSimRun(simRunId, projectId);
-                var markedSourceSimRun = await _simRunServiceClient.StopSimRun(simRunId, projectId);
+                var sourceSimRun = await _simRunClient.GetSimRun(simRunId, projectId);
+                var markedSourceSimRun = await _simRunClient.StopSimRun(simRunId, projectId);
                 dependantResources.Add(markedSourceSimRun);
 
-                var markedResultData = await _resultDataServiceClient.CreateMarkedResultData(sourceSimRun);
+                var markedResultData = await _resultDataClient.CreateMarkedResultData(sourceSimRun);
                 dependantResources.Add(markedResultData);
 
                 return new OkObjectResult(dependantResources);

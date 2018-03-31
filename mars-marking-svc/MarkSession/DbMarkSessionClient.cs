@@ -5,22 +5,21 @@ using mars_marking_svc.MarkedResource.Models;
 using mars_marking_svc.Services.Models;
 using MongoDB.Driver;
 
-public class DbService : IDbService
+public class DbMarkSessionClient : IDbMarkSessionClient
 {
+    private readonly IDbMongoService _dbMongoService;
     private readonly ILoggerService _loggerService;
-    private readonly IMongoCollection<DbMarkSessionModel> _markedSessionCollection;
 
-    public DbService(
+    public DbMarkSessionClient(
+        IDbMongoService dbMongoService,
         ILoggerService loggerService
     )
     {
+        _dbMongoService = dbMongoService;
         _loggerService = loggerService;
-        var client = new MongoClient("mongodb://mongodb:27017");
-        var db = client.GetDatabase("marked-resources");
-        _markedSessionCollection = db.GetCollection<DbMarkSessionModel>("marked-resources");
     }
 
-    public async Task InsertNewMarkSession(DbMarkSessionModel markSessionModel)
+    public async Task Create(DbMarkSessionModel markSessionModel)
     {
         try
         {
@@ -33,7 +32,7 @@ public class DbService : IDbService
                 );
             }
 
-            await _markedSessionCollection.InsertOneAsync(markSessionModel);
+            await _dbMongoService.GetMarkSessionCollection().InsertOneAsync(markSessionModel);
             _loggerService.LodCreateEvent(markSessionModel.ToString());
         }
         catch (MarkSessionAlreadyExistsException)
@@ -49,15 +48,15 @@ public class DbService : IDbService
         }
     }
 
-    public async Task UpdateMarkSession(DbMarkSessionModel markSessionModel)
+    public async Task Update(DbMarkSessionModel markSessionModel)
     {
-        await _markedSessionCollection.ReplaceOneAsync(
+        await _dbMongoService.GetMarkSessionCollection().ReplaceOneAsync(
             GetFilterDefinitionForResourceId(markSessionModel.ResourceId),
             markSessionModel
         );
     }
 
-    public async Task DeleteMarkSession(DbMarkSessionModel markSessionModel)
+    public async Task Delete(DbMarkSessionModel markSessionModel)
     {
         if (markSessionModel.DependantResources.Count != 0)
         {
@@ -73,7 +72,7 @@ public class DbService : IDbService
             );
         }
 
-        await _markedSessionCollection.DeleteOneAsync(
+        await _dbMongoService.GetMarkSessionCollection().DeleteOneAsync(
             GetFilterDefinitionForResourceId(markSessionModel.ResourceId)
         );
         _loggerService.LogDeleteEvent(markSessionModel.ToString());
@@ -86,7 +85,7 @@ public class DbService : IDbService
 
     private async Task<DbMarkSessionModel> FindMarkSessionByResourceId(string resourceId)
     {
-        var markSessionCursor = await _markedSessionCollection.FindAsync(
+        var markSessionCursor = await _dbMongoService.GetMarkSessionCollection().FindAsync(
             GetFilterDefinitionForResourceId(resourceId)
         );
 

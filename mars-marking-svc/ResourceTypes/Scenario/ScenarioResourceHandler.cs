@@ -14,29 +14,29 @@ namespace mars_marking_svc.ResourceTypes.Scenario
 {
     public class ScenarioResourceHandler : IScenarioResourceHandler
     {
-        private readonly IDbService _dbService;
+        private readonly IDbMarkSessionClient _dbMarkSessionClient;
         private readonly ILoggerService _loggerService;
         private readonly IErrorHandlerService _errorHandlerService;
-        private readonly IScenarioServiceClient _scenarioServiceClient;
-        private readonly ISimPlanServiceClient _simPlanServiceClient;
-        private readonly ISimRunServiceClient _simRunServiceClient;
-        private readonly IResultDataServiceClient _resultDataServiceClient;
+        private readonly IScenarioClient _scenarioClient;
+        private readonly ISimPlanClient _simPlanClient;
+        private readonly ISimRunClient _simRunClient;
+        private readonly IResultDataClient _resultDataClient;
 
         public ScenarioResourceHandler(
-            IScenarioServiceClient scenarioServiceClient,
-            ISimPlanServiceClient simPlanServiceClient,
-            ISimRunServiceClient simRunServiceClient,
-            IResultDataServiceClient resultDataServiceClient,
-            IDbService dbService,
+            IScenarioClient scenarioClient,
+            ISimPlanClient simPlanClient,
+            ISimRunClient simRunClient,
+            IResultDataClient resultDataClient,
+            IDbMarkSessionClient dbMarkSessionClient,
             ILoggerService loggerService,
             IErrorHandlerService errorHandlerService
         )
         {
-            _scenarioServiceClient = scenarioServiceClient;
-            _simPlanServiceClient = simPlanServiceClient;
-            _simRunServiceClient = simRunServiceClient;
-            _resultDataServiceClient = resultDataServiceClient;
-            _dbService = dbService;
+            _scenarioClient = scenarioClient;
+            _simPlanClient = simPlanClient;
+            _simRunClient = simRunClient;
+            _resultDataClient = resultDataClient;
+            _dbMarkSessionClient = dbMarkSessionClient;
             _loggerService = loggerService;
             _errorHandlerService = errorHandlerService;
         }
@@ -47,43 +47,43 @@ namespace mars_marking_svc.ResourceTypes.Scenario
 
             try
             {
-                await _dbService.InsertNewMarkSession(markSessionModel);
+                await _dbMarkSessionClient.Create(markSessionModel);
 
-                var markedSourceScenario = await _scenarioServiceClient.MarkScenario(scenarioId);
+                var markedSourceScenario = await _scenarioClient.MarkScenario(scenarioId);
                 markSessionModel.DependantResources.Add(markedSourceScenario);
-                await _dbService.UpdateMarkSession(markSessionModel);
+                await _dbMarkSessionClient.Update(markSessionModel);
 
-                var simPlansForScenario = await _simPlanServiceClient.GetSimPlansForScenario(scenarioId, projectId);
+                var simPlansForScenario = await _simPlanClient.GetSimPlansForScenario(scenarioId, projectId);
                 foreach (var simPlanModel in simPlansForScenario)
                 {
-                    var markedSimPlan = await _simPlanServiceClient.MarkSimPlan(simPlanModel, projectId);
+                    var markedSimPlan = await _simPlanClient.MarkSimPlan(simPlanModel, projectId);
                     markSessionModel.DependantResources.Add(markedSimPlan);
-                    await _dbService.UpdateMarkSession(markSessionModel);
+                    await _dbMarkSessionClient.Update(markSessionModel);
                 }
 
                 var simRunsForSimPlans = new List<SimRunModel>();
                 foreach (var simPlanModel in simPlansForScenario)
                 {
                     simRunsForSimPlans.AddRange(
-                        await _simRunServiceClient.GetSimRunsForSimPlan(simPlanModel.Id, projectId)
+                        await _simRunClient.GetSimRunsForSimPlan(simPlanModel.Id, projectId)
                     );
                 }
                 foreach (var simRunModel in simRunsForSimPlans)
                 {
-                    var markedSimRun = await _simRunServiceClient.StopSimRun(simRunModel.Id, projectId);
+                    var markedSimRun = await _simRunClient.StopSimRun(simRunModel.Id, projectId);
                     markSessionModel.DependantResources.Add(markedSimRun);
-                    await _dbService.UpdateMarkSession(markSessionModel);
+                    await _dbMarkSessionClient.Update(markSessionModel);
                 }
 
                 foreach (var simRunModel in simRunsForSimPlans)
                 {
-                    var markedResultData = await _resultDataServiceClient.CreateMarkedResultData(simRunModel);
+                    var markedResultData = await _resultDataClient.CreateMarkedResultData(simRunModel);
                     markSessionModel.DependantResources.Add(markedResultData);
-                    await _dbService.UpdateMarkSession(markSessionModel);
+                    await _dbMarkSessionClient.Update(markSessionModel);
                 }
 
                 markSessionModel.State = DbMarkSessionModel.DoneState;
-                await _dbService.UpdateMarkSession(markSessionModel);
+                await _dbMarkSessionClient.Update(markSessionModel);
                 _loggerService.LogUpdateEvent(markSessionModel.ToString());
 
                 return new OkObjectResult(markSessionModel.DependantResources);

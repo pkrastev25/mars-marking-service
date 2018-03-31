@@ -37,24 +37,31 @@ namespace mars_marking_svc
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+
+            // Services
             services.AddSingleton<HttpClient>();
+            services.AddSingleton<IDbMongoService, DbMongoService>();
             services.AddTransient<IHttpService, HttpService>();
             services.AddTransient<ILoggerService, LoggerService>();
-            services.AddTransient<IMetadataServiceClient, MetadataServiceClient>();
-            services.AddTransient<IMetadataResourceHandler, MetadataResourceHandler>();
-            services.AddTransient<IScenarioServiceClient, ScenarioServiceClient>();
-            services.AddTransient<IScenarioResourceHandler, ScenarioResourceHandler>();
-            services.AddTransient<IResultConfigServiceClient, ResultConfigServiceClient>();
-            services.AddTransient<IResultConfigResourceHandler, ResultConfigResourceHandler>();
-            services.AddTransient<ISimPlanServiceClient, SimPlanServiceClient>();
-            services.AddTransient<ISimPlanResourceHandler, SimPlanResourceHandler>();
-            services.AddTransient<ISimRunServiceClient, SimRunServiceClient>();
-            services.AddTransient<ISimRunResourceHandler, SimRunResourceHandler>();
-            services.AddTransient<IProjectResourceHandler, ProjectResourceHandler>();
-            services.AddTransient<IResultDataServiceClient, ResultDataServiceClient>();
-            services.AddSingleton<IDbService, DbService>();
-            services.AddTransient<IDbMarkSessionHandler, DbMarkSessionHandler>();
             services.AddTransient<IErrorHandlerService, ErrorHandlerService>();
+
+            // Clients
+            services.AddTransient<IMetadataClient, MetadataClient>();
+            services.AddTransient<IScenarioClient, ScenarioClient>();
+            services.AddTransient<IResultConfigClient, ResultConfigClient>();
+            services.AddTransient<ISimPlanClient, SimPlanClient>();
+            services.AddTransient<ISimRunClient, SimRunClient>();
+            services.AddTransient<IResultDataClient, ResultDataClient>();
+            services.AddTransient<IDbMarkSessionClient, DbMarkSessionClient>();
+
+            // Handlers
+            services.AddTransient<IProjectResourceHandler, ProjectResourceHandler>();
+            services.AddTransient<IMetadataResourceHandler, MetadataResourceHandler>();
+            services.AddTransient<IScenarioResourceHandler, ScenarioResourceHandler>();
+            services.AddTransient<IResultConfigResourceHandler, ResultConfigResourceHandler>();
+            services.AddTransient<ISimPlanResourceHandler, SimPlanResourceHandler>();
+            services.AddTransient<ISimRunResourceHandler, SimRunResourceHandler>();
+            services.AddTransient<IDbMarkSessionHandler, DbMarkSessionHandler>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

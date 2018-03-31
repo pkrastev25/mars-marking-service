@@ -14,29 +14,29 @@ namespace mars_marking_svc.ResourceTypes.ResultConfig
 {
     public class ResultConfigResourceHandler : IResultConfigResourceHandler
     {
-        private readonly IResultConfigServiceClient _resultConfigServiceClient;
-        private readonly ISimPlanServiceClient _simPlanServiceClient;
-        private readonly ISimRunServiceClient _simRunServiceClient;
-        private readonly IResultDataServiceClient _resultDataServiceClient;
-        private readonly IDbService _dbService;
+        private readonly IResultConfigClient _resultConfigClient;
+        private readonly ISimPlanClient _simPlanClient;
+        private readonly ISimRunClient _simRunClient;
+        private readonly IResultDataClient _resultDataClient;
+        private readonly IDbMarkSessionClient _dbMarkSessionClient;
         private readonly ILoggerService _loggerService;
         private readonly IErrorHandlerService _errorHandlerService;
 
         public ResultConfigResourceHandler(
-            IResultConfigServiceClient resultConfigServiceClient,
-            ISimPlanServiceClient simPlanServiceClient,
-            ISimRunServiceClient simRunServiceClient,
-            IResultDataServiceClient resultDataServiceClient,
-            IDbService dbService,
+            IResultConfigClient resultConfigClient,
+            ISimPlanClient simPlanClient,
+            ISimRunClient simRunClient,
+            IResultDataClient resultDataClient,
+            IDbMarkSessionClient dbMarkSessionClient,
             ILoggerService loggerService,
             IErrorHandlerService errorHandlerService
         )
         {
-            _resultConfigServiceClient = resultConfigServiceClient;
-            _simPlanServiceClient = simPlanServiceClient;
-            _simRunServiceClient = simRunServiceClient;
-            _resultDataServiceClient = resultDataServiceClient;
-            _dbService = dbService;
+            _resultConfigClient = resultConfigClient;
+            _simPlanClient = simPlanClient;
+            _simRunClient = simRunClient;
+            _resultDataClient = resultDataClient;
+            _dbMarkSessionClient = dbMarkSessionClient;
             _loggerService = loggerService;
             _errorHandlerService = errorHandlerService;
         }
@@ -47,47 +47,47 @@ namespace mars_marking_svc.ResourceTypes.ResultConfig
 
             try
             {
-                var sourceResultConfig = await _resultConfigServiceClient.GetResultConfig(resultConfigId);
+                var sourceResultConfig = await _resultConfigClient.GetResultConfig(resultConfigId);
                 var sourceDependantResource = new MarkedResourceModel("metadata", sourceResultConfig.ModelId);
                 markSessionModel.SourceDependency = sourceDependantResource;
-                await _dbService.InsertNewMarkSession(markSessionModel);
+                await _dbMarkSessionClient.Create(markSessionModel);
 
-                var markedSourceResultConfig = await _resultConfigServiceClient.CreateMarkedResultConfig(resultConfigId);
+                var markedSourceResultConfig = await _resultConfigClient.CreateMarkedResultConfig(resultConfigId);
                 markSessionModel.DependantResources.Add(markedSourceResultConfig);
-                await _dbService.UpdateMarkSession(markSessionModel);
+                await _dbMarkSessionClient.Update(markSessionModel);
 
                 var simPlansForResultConfig =
-                    await _simPlanServiceClient.GetSimPlansForResultConfig(resultConfigId, projectId);
+                    await _simPlanClient.GetSimPlansForResultConfig(resultConfigId, projectId);
                 foreach (var simPlanModel in simPlansForResultConfig)
                 {
-                    var markedSimPlan = await _simPlanServiceClient.MarkSimPlan(simPlanModel, projectId);
+                    var markedSimPlan = await _simPlanClient.MarkSimPlan(simPlanModel, projectId);
                     markSessionModel.DependantResources.Add(markedSimPlan);
-                    await _dbService.UpdateMarkSession(markSessionModel);
+                    await _dbMarkSessionClient.Update(markSessionModel);
                 }
 
                 var simRunsForSimPlans = new List<SimRunModel>();
                 foreach (var simPlanModel in simPlansForResultConfig)
                 {
                     simRunsForSimPlans.AddRange(
-                        await _simRunServiceClient.GetSimRunsForSimPlan(simPlanModel.Id, projectId)
+                        await _simRunClient.GetSimRunsForSimPlan(simPlanModel.Id, projectId)
                     );
                 }
                 foreach (var simRunModel in simRunsForSimPlans)
                 {
-                    var markedSimSun = await _simRunServiceClient.StopSimRun(simRunModel, projectId);
+                    var markedSimSun = await _simRunClient.StopSimRun(simRunModel, projectId);
                     markSessionModel.DependantResources.Add(markedSimSun);
-                    await _dbService.UpdateMarkSession(markSessionModel);
+                    await _dbMarkSessionClient.Update(markSessionModel);
                 }
 
                 foreach (var simRunModel in simRunsForSimPlans)
                 {
-                    var markedResultData = await _resultDataServiceClient.CreateMarkedResultData(simRunModel);
+                    var markedResultData = await _resultDataClient.CreateMarkedResultData(simRunModel);
                     markSessionModel.DependantResources.Add(markedResultData);
-                    await _dbService.UpdateMarkSession(markSessionModel);
+                    await _dbMarkSessionClient.Update(markSessionModel);
                 }
 
                 markSessionModel.State = DbMarkSessionModel.DoneState;
-                await _dbService.UpdateMarkSession(markSessionModel);
+                await _dbMarkSessionClient.Update(markSessionModel);
                 _loggerService.LogUpdateEvent(markSessionModel.ToString());
 
                 return new OkObjectResult(markSessionModel.DependantResources);

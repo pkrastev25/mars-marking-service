@@ -10,12 +10,12 @@ using Newtonsoft.Json;
 
 namespace mars_marking_svc.ResourceTypes.SimPlan
 {
-    public class SimPlanServiceClient : ISimPlanServiceClient
+    public class SimPlanClient : ISimPlanClient
     {
         private readonly IHttpService _httpService;
         private readonly ILoggerService _loggerService;
 
-        public SimPlanServiceClient(
+        public SimPlanClient(
             IHttpService httpService,
             ILoggerService loggerService
         )

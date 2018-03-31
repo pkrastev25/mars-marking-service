@@ -5,7 +5,7 @@ using mars_marking_svc.ResourceTypes.Metadata.Models;
 
 namespace mars_marking_svc.ResourceTypes.Metadata.Interfaces
 {
-    public interface IMetadataServiceClient
+    public interface IMetadataClient
     {
         Task<MetadataModel> GetMetadata(string metadataId);
 

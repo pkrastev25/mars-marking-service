@@ -4,7 +4,6 @@ using System.Net;
 using System.Threading.Tasks;
 using mars_marking_svc.Exceptions;
 using mars_marking_svc.MarkedResource.Models;
-using mars_marking_svc.ResourceTypes.Metadata.Interfaces;
 using mars_marking_svc.ResourceTypes.ResultConfig.Interfaces;
 using mars_marking_svc.ResourceTypes.ResultConfig.Models;
 using mars_marking_svc.Services.Models;
@@ -15,17 +14,14 @@ namespace mars_marking_svc.ResourceTypes.ResultConfig
     public class ResultConfigServiceClient : IResultConfigServiceClient
     {
         private readonly IHttpService _httpService;
-        private readonly IMetadataServiceClient _metadataServiceClient;
         private readonly ILoggerService _loggerService;
 
         public ResultConfigServiceClient(
             IHttpService httpService,
-            IMetadataServiceClient metadataServiceClient,
             ILoggerService loggerService
         )
         {
             _httpService = httpService;
-            _metadataServiceClient = metadataServiceClient;
             _loggerService = loggerService;
         }
 
@@ -66,34 +62,22 @@ namespace mars_marking_svc.ResourceTypes.ResultConfig
                 .ToList();
         }
 
-        public async Task<MarkedResourceModel> MarkResultConfig(string resultConfigId)
+        public async Task<MarkedResourceModel> CreateMarkedResultConfig(string resultConfigId)
         {
             var resultConfig = await GetResultConfig(resultConfigId);
 
-            return await MarkResultConfig(resultConfig);
+            return await CreateMarkedResultConfig(resultConfig);
         }
 
-        public async Task<MarkedResourceModel> MarkResultConfig(ResultConfigModel resultConfigModel)
+        public async Task<MarkedResourceModel> CreateMarkedResultConfig(ResultConfigModel resultConfigModel)
         {
-            var metadataForResultConfig = await _metadataServiceClient.GetMetadata(resultConfigModel.ModelId);
-            // TODO: Do not forget to remove the marks later!
-            await _metadataServiceClient.MarkMetadata(metadataForResultConfig);
-            var markedResource = new MarkedResourceModel
+            return await Task.Run(() =>
             {
-                ResourceType = "resultConfig",
-                ResourceId = resultConfigModel.ConfigId
-            };
-            _loggerService.LogMarkedResource(markedResource);
+                var markedResource = new MarkedResourceModel("resultConfig", resultConfigModel.ConfigId);
+                _loggerService.LogSkipEvent(markedResource.ToString());
 
-            return markedResource;
-        }
-
-        public async Task UnmarkResultConfig(string resultConfigId)
-        {
-            var resultConfigModel = await GetResultConfig(resultConfigId);
-            var metadataForResultConfig = await _metadataServiceClient.GetMetadata(resultConfigModel.ModelId);
-            await _metadataServiceClient.UnmarkMetadata(metadataForResultConfig.DataId);
-            _loggerService.LogUnmarkResource("resultConfig", resultConfigId);
+                return markedResource;
+            });
         }
     }
 }

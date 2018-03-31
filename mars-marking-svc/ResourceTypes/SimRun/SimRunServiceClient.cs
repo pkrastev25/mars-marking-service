@@ -32,7 +32,7 @@ namespace mars_marking_svc.ResourceTypes.SimRun
             if (response.StatusCode != HttpStatusCode.OK)
             {
                 throw new FailedToGetResourceException(
-                    $"Failed to get simRun with id: {simRunId} and projectId: {projectId} from sim-runner-svc!"
+                    $"Failed to get simRun with id: {simRunId}, projectId: {projectId} from sim-runner-svc!"
                 );
             }
 
@@ -50,7 +50,7 @@ namespace mars_marking_svc.ResourceTypes.SimRun
             if (response.StatusCode != HttpStatusCode.OK)
             {
                 throw new FailedToGetResourceException(
-                    $"Failed to get simRuns for simPlanId: {simPlanId} and projectId: {projectId} from sim-runner-svc!"
+                    $"Failed to get simRuns for simPlanId: {simPlanId}, projectId: {projectId} from sim-runner-svc!"
                 );
             }
 
@@ -75,15 +75,15 @@ namespace mars_marking_svc.ResourceTypes.SimRun
             return JsonConvert.DeserializeObject<List<SimRunModel>>(jsonResponse);
         }
 
-        public async Task<MarkedResourceModel> MarkSimRun(string simRunId, string projectId)
+        public async Task<MarkedResourceModel> StopSimRun(string simRunId, string projectId)
         {
             var simRun = await GetSimRun(simRunId, projectId);
             simRun.Id = simRunId;
 
-            return await MarkSimRun(simRun, projectId);
+            return await StopSimRun(simRun, projectId);
         }
 
-        public async Task<MarkedResourceModel> MarkSimRun(SimRunModel simRunModel, string projectId)
+        public async Task<MarkedResourceModel> StopSimRun(SimRunModel simRunModel, string projectId)
         {
             var response = await _httpService.PutAsync(
                 "http://sim-runner-svc/simrun",
@@ -97,23 +97,14 @@ namespace mars_marking_svc.ResourceTypes.SimRun
             if (response.StatusCode != HttpStatusCode.OK)
             {
                 throw new FailedToUpdateResourceException(
-                    $"Failed to update simRun with id: {simRunModel.Id} and projectId: {projectId} from sim-runner-svc!"
+                    $"Failed to update simRun with id: {simRunModel.Id}, projectId: {projectId} from sim-runner-svc!"
                 );
             }
 
-            var markedResource = new MarkedResourceModel
-            {
-                ResourceType = "simRun",
-                ResourceId = simRunModel.Id
-            };
-            _loggerService.LogMarkedResource(markedResource);
+            var markedResource = new MarkedResourceModel("simRun", simRunModel.Id);
+            _loggerService.LogStopEvent(markedResource.ToString());
 
             return markedResource;
-        }
-
-        public async Task UnmarkSimRun(string simRunId, string projectId)
-        {
-            await Task.Run(() => { _loggerService.LogUnmarkResource("simRun", simRunId); });
         }
     }
 }

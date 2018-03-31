@@ -32,13 +32,14 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
             if (response.StatusCode != HttpStatusCode.OK)
             {
                 throw new FailedToGetResourceException(
-                    $"Failed to get simPlan with id: {simPlanId} and projectId: {projectId} from sim-runner-svc!"
+                    $"Failed to get simPlan with id: {simPlanId}, projectId: {projectId} from sim-runner-svc!"
                 );
             }
 
             var jsonResponse = await response.Content.ReadAsStringAsync();
 
-            return JsonConvert.DeserializeObject<SimPlanModel>(jsonResponse);
+            // TODO: Potentially fix this in the sim-runner-svc!
+            return JsonConvert.DeserializeObject<List<SimPlanModel>>(jsonResponse)[0];
         }
 
         public async Task<List<SimPlanModel>> GetSimPlansForScenario(string scenarioId, string projectId)
@@ -50,7 +51,7 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
             if (response.StatusCode != HttpStatusCode.OK)
             {
                 throw new FailedToGetResourceException(
-                    $"Failed to get simPlans for scenarioId: {scenarioId} and projectId: {projectId} from sim-runner-svc!"
+                    $"Failed to get simPlans for scenarioId: {scenarioId}, projectId: {projectId} from sim-runner-svc!"
                 );
             }
 
@@ -68,7 +69,7 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
             if (response.StatusCode != HttpStatusCode.OK)
             {
                 throw new FailedToGetResourceException(
-                    $"Failed to get simPlans for resultConfigId: {resultConfigId} and projectId: {projectId} from sim-runner-svc!"
+                    $"Failed to get simPlans for resultConfigId: {resultConfigId}, projectId: {projectId} from sim-runner-svc!"
                 );
             }
 
@@ -106,7 +107,7 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
             if (simPlanModel.ToBeDeleted)
             {
                 throw new ResourceAlreadyMarkedException(
-                    $"Cannot mark simPlan with id: {simPlanModel.Id} and projectId: {projectId}, it is already marked!"
+                    $"Cannot mark simPlan with id: {simPlanModel.Id}, projectId: {projectId}, it is already marked!"
                 );
             }
 
@@ -120,23 +121,25 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
             if (response.StatusCode != HttpStatusCode.OK)
             {
                 throw new FailedToUpdateResourceException(
-                    $"Failed to update simPlan with id: {simPlanModel.Id} and projectId: {projectId} from sim-runner-svc!"
+                    $"Failed to update simPlan with id: {simPlanModel.Id}, projectId: {projectId} from sim-runner-svc!"
                 );
             }
 
-            var markedResource = new MarkedResourceModel
-            {
-                ResourceType = "simPlan",
-                ResourceId = simPlanModel.Id
-            };
-            _loggerService.LogMarkedResource(markedResource);
+            var markedResource = new MarkedResourceModel("simPlan", simPlanModel.Id);
+            _loggerService.LogMarkEvent(markedResource.ToString());
 
             return markedResource;
         }
 
-        public async Task UnmarkSimPlan(string simPlanId, string projectId)
+        public async Task UnmarkSimPlan(MarkedResourceModel markedResourceModel, string projectId)
         {
-            var simPlanModel = await GetSimPlan(simPlanId, projectId);
+            if (!await DoesSimPlanExist(markedResourceModel.ResourceId, projectId))
+            {
+                _loggerService.LogSkipEvent(markedResourceModel.ToString());
+                return;
+            }
+
+            var simPlanModel = await GetSimPlan(markedResourceModel.ResourceId, projectId);
             simPlanModel.ToBeDeleted = false;
 
             var response = await _httpService.PutAsync(
@@ -147,11 +150,29 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
             if (response.StatusCode != HttpStatusCode.OK)
             {
                 throw new FailedToUpdateResourceException(
-                    $"Failed to update simPlan with id: {simPlanModel.Id} and projectId: {projectId} from sim-runner-svc!"
+                    $"Failed to update simPlan with id: {simPlanModel.Id}, projectId: {projectId} from sim-runner-svc!"
                 );
             }
 
-            _loggerService.LogUnmarkResource("simPlan", simPlanId);
+            _loggerService.LogUnmarkEvent(markedResourceModel.ToString());
+        }
+
+        private async Task<bool> DoesSimPlanExist(string simPlanId, string projectId)
+        {
+            var response =
+                await _httpService.GetAsync($"http://sim-runner-svc/simplan?id={simPlanId}&projectid={projectId}");
+
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.OK:
+                    return true;
+                case HttpStatusCode.NotFound:
+                    return false;
+                default:
+                    throw new FailedToGetResourceException(
+                        $"Failed to get simPlan with id: {simPlanId}, projectId: {projectId} from sim-runner-svc!"
+                    );
+            }
         }
     }
 }

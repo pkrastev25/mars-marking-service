@@ -4,10 +4,24 @@ namespace mars_marking_svc.MarkedResource.Models
 {
     public class MarkedResourceModel
     {
-        [JsonProperty("ResourceType")]
+        [JsonProperty("resourceType")]
         public string ResourceType { get; set; }
 
-        [JsonProperty("ResourceId")]
+        [JsonProperty("resourceId")]
         public string ResourceId { get; set; }
+
+        [JsonProperty("previousState", NullValueHandling = NullValueHandling.Ignore)]
+        public string PreviousState { get; set; }
+
+        public MarkedResourceModel(string resourceType, string resourceId)
+        {
+            ResourceType = resourceType;
+            ResourceId = resourceId;
+        }
+
+        public override string ToString()
+        {
+            return $"{ResourceType} with id: {ResourceId}";
+        }
     }
 }

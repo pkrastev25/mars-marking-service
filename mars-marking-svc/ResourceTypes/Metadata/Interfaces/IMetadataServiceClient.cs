@@ -15,6 +15,6 @@ namespace mars_marking_svc.ResourceTypes.Metadata.Interfaces
 
         Task<MarkedResourceModel> MarkMetadata(MetadataModel metadataModel);
 
-        Task UnmarkMetadata(string metadataId);
+        Task UnmarkMetadata(MarkedResourceModel markedResourceModel);
     }
 }

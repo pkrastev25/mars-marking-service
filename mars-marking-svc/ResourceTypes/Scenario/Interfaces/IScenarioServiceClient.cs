@@ -17,6 +17,6 @@ namespace mars_marking_svc.ResourceTypes.Scenario.Interfaces
 
         Task<MarkedResourceModel> MarkScenario(ScenarioModel scenarioModel);
 
-        Task UnmarkScenario(string scenarioId);
+        Task UnmarkScenario(MarkedResourceModel markedResourceModel);
     }
 }

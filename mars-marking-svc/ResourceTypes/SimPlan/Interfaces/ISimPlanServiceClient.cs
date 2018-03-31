@@ -19,6 +19,6 @@ namespace mars_marking_svc.ResourceTypes.SimPlan.Interfaces
 
         Task<MarkedResourceModel> MarkSimPlan(SimPlanModel simPlanModel, string projectId);
 
-        Task UnmarkSimPlan(string simPlanId, string projectId);
+        Task UnmarkSimPlan(MarkedResourceModel markedResourceModel, string projectId);
     }
 }

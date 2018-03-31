@@ -72,13 +72,16 @@ namespace mars_marking_svc.ResourceTypes.Metadata
                 );
             }
 
-            if (!MetadataModel.FinishedState.Equals(metadataModel.State))
+            if (!MetadataModel.FinishedState.Equals(metadataModel.State) &&
+                !MetadataModel.FailedState.Equals(metadataModel.State)
+            )
             {
                 throw new CannotMarkResourceException(
-                    $"Cannot mark metadata with id: {metadataModel.DataId}, it must be in state: {MetadataModel.FinishedState} beforehand!"
+                    $"Cannot mark metadata with id: {metadataModel.DataId}, it must be in state: {MetadataModel.FinishedState} or state: {MetadataModel.FailedState} beforehand!"
                 );
             }
 
+            var metadataPreviousState = metadataModel.State;
             metadataModel.State = MetadataModel.ToBeDeletedState;
 
             var response = await _httpService.PutAsync(
@@ -93,22 +96,25 @@ namespace mars_marking_svc.ResourceTypes.Metadata
                 );
             }
 
-            var markedResource = new MarkedResourceModel
-            {
-                ResourceType = "metadata",
-                ResourceId = metadataModel.DataId
-            };
-            _loggerService.LogMarkedResource(markedResource);
+            var markedResource = new MarkedResourceModel("metadata", metadataModel.DataId);
+            markedResource.PreviousState = metadataPreviousState;
+            _loggerService.LogMarkEvent(markedResource.ToString());
 
             return markedResource;
         }
 
-        public async Task UnmarkMetadata(string metadataId)
+        public async Task UnmarkMetadata(MarkedResourceModel markedResourceModel)
         {
+            if (!await DoesMetadataExist(markedResourceModel.ResourceId))
+            {
+                _loggerService.LogSkipEvent(markedResourceModel.ToString());
+                return;
+            }
+
             var metadataModel = new MetadataModel
             {
-                DataId = metadataId,
-                State = MetadataModel.FinishedState
+                DataId = markedResourceModel.ResourceId,
+                State = markedResourceModel.PreviousState
             };
 
             var response = await _httpService.PutAsync(
@@ -119,11 +125,28 @@ namespace mars_marking_svc.ResourceTypes.Metadata
             if (response.StatusCode != HttpStatusCode.OK)
             {
                 throw new FailedToUpdateResourceException(
-                    $"Failed to update metadata with id: {metadataModel.DataId} from metadata-svc!"
+                    $"Failed to update {markedResourceModel} from metadata-svc!"
                 );
             }
 
-            _loggerService.LogUnmarkResource("metadata", metadataId);
+            _loggerService.LogUnmarkEvent(markedResourceModel.ToString());
+        }
+
+        private async Task<bool> DoesMetadataExist(string metadataId)
+        {
+            var response = await _httpService.GetAsync($"http://metadata-svc/metadata/{metadataId}");
+
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.OK:
+                    return true;
+                case HttpStatusCode.NotFound:
+                    return false;
+                default:
+                    throw new FailedToGetResourceException(
+                        $"Failed to get metadata with id: {metadataId} from metadata-svc!"
+                    );
+            }
         }
     }
 }

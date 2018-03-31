@@ -85,7 +85,7 @@ namespace mars_marking_svc.ResourceTypes.Scenario
             if (scenarioModel.ToBeDeleted)
             {
                 throw new ResourceAlreadyMarkedException(
-                    $"Cannot mark scenario with id: {scenarioModel.ScenarioId}, it is already marked!"
+                    $"Cannot mark {scenarioModel}, it is already marked!"
                 );
             }
 
@@ -99,25 +99,27 @@ namespace mars_marking_svc.ResourceTypes.Scenario
             if (response.StatusCode != HttpStatusCode.NoContent)
             {
                 throw new FailedToUpdateResourceException(
-                    $"Failed to update scenario with id: {scenarioModel.ScenarioId} from scenario-svc!"
+                    $"Failed to update scenario {scenarioModel} from scenario-svc!"
                 );
             }
 
-            var markedResource = new MarkedResourceModel
-            {
-                ResourceType = "scenario",
-                ResourceId = scenarioModel.ScenarioId
-            };
-            _loggerService.LogMarkedResource(markedResource);
+            var markedResource = new MarkedResourceModel("scenario", scenarioModel.ScenarioId);
+            _loggerService.LogMarkEvent(markedResource.ToString());
 
             return markedResource;
         }
 
-        public async Task UnmarkScenario(string scenarioId)
+        public async Task UnmarkScenario(MarkedResourceModel markedResourceModel)
         {
+            if (!await DoesScenarioExist(markedResourceModel.ResourceId))
+            {
+                _loggerService.LogSkipEvent(markedResourceModel.ToString());
+                return;
+            }
+
             var scenarioModel = new ScenarioModel
             {
-                ScenarioId = scenarioId,
+                ScenarioId = markedResourceModel.ResourceId,
                 ToBeDeleted = false
             };
 
@@ -129,11 +131,28 @@ namespace mars_marking_svc.ResourceTypes.Scenario
             if (response.StatusCode != HttpStatusCode.NoContent)
             {
                 throw new FailedToUpdateResourceException(
-                    $"Failed to update scenario with id: {scenarioModel.ScenarioId} from scenario-svc!"
+                    $"Failed to update {markedResourceModel} from scenario-svc!"
                 );
             }
 
-            _loggerService.LogUnmarkResource("scenario", scenarioId);
+            _loggerService.LogUnmarkEvent(markedResourceModel.ToString());
+        }
+
+        private async Task<bool> DoesScenarioExist(string scenarioId)
+        {
+            var response = await _httpService.GetAsync($"http://scenario-svc/scenarios/{scenarioId}");
+
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.OK:
+                    return true;
+                case HttpStatusCode.NotFound:
+                    return false;
+                default:
+                    throw new FailedToGetResourceException(
+                        $"Failed to get scenario with id: {scenarioId} from scenario-svc!"
+                    );
+            }
         }
     }
 }

@@ -6,10 +6,8 @@ namespace mars_marking_svc.ResourceTypes.ResultData.Interfaces
 {
     public interface IResultDataServiceClient
     {
-        Task<MarkedResourceModel> MarkResultData(string resultDataId);
+        Task<MarkedResourceModel> CreateMarkedResultData(string resultDataId);
 
-        Task<MarkedResourceModel> MarkResultData(SimRunModel simRunModel);
-
-        Task UnmarkResultData(string resultDataId);
+        Task<MarkedResourceModel> CreateMarkedResultData(SimRunModel simRunModel);
     }
 }

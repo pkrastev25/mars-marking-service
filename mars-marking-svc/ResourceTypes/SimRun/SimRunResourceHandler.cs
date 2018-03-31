@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using mars_marking_svc.Exceptions;
 using mars_marking_svc.MarkedResource.Models;
-using mars_marking_svc.ResourceTypes.MarkedResource.Interfaces;
 using mars_marking_svc.ResourceTypes.ResultData.Interfaces;
 using mars_marking_svc.ResourceTypes.SimRun.Interfaces;
 using mars_marking_svc.Services.Models;
@@ -15,72 +13,45 @@ namespace mars_marking_svc.ResourceTypes.SimRun
     {
         private readonly ISimRunServiceClient _simRunServiceClient;
         private readonly IResultDataServiceClient _resultDataServiceClient;
-        private readonly IMarkedResourceHandler _markedResourceHandler;
         private readonly ILoggerService _loggerService;
+        private readonly IErrorHandlerService _errorHandlerService;
 
         public SimRunResourceHandler(
             ISimRunServiceClient simRunServiceClient,
             IResultDataServiceClient resultDataServiceClient,
-            IMarkedResourceHandler markedResourceHandler,
-            ILoggerService loggerService
+            ILoggerService loggerService,
+            IErrorHandlerService errorHandlerService
         )
         {
             _simRunServiceClient = simRunServiceClient;
             _resultDataServiceClient = resultDataServiceClient;
-            _markedResourceHandler = markedResourceHandler;
             _loggerService = loggerService;
+            _errorHandlerService = errorHandlerService;
         }
 
         public async Task<IActionResult> MarkSimRunDependantResources(string simRunId, string projectId)
         {
-            var markedResources = new List<MarkedResourceModel>();
+            var dependantResources = new List<MarkedResourceModel>();
+            _loggerService.LogWarningEvent(
+                $"Mark session for simPlan, id: {simRunId}, projectId: {projectId} will not be created, because simRuns do not have a mark! However, the simRun will be stopped!"
+            );
 
             try
             {
                 var sourceSimRun = await _simRunServiceClient.GetSimRun(simRunId, projectId);
-                var markedSourceSimRun = await _simRunServiceClient.MarkSimRun(sourceSimRun, projectId);
-                markedResources.Add(markedSourceSimRun);
+                var markedSourceSimRun = await _simRunServiceClient.StopSimRun(simRunId, projectId);
+                dependantResources.Add(markedSourceSimRun);
 
-                markedResources.Add(
-                    await _resultDataServiceClient.MarkResultData(sourceSimRun)
-                );
+                var markedResultData = await _resultDataServiceClient.CreateMarkedResultData(sourceSimRun);
+                dependantResources.Add(markedResultData);
 
-                return new OkObjectResult(markedResources);
-            }
-            catch (FailedToGetResourceException e)
-            {
-                _loggerService.LogExceptionMessage(e);
-                var unused = _markedResourceHandler.UnmarkMarkedResources(markedResources, projectId);
-
-                return new StatusCodeResult(503);
-            }
-            catch (FailedToUpdateResourceException e)
-            {
-                _loggerService.LogExceptionMessage(e);
-                var unused = _markedResourceHandler.UnmarkMarkedResources(markedResources, projectId);
-
-                return new StatusCodeResult(503);
-            }
-            catch (ResourceAlreadyMarkedException e)
-            {
-                _loggerService.LogExceptionMessage(e);
-                var unused = _markedResourceHandler.UnmarkMarkedResources(markedResources, projectId);
-
-                return new StatusCodeResult(503);
-            }
-            catch (CannotMarkResourceException e)
-            {
-                _loggerService.LogExceptionMessage(e);
-                var unused = _markedResourceHandler.UnmarkMarkedResources(markedResources, projectId);
-
-                return new StatusCodeResult(409);
+                return new OkObjectResult(dependantResources);
             }
             catch (Exception e)
             {
-                _loggerService.LogExceptionMessageWithStackTrace(e);
-                var unused = _markedResourceHandler.UnmarkMarkedResources(markedResources, projectId);
+                _loggerService.LogErrorEvent(e);
 
-                return new StatusCodeResult(503);
+                return _errorHandlerService.GetStatusCodeForError(e);
             }
         }
     }

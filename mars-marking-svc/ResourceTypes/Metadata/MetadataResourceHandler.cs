@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using mars_marking_svc.Exceptions;
 using mars_marking_svc.MarkedResource.Models;
-using mars_marking_svc.ResourceTypes.MarkedResource.Interfaces;
 using mars_marking_svc.ResourceTypes.Metadata.Interfaces;
 using mars_marking_svc.ResourceTypes.ResultConfig.Interfaces;
 using mars_marking_svc.ResourceTypes.ResultData.Interfaces;
@@ -25,8 +23,9 @@ namespace mars_marking_svc.ResourceTypes.Metadata
         private readonly ISimPlanServiceClient _simPlanServiceClient;
         private readonly ISimRunServiceClient _simRunServiceClient;
         private readonly IResultDataServiceClient _resultDataServiceClient;
-        private readonly IMarkedResourceHandler _markedResourceHandler;
+        private readonly IDbService _dbService;
         private readonly ILoggerService _loggerService;
+        private readonly IErrorHandlerService _errorHandlerService;
 
         public MetadataResourceHandler(
             IMetadataServiceClient metadataServiceClient,
@@ -35,8 +34,9 @@ namespace mars_marking_svc.ResourceTypes.Metadata
             ISimPlanServiceClient simPlanServiceClient,
             ISimRunServiceClient simRunServiceClient,
             IResultDataServiceClient resultDataServiceClient,
-            IMarkedResourceHandler markedResourceHandler,
-            ILoggerService loggerService
+            IDbService dbService,
+            ILoggerService loggerService,
+            IErrorHandlerService errorHandlerService
         )
         {
             _metadataServiceClient = metadataServiceClient;
@@ -45,38 +45,39 @@ namespace mars_marking_svc.ResourceTypes.Metadata
             _simPlanServiceClient = simPlanServiceClient;
             _simRunServiceClient = simRunServiceClient;
             _resultDataServiceClient = resultDataServiceClient;
-            _markedResourceHandler = markedResourceHandler;
+            _dbService = dbService;
             _loggerService = loggerService;
+            _errorHandlerService = errorHandlerService;
         }
 
         public async Task<IActionResult> MarkMetadataDependantResources(string metadataId, string projectId)
         {
-            var markedResources = new List<MarkedResourceModel>();
+            var markSessionModel = new DbMarkSessionModel(metadataId, projectId, "metadata");
 
             try
             {
-                var sourceMetadata = await _metadataServiceClient.MarkMetadata(metadataId);
-                markedResources.Add(sourceMetadata);
+                await _dbService.InsertNewMarkSession(markSessionModel);
+
+                var markedSourceMetadata = await _metadataServiceClient.MarkMetadata(metadataId);
+                markSessionModel.DependantResources.Add(markedSourceMetadata);
+                await _dbService.UpdateMarkSession(markSessionModel);
 
                 var scenariosForMetadata = await _scenarioServiceClient.GetScenariosForMetadata(metadataId);
                 foreach (var scenarioModel in scenariosForMetadata)
                 {
-                    markedResources.Add(
-                        await _scenarioServiceClient.MarkScenario(scenarioModel)
-                    );
+                    var markedScenario = await _scenarioServiceClient.MarkScenario(scenarioModel);
+                    markSessionModel.DependantResources.Add(markedScenario);
+                    await _dbService.UpdateMarkSession(markSessionModel);
                 }
 
                 var resultConfigsForMetadata = await _resultConfigServiceClient.GetResultConfigsForMetadata(metadataId);
                 foreach (var resultConfigModel in resultConfigsForMetadata)
                 {
                     // ResultConfigs obey the metadata mark!
-                    var markedResultConfig = new MarkedResourceModel
-                    {
-                        ResourceType = "resultConfig",
-                        ResourceId = resultConfigModel.ConfigId
-                    };
-                    _loggerService.LogMarkedResource(markedResultConfig);
-                    markedResources.Add(markedResultConfig);
+                    var markedResultConfig =
+                        await _resultConfigServiceClient.CreateMarkedResultConfig(resultConfigModel);
+                    markSessionModel.DependantResources.Add(markedResultConfig);
+                    await _dbService.UpdateMarkSession(markSessionModel);
                 }
 
                 var simPlansForScenarios = new List<SimPlanModel>();
@@ -88,9 +89,9 @@ namespace mars_marking_svc.ResourceTypes.Metadata
                 }
                 foreach (var simPlanModel in simPlansForScenarios)
                 {
-                    markedResources.Add(
-                        await _simPlanServiceClient.MarkSimPlan(simPlanModel, projectId)
-                    );
+                    var markedSimPlan = await _simPlanServiceClient.MarkSimPlan(simPlanModel, projectId);
+                    markSessionModel.DependantResources.Add(markedSimPlan);
+                    await _dbService.UpdateMarkSession(markSessionModel);
                 }
 
                 var simRunsForSimPlans = new List<SimRunModel>();
@@ -102,54 +103,29 @@ namespace mars_marking_svc.ResourceTypes.Metadata
                 }
                 foreach (var simRunModel in simRunsForSimPlans)
                 {
-                    markedResources.Add(
-                        await _simRunServiceClient.MarkSimRun(simRunModel, projectId)
-                    );
+                    var stoppedSimRun = await _simRunServiceClient.StopSimRun(simRunModel, projectId);
+                    markSessionModel.DependantResources.Add(stoppedSimRun);
+                    await _dbService.UpdateMarkSession(markSessionModel);
                 }
 
                 foreach (var simRunModel in simRunsForSimPlans)
                 {
-                    markedResources.Add(
-                        await _resultDataServiceClient.MarkResultData(simRunModel)
-                    );
+                    var resultData = await _resultDataServiceClient.CreateMarkedResultData(simRunModel);
+                    markSessionModel.DependantResources.Add(resultData);
+                    await _dbService.UpdateMarkSession(markSessionModel);
                 }
 
-                return new OkObjectResult(markedResources);
-            }
-            catch (FailedToGetResourceException e)
-            {
-                _loggerService.LogExceptionMessage(e);
-                var unused = _markedResourceHandler.UnmarkMarkedResources(markedResources, projectId);
-                
-                return new StatusCodeResult(503);
-            }
-            catch (FailedToUpdateResourceException e)
-            {
-                _loggerService.LogExceptionMessage(e);
-                var unused = _markedResourceHandler.UnmarkMarkedResources(markedResources, projectId);
-                
-                return new StatusCodeResult(503);
-            }
-            catch (ResourceAlreadyMarkedException e)
-            {
-                _loggerService.LogExceptionMessage(e);
-                var unused = _markedResourceHandler.UnmarkMarkedResources(markedResources, projectId);
-                
-                return new StatusCodeResult(503);
-            }
-            catch (CannotMarkResourceException e)
-            {
-                _loggerService.LogExceptionMessage(e);
-                var unused = _markedResourceHandler.UnmarkMarkedResources(markedResources, projectId);
-                
-                return new StatusCodeResult(409);
+                markSessionModel.State = DbMarkSessionModel.DoneState;
+                await _dbService.UpdateMarkSession(markSessionModel);
+                _loggerService.LogUpdateEvent(markSessionModel.ToString());
+
+                return new OkObjectResult(markSessionModel.DependantResources);
             }
             catch (Exception e)
             {
-                _loggerService.LogExceptionMessageWithStackTrace(e);
-                var unused = _markedResourceHandler.UnmarkMarkedResources(markedResources, projectId);
-                
-                return new StatusCodeResult(503);
+                var unused = _errorHandlerService.HandleError(e, markSessionModel);
+
+                return _errorHandlerService.GetStatusCodeForError(e);
             }
         }
     }

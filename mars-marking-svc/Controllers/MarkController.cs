@@ -2,7 +2,6 @@
 using mars_marking_svc.ResourceTypes.Metadata.Interfaces;
 using mars_marking_svc.ResourceTypes.ProjectContents.Interfaces;
 using mars_marking_svc.ResourceTypes.ResultConfig.Interfaces;
-using mars_marking_svc.ResourceTypes.ResultData.Interfaces;
 using mars_marking_svc.ResourceTypes.Scenario.Interfaces;
 using mars_marking_svc.ResourceTypes.SimPlan.Interfaces;
 using mars_marking_svc.ResourceTypes.SimRun.Interfaces;
@@ -19,7 +18,6 @@ namespace mars_marking_svc.Controllers
         private readonly IResultConfigResourceHandler _resultConfigResourceHandler;
         private readonly ISimPlanResourceHandler _simPlanResourceHandler;
         private readonly ISimRunResourceHandler _simRunResourceHandler;
-        private readonly IResultDataResourceHandler _resultDataResourceHandler;
 
         public MarkController(
             IProjectResourceHandler projectResourceHandler,
@@ -27,8 +25,7 @@ namespace mars_marking_svc.Controllers
             IScenarioResourceHandler scenarioResourceHandler,
             IResultConfigResourceHandler resultConfigResourceHandler,
             ISimPlanResourceHandler simPlanResourceHandler,
-            ISimRunResourceHandler simRunResourceHandler,
-            IResultDataResourceHandler resultDataResourceHandler
+            ISimRunResourceHandler simRunResourceHandler
         )
         {
             _projectResourceHandler = projectResourceHandler;
@@ -37,7 +34,6 @@ namespace mars_marking_svc.Controllers
             _resultConfigResourceHandler = resultConfigResourceHandler;
             _simPlanResourceHandler = simPlanResourceHandler;
             _simRunResourceHandler = simRunResourceHandler;
-            _resultDataResourceHandler = resultDataResourceHandler;
         }
 
         [HttpGet("{resourceType}/{resourceId}")]
@@ -87,10 +83,6 @@ namespace mars_marking_svc.Controllers
                 case "simRun":
                 {
                     return await _simRunResourceHandler.MarkSimRunDependantResources(resourceId, projectId);
-                }
-                case "resultData":
-                {
-                    return await _resultDataResourceHandler.MarkResultDataDependantResources(resourceId, projectId);
                 }
                 default:
                 {

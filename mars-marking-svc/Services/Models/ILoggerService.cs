@@ -5,14 +5,22 @@ namespace mars_marking_svc.Services.Models
 {
     public interface ILoggerService
     {
-        void LogMarkedResource(MarkedResourceModel model);
+        void LodCreateEvent(string message);
 
-        void LogUnmarkResource(string resourceType, string id);
+        void LogUpdateEvent(string message);
 
-        void LogExceptionMessage(string exceptionMessage);
+        void LogDeleteEvent(string message);
 
-        void LogExceptionMessage(Exception error);
+        void LogMarkEvent(string message);
 
-        void LogExceptionMessageWithStackTrace(Exception error);
+        void LogUnmarkEvent(string message);
+
+        void LogSkipEvent(string message);
+
+        void LogStopEvent(string message);
+
+        void LogErrorEvent(Exception error);
+
+        void LogWarningEvent(string message);
     }
 }

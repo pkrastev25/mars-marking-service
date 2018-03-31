@@ -17,29 +17,20 @@ namespace mars_marking_svc.ResourceTypes.ResultData
             _loggerService = loggerService;
         }
 
-        public async Task<MarkedResourceModel> MarkResultData(string resultDataId)
+        public async Task<MarkedResourceModel> CreateMarkedResultData(string resultDataId)
         {
             return await Task.Run(() =>
             {
-                var markedResources = new MarkedResourceModel
-                {
-                    ResourceType = "resultData",
-                    ResourceId = resultDataId
-                };
-                _loggerService.LogMarkedResource(markedResources);
+                var markedResources = new MarkedResourceModel("resultData", resultDataId);
+                _loggerService.LogSkipEvent(markedResources.ToString());
 
                 return markedResources;
             });
         }
 
-        public async Task<MarkedResourceModel> MarkResultData(SimRunModel simRunModel)
+        public async Task<MarkedResourceModel> CreateMarkedResultData(SimRunModel simRunModel)
         {
-            return await MarkResultData(simRunModel.SimulationId);
-        }
-
-        public async Task UnmarkResultData(string resultDataId)
-        {
-            await Task.Run(() => { _loggerService.LogUnmarkResource("resultData", resultDataId); });
+            return await CreateMarkedResultData(simRunModel.SimulationId);
         }
     }
 }

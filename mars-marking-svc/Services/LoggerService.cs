@@ -1,41 +1,54 @@
 ﻿using System;
-using mars_marking_svc.MarkedResource.Models;
 using mars_marking_svc.Services.Models;
 
 namespace mars_marking_svc.Services
 {
     public class LoggerService : ILoggerService
     {
-        public void LogMarkedResource(MarkedResourceModel model)
+        public void LodCreateEvent(string message)
         {
-            Console.WriteLine(
-                $"[SUCCESS] Marked {model.ResourceType} with id: {model.ResourceId}"
-            );
+            Console.WriteLine($"[CREATE] {message}");
         }
 
-        public void LogUnmarkResource(string resourceType, string resourceId)
+        public void LogUpdateEvent(string message)
         {
-            Console.WriteLine(
-                $"[SUCCESS] Unmarked {resourceType} with id: {resourceId}"
-            );
+            Console.WriteLine($"[UPDATE] {message}");
         }
 
-        public void LogExceptionMessage(string exceptionMessage)
+        public void LogDeleteEvent(string message)
         {
-            Console.Error.WriteLine(
-                $"[ERROR] {exceptionMessage}"
-            );
+            Console.WriteLine($"[DELETE] {message}");
         }
 
-        public void LogExceptionMessage(Exception error)
+        public void LogMarkEvent(string message)
         {
-            LogExceptionMessage(error.Message);
+            Console.WriteLine($"[MARK] {message}");
         }
 
-        public void LogExceptionMessageWithStackTrace(Exception error)
+        public void LogUnmarkEvent(string message)
         {
-            LogExceptionMessage(error.Message);
+            Console.WriteLine($"[UNMARK] {message}");
+        }
+
+        public void LogSkipEvent(string message)
+        {
+            Console.WriteLine($"[SKIP] {message}");
+        }
+
+        public void LogStopEvent(string message)
+        {
+            Console.WriteLine($"[STOP] {message}");
+        }
+
+        public void LogErrorEvent(Exception error)
+        {
+            Console.Error.WriteLine($"[ERROR] {error.Message}");
             Console.Error.WriteLine(error.StackTrace);
+        }
+
+        public void LogWarningEvent(string message)
+        {
+            Console.WriteLine($"[WARNING] {message}");
         }
     }
 }

@@ -25,7 +25,7 @@ namespace mars_marking_svc.ResourceTypes.Metadata
         private readonly IResultDataClient _resultDataClient;
         private readonly IDbMarkSessionClient _dbMarkSessionClient;
         private readonly ILoggerService _loggerService;
-        private readonly IErrorHandlerService _errorHandlerService;
+        private readonly IErrorService _errorService;
 
         public MetadataResourceHandler(
             IMetadataClient metadataClient,
@@ -36,7 +36,7 @@ namespace mars_marking_svc.ResourceTypes.Metadata
             IResultDataClient resultDataClient,
             IDbMarkSessionClient dbMarkSessionClient,
             ILoggerService loggerService,
-            IErrorHandlerService errorHandlerService
+            IErrorService errorService
         )
         {
             _metadataClient = metadataClient;
@@ -47,7 +47,7 @@ namespace mars_marking_svc.ResourceTypes.Metadata
             _resultDataClient = resultDataClient;
             _dbMarkSessionClient = dbMarkSessionClient;
             _loggerService = loggerService;
-            _errorHandlerService = errorHandlerService;
+            _errorService = errorService;
         }
 
         public async Task<IActionResult> MarkMetadataDependantResources(string metadataId, string projectId)
@@ -123,9 +123,9 @@ namespace mars_marking_svc.ResourceTypes.Metadata
             }
             catch (Exception e)
             {
-                var unused = _errorHandlerService.HandleError(e, markSessionModel);
+                _errorService.HandleError(e, markSessionModel);
 
-                return _errorHandlerService.GetStatusCodeForError(e);
+                return _errorService.GetStatusCodeForError(e);
             }
         }
     }

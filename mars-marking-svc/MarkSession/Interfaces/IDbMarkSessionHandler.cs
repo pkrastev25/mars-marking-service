@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using mars_marking_svc.MarkedResource.Models;
 
-namespace mars_marking_svc.ResourceTypes.MarkedResource.Interfaces
+namespace mars_marking_svc.MarkSession.Interfaces
 {
     public interface IDbMarkSessionHandler
     {

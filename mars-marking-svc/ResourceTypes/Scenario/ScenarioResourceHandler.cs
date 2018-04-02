@@ -16,7 +16,7 @@ namespace mars_marking_svc.ResourceTypes.Scenario
     {
         private readonly IDbMarkSessionClient _dbMarkSessionClient;
         private readonly ILoggerService _loggerService;
-        private readonly IErrorHandlerService _errorHandlerService;
+        private readonly IErrorService _errorService;
         private readonly IScenarioClient _scenarioClient;
         private readonly ISimPlanClient _simPlanClient;
         private readonly ISimRunClient _simRunClient;
@@ -29,7 +29,7 @@ namespace mars_marking_svc.ResourceTypes.Scenario
             IResultDataClient resultDataClient,
             IDbMarkSessionClient dbMarkSessionClient,
             ILoggerService loggerService,
-            IErrorHandlerService errorHandlerService
+            IErrorService errorService
         )
         {
             _scenarioClient = scenarioClient;
@@ -38,7 +38,7 @@ namespace mars_marking_svc.ResourceTypes.Scenario
             _resultDataClient = resultDataClient;
             _dbMarkSessionClient = dbMarkSessionClient;
             _loggerService = loggerService;
-            _errorHandlerService = errorHandlerService;
+            _errorService = errorService;
         }
 
         public async Task<IActionResult> MarkScenarioDependantResources(string scenarioId, string projectId)
@@ -90,9 +90,9 @@ namespace mars_marking_svc.ResourceTypes.Scenario
             }
             catch (Exception e)
             {
-                var unused = _errorHandlerService.HandleError(e, markSessionModel);
+                _errorService.HandleError(e, markSessionModel);
 
-                return _errorHandlerService.GetStatusCodeForError(e);
+                return _errorService.GetStatusCodeForError(e);
             }
         }
     }

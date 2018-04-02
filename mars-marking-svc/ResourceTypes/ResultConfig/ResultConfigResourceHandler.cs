@@ -20,7 +20,7 @@ namespace mars_marking_svc.ResourceTypes.ResultConfig
         private readonly IResultDataClient _resultDataClient;
         private readonly IDbMarkSessionClient _dbMarkSessionClient;
         private readonly ILoggerService _loggerService;
-        private readonly IErrorHandlerService _errorHandlerService;
+        private readonly IErrorService _errorService;
 
         public ResultConfigResourceHandler(
             IResultConfigClient resultConfigClient,
@@ -29,7 +29,7 @@ namespace mars_marking_svc.ResourceTypes.ResultConfig
             IResultDataClient resultDataClient,
             IDbMarkSessionClient dbMarkSessionClient,
             ILoggerService loggerService,
-            IErrorHandlerService errorHandlerService
+            IErrorService errorService
         )
         {
             _resultConfigClient = resultConfigClient;
@@ -38,7 +38,7 @@ namespace mars_marking_svc.ResourceTypes.ResultConfig
             _resultDataClient = resultDataClient;
             _dbMarkSessionClient = dbMarkSessionClient;
             _loggerService = loggerService;
-            _errorHandlerService = errorHandlerService;
+            _errorService = errorService;
         }
 
         public async Task<IActionResult> MarkResultConfigDependantResources(string resultConfigId, string projectId)
@@ -94,9 +94,9 @@ namespace mars_marking_svc.ResourceTypes.ResultConfig
             }
             catch (Exception e)
             {
-                var unused = _errorHandlerService.HandleError(e, markSessionModel);
+                _errorService.HandleError(e, markSessionModel);
 
-                return _errorHandlerService.GetStatusCodeForError(e);
+                return _errorService.GetStatusCodeForError(e);
             }
         }
     }

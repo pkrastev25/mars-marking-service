@@ -162,17 +162,19 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
             var response =
                 await _httpService.GetAsync($"http://sim-runner-svc/simplan?id={simPlanId}&projectid={projectId}");
 
-            switch (response.StatusCode)
+            if (response.StatusCode == HttpStatusCode.OK)
             {
-                case HttpStatusCode.OK:
-                    return true;
-                case HttpStatusCode.NotFound:
-                    return false;
-                default:
-                    throw new FailedToGetResourceException(
-                        $"Failed to get simPlan with id: {simPlanId}, projectId: {projectId} from sim-runner-svc!"
-                    );
+                return true;
             }
+
+            if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                return false;
+            }
+
+            throw new FailedToGetResourceException(
+                $"Failed to get simPlan with id: {simPlanId}, projectId: {projectId} from sim-runner-svc!"
+            );
         }
     }
 }

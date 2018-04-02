@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using mars_marking_svc.Exceptions;
 using mars_marking_svc.MarkedResource.Models;
 using mars_marking_svc.Services.Models;
 using MongoDB.Driver;
+using static mars_marking_svc.Constants.Constants;
 
 public class DbMarkSessionClient : IDbMarkSessionClient
 {
@@ -48,8 +50,25 @@ public class DbMarkSessionClient : IDbMarkSessionClient
         }
     }
 
+    public async Task<IEnumerable<DbMarkSessionModel>> GetAll()
+    {
+        return await _dbMongoService.GetMarkSessionCollection().Find(x => true).ToListAsync();
+    }
+
     public async Task Update(DbMarkSessionModel markSessionModel)
     {
+        if (DbMarkSessionModel.MarkingState.Equals(markSessionModel.State))
+        {
+            markSessionModel.MarkSessionExpireTime =
+                DateTime.Now.AddMilliseconds(MarkSessionExpireIntervalForUpdateStateMs).Ticks;
+        }
+
+        if (DbMarkSessionModel.DoneState.Equals(markSessionModel.State))
+        {
+            markSessionModel.MarkSessionExpireTime =
+                DateTime.Now.AddMilliseconds(MarkSessionExpireIntervalForDoneStateMs).Ticks;
+        }
+
         await _dbMongoService.GetMarkSessionCollection().ReplaceOneAsync(
             GetFilterDefinitionForResourceId(markSessionModel.ResourceId),
             markSessionModel

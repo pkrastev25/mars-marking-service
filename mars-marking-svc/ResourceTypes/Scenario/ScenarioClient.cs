@@ -142,17 +142,19 @@ namespace mars_marking_svc.ResourceTypes.Scenario
         {
             var response = await _httpService.GetAsync($"http://scenario-svc/scenarios/{scenarioId}");
 
-            switch (response.StatusCode)
+            if (response.StatusCode == HttpStatusCode.OK)
             {
-                case HttpStatusCode.OK:
-                    return true;
-                case HttpStatusCode.NotFound:
-                    return false;
-                default:
-                    throw new FailedToGetResourceException(
-                        $"Failed to get scenario with id: {scenarioId} from scenario-svc!"
-                    );
+                return true;
             }
+
+            if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                return false;
+            }
+
+            throw new FailedToGetResourceException(
+                $"Failed to get scenario with id: {scenarioId} from scenario-svc!"
+            );
         }
     }
 }

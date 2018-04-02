@@ -1,6 +1,6 @@
 ﻿using System.Net.Http;
+using mars_marking_svc.MarkSession.Interfaces;
 using mars_marking_svc.ResourceTypes.MarkedResource;
-using mars_marking_svc.ResourceTypes.MarkedResource.Interfaces;
 using mars_marking_svc.ResourceTypes.Metadata;
 using mars_marking_svc.ResourceTypes.Metadata.Interfaces;
 using mars_marking_svc.ResourceTypes.ProjectContents;
@@ -21,6 +21,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace mars_marking_svc
 {
@@ -41,9 +42,10 @@ namespace mars_marking_svc
             // Services
             services.AddSingleton<HttpClient>();
             services.AddSingleton<IDbMongoService, DbMongoService>();
+            services.AddSingleton<IHostedService, HostedMarkSessionCronService>();
             services.AddTransient<IHttpService, HttpService>();
             services.AddTransient<ILoggerService, LoggerService>();
-            services.AddTransient<IErrorHandlerService, ErrorHandlerService>();
+            services.AddTransient<IErrorService, ErrorService>();
 
             // Clients
             services.AddTransient<IMetadataClient, MetadataClient>();

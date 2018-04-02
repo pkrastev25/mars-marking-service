@@ -16,7 +16,7 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
         private readonly IResultDataClient _resultDataClient;
         private readonly IDbMarkSessionClient _dbMarkSessionClient;
         private readonly ILoggerService _loggerService;
-        private readonly IErrorHandlerService _errorHandlerService;
+        private readonly IErrorService _errorService;
 
         public SimPlanResourceHandler(
             ISimPlanClient simPlanClient,
@@ -24,7 +24,7 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
             IResultDataClient resultDataClient,
             IDbMarkSessionClient dbMarkSessionClient,
             ILoggerService loggerService,
-            IErrorHandlerService errorHandlerService
+            IErrorService errorService
         )
         {
             _simPlanClient = simPlanClient;
@@ -32,7 +32,7 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
             _resultDataClient = resultDataClient;
             _dbMarkSessionClient = dbMarkSessionClient;
             _loggerService = loggerService;
-            _errorHandlerService = errorHandlerService;
+            _errorService = errorService;
         }
 
         public async Task<IActionResult> MarkSimPlanDependantResources(string simPlanId, string projectId)
@@ -70,9 +70,9 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
             }
             catch (Exception e)
             {
-                var unused = _errorHandlerService.HandleError(e, markSessionModel);
+                _errorService.HandleError(e, markSessionModel);
 
-                return _errorHandlerService.GetStatusCodeForError(e);
+                return _errorService.GetStatusCodeForError(e);
             }
         }
     }

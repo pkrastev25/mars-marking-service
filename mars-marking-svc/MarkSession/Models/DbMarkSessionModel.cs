@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using MongoDB.Bson.Serialization.Attributes;
+using static mars_marking_svc.Constants.Constants;
 
 namespace mars_marking_svc.MarkedResource.Models
 {
@@ -20,8 +22,7 @@ namespace mars_marking_svc.MarkedResource.Models
 
         public string State { get; set; }
 
-        // TODO: Discuss this
-        public long MarkExpireTime { get; set; }
+        public long MarkSessionExpireTime { get; set; }
 
         public MarkedResourceModel SourceDependency { get; set; }
 
@@ -32,6 +33,7 @@ namespace mars_marking_svc.MarkedResource.Models
             ResourceId = resourceId;
             ProjectId = projectId;
             ResourceType = resourceType;
+            MarkSessionExpireTime = DateTime.Now.AddMilliseconds(MarkSessionExpireIntervalForUpdateStateMs).Ticks;
             State = MarkingState;
             DependantResources = new List<MarkedResourceModel>();
         }

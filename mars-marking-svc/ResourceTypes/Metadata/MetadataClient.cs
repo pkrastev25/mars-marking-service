@@ -96,8 +96,10 @@ namespace mars_marking_svc.ResourceTypes.Metadata
                 );
             }
 
-            var markedResource = new MarkedResourceModel("metadata", metadataModel.DataId);
-            markedResource.PreviousState = metadataPreviousState;
+            var markedResource = new MarkedResourceModel("metadata", metadataModel.DataId)
+            {
+                PreviousState = metadataPreviousState
+            };
             _loggerService.LogMarkEvent(markedResource.ToString());
 
             return markedResource;
@@ -136,17 +138,19 @@ namespace mars_marking_svc.ResourceTypes.Metadata
         {
             var response = await _httpService.GetAsync($"http://metadata-svc/metadata/{metadataId}");
 
-            switch (response.StatusCode)
+            if (response.StatusCode == HttpStatusCode.OK)
             {
-                case HttpStatusCode.OK:
-                    return true;
-                case HttpStatusCode.NotFound:
-                    return false;
-                default:
-                    throw new FailedToGetResourceException(
-                        $"Failed to get metadata with id: {metadataId} from metadata-svc!"
-                    );
+                return true;
             }
+
+            if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                return false;
+            }
+
+            throw new FailedToGetResourceException(
+                $"Failed to get metadata with id: {metadataId} from metadata-svc!"
+            );
         }
     }
 }

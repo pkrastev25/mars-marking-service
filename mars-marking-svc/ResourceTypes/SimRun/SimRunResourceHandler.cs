@@ -14,19 +14,19 @@ namespace mars_marking_svc.ResourceTypes.SimRun
         private readonly ISimRunClient _simRunClient;
         private readonly IResultDataClient _resultDataClient;
         private readonly ILoggerService _loggerService;
-        private readonly IErrorHandlerService _errorHandlerService;
+        private readonly IErrorService _errorService;
 
         public SimRunResourceHandler(
             ISimRunClient simRunClient,
             IResultDataClient resultDataClient,
             ILoggerService loggerService,
-            IErrorHandlerService errorHandlerService
+            IErrorService errorService
         )
         {
             _simRunClient = simRunClient;
             _resultDataClient = resultDataClient;
             _loggerService = loggerService;
-            _errorHandlerService = errorHandlerService;
+            _errorService = errorService;
         }
 
         public async Task<IActionResult> MarkSimRunDependantResources(string simRunId, string projectId)
@@ -51,7 +51,7 @@ namespace mars_marking_svc.ResourceTypes.SimRun
             {
                 _loggerService.LogErrorEvent(e);
 
-                return _errorHandlerService.GetStatusCodeForError(e);
+                return _errorService.GetStatusCodeForError(e);
             }
         }
     }

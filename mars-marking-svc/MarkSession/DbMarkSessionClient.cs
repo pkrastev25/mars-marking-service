@@ -50,6 +50,11 @@ public class DbMarkSessionClient : IDbMarkSessionClient
         }
     }
 
+    public async Task<DbMarkSessionModel> Get(string resourceId)
+    {
+        return await FindMarkSessionByResourceId(resourceId);
+    }
+
     public async Task<IEnumerable<DbMarkSessionModel>> GetAll()
     {
         return await _dbMongoService.GetMarkSessionCollection().Find(x => true).ToListAsync();
@@ -60,13 +65,13 @@ public class DbMarkSessionClient : IDbMarkSessionClient
         if (DbMarkSessionModel.MarkingState.Equals(markSessionModel.State))
         {
             markSessionModel.MarkSessionExpireTime =
-                DateTime.Now.AddMilliseconds(MarkSessionExpireIntervalForUpdateStateMs).Ticks;
+                DateTime.Now.AddTicks(MarkSessionExpireIntervalForUpdateStateTicks).Ticks;
         }
 
         if (DbMarkSessionModel.DoneState.Equals(markSessionModel.State))
         {
             markSessionModel.MarkSessionExpireTime =
-                DateTime.Now.AddMilliseconds(MarkSessionExpireIntervalForDoneStateMs).Ticks;
+                DateTime.Now.AddTicks(MarkSessionExpireIntervalForDoneStateTicks).Ticks;
         }
 
         await _dbMongoService.GetMarkSessionCollection().ReplaceOneAsync(

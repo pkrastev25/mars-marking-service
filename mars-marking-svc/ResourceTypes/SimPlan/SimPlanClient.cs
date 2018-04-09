@@ -167,7 +167,7 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
                 return true;
             }
 
-            if (response.StatusCode == HttpStatusCode.NotFound)
+            if (response.StatusCode == HttpStatusCode.NoContent)
             {
                 return false;
             }

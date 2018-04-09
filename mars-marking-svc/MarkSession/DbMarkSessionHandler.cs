@@ -7,6 +7,7 @@ using mars_marking_svc.ResourceTypes.Metadata.Interfaces;
 using mars_marking_svc.ResourceTypes.Scenario.Interfaces;
 using mars_marking_svc.ResourceTypes.SimPlan.Interfaces;
 using mars_marking_svc.Services.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace mars_marking_svc.ResourceTypes.MarkedResource
 {
@@ -31,6 +32,23 @@ namespace mars_marking_svc.ResourceTypes.MarkedResource
             _simPlanClient = simPlanClient;
             _dbMarkSessionClient = dbMarkSessionClient;
             _loggerService = loggerService;
+        }
+
+        public async Task<IActionResult> UnmarkResourcesForMarkSession(string resourceId)
+        {
+            try
+            {
+                var markSession = await _dbMarkSessionClient.Get(resourceId);
+                await UnmarkResourcesForMarkSession(markSession);
+
+                return new OkResult();
+            }
+            catch (Exception e)
+            {
+                _loggerService.LogErrorEvent(e);
+
+                return new StatusCodeResult(500);
+            }
         }
 
         public async Task UnmarkResourcesForMarkSession(DbMarkSessionModel markSessionModel)

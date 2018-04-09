@@ -40,7 +40,6 @@ namespace mars_marking_svc
             services.AddMvc();
 
             // Services
-            services.AddSingleton<HttpClient>();
             services.AddSingleton<IDbMongoService, DbMongoService>();
             services.AddSingleton<IHostedService, HostedMarkSessionCronService>();
             services.AddTransient<IHttpService, HttpService>();
@@ -48,6 +47,7 @@ namespace mars_marking_svc
             services.AddTransient<IErrorService, ErrorService>();
 
             // Clients
+            services.AddSingleton<HttpClient>();
             services.AddTransient<IMetadataClient, MetadataClient>();
             services.AddTransient<IScenarioClient, ScenarioClient>();
             services.AddTransient<IResultConfigClient, ResultConfigClient>();

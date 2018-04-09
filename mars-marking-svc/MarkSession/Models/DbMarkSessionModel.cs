@@ -33,7 +33,7 @@ namespace mars_marking_svc.MarkedResource.Models
             ResourceId = resourceId;
             ProjectId = projectId;
             ResourceType = resourceType;
-            MarkSessionExpireTime = DateTime.Now.AddMilliseconds(MarkSessionExpireIntervalForUpdateStateMs).Ticks;
+            MarkSessionExpireTime = DateTime.Now.AddTicks(MarkSessionExpireIntervalForUpdateStateTicks).Ticks;
             State = MarkingState;
             DependantResources = new List<MarkedResourceModel>();
         }

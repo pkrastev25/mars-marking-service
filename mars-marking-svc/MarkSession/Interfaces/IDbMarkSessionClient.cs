@@ -8,6 +8,8 @@ namespace mars_marking_svc.Services.Models
     {
         Task Create(DbMarkSessionModel markSessionModel);
 
+        Task<DbMarkSessionModel> Get(string resourceId);
+
         Task<IEnumerable<DbMarkSessionModel>> GetAll();
 
         Task Update(DbMarkSessionModel markSessionModel);

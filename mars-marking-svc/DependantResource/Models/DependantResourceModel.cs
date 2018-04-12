@@ -2,7 +2,7 @@
 
 namespace mars_marking_svc.MarkedResource.Models
 {
-    public class MarkedResourceModel
+    public class DependantResourceModel
     {
         [JsonProperty("resourceType")]
         public string ResourceType { get; set; }
@@ -13,7 +13,7 @@ namespace mars_marking_svc.MarkedResource.Models
         [JsonProperty("previousState", NullValueHandling = NullValueHandling.Ignore)]
         public string PreviousState { get; set; }
 
-        public MarkedResourceModel(string resourceType, string resourceId)
+        public DependantResourceModel(string resourceType, string resourceId)
         {
             ResourceType = resourceType;
             ResourceId = resourceId;

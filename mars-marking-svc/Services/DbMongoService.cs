@@ -13,11 +13,11 @@ namespace mars_marking_svc.Services
             _mongoClient = new MongoClient("mongodb://mongodb:27017");
         }
 
-        public IMongoCollection<DbMarkSessionModel> GetMarkSessionCollection()
+        public IMongoCollection<MarkSessionModel> GetMarkSessionCollection()
         {
             return _mongoClient
                 .GetDatabase("marked-resources")
-                .GetCollection<DbMarkSessionModel>("mark-session");
+                .GetCollection<MarkSessionModel>("mark-session");
         }
     }
 }

@@ -54,7 +54,7 @@ namespace mars_marking_svc
             services.AddTransient<ISimPlanClient, SimPlanClient>();
             services.AddTransient<ISimRunClient, SimRunClient>();
             services.AddTransient<IResultDataClient, ResultDataClient>();
-            services.AddTransient<IDbMarkSessionClient, DbMarkSessionClient>();
+            services.AddTransient<IMarkSessionRepository, MarkSessionRepository>();
 
             // Handlers
             services.AddTransient<IProjectResourceHandler, ProjectResourceHandler>();
@@ -63,7 +63,7 @@ namespace mars_marking_svc
             services.AddTransient<IResultConfigResourceHandler, ResultConfigResourceHandler>();
             services.AddTransient<ISimPlanResourceHandler, SimPlanResourceHandler>();
             services.AddTransient<ISimRunResourceHandler, SimRunResourceHandler>();
-            services.AddTransient<IDbMarkSessionHandler, DbMarkSessionHandler>();
+            services.AddTransient<IMarkSessionHandler, MarkSessionHandler>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

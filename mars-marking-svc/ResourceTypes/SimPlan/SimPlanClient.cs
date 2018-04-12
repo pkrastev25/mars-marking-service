@@ -94,7 +94,7 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
             return JsonConvert.DeserializeObject<List<SimPlanModel>>(jsonResponse);
         }
 
-        public async Task<MarkedResourceModel> MarkSimPlan(string simPlanId, string projectId)
+        public async Task<DependantResourceModel> MarkSimPlan(string simPlanId, string projectId)
         {
             var simPlan = await GetSimPlan(simPlanId, projectId);
             simPlan.Id = simPlanId;
@@ -102,7 +102,7 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
             return await MarkSimPlan(simPlan, projectId);
         }
 
-        public async Task<MarkedResourceModel> MarkSimPlan(SimPlanModel simPlanModel, string projectId)
+        public async Task<DependantResourceModel> MarkSimPlan(SimPlanModel simPlanModel, string projectId)
         {
             if (simPlanModel.ToBeDeleted)
             {
@@ -125,21 +125,21 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
                 );
             }
 
-            var markedResource = new MarkedResourceModel("simPlan", simPlanModel.Id);
+            var markedResource = new DependantResourceModel("simPlan", simPlanModel.Id);
             _loggerService.LogMarkEvent(markedResource.ToString());
 
             return markedResource;
         }
 
-        public async Task UnmarkSimPlan(MarkedResourceModel markedResourceModel, string projectId)
+        public async Task UnmarkSimPlan(DependantResourceModel dependantResourceModel, string projectId)
         {
-            if (!await DoesSimPlanExist(markedResourceModel.ResourceId, projectId))
+            if (!await DoesSimPlanExist(dependantResourceModel.ResourceId, projectId))
             {
-                _loggerService.LogSkipEvent(markedResourceModel.ToString());
+                _loggerService.LogSkipEvent(dependantResourceModel.ToString());
                 return;
             }
 
-            var simPlanModel = await GetSimPlan(markedResourceModel.ResourceId, projectId);
+            var simPlanModel = await GetSimPlan(dependantResourceModel.ResourceId, projectId);
             simPlanModel.ToBeDeleted = false;
 
             var response = await _httpService.PutAsync(
@@ -154,7 +154,7 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
                 );
             }
 
-            _loggerService.LogUnmarkEvent(markedResourceModel.ToString());
+            _loggerService.LogUnmarkEvent(dependantResourceModel.ToString());
         }
 
         private async Task<bool> DoesSimPlanExist(string simPlanId, string projectId)

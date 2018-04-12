@@ -23,7 +23,7 @@ namespace mars_marking_svc.ResourceTypes.Metadata
         private readonly ISimPlanClient _simPlanClient;
         private readonly ISimRunClient _simRunClient;
         private readonly IResultDataClient _resultDataClient;
-        private readonly IDbMarkSessionClient _dbMarkSessionClient;
+        private readonly IMarkSessionRepository _markSessionRepository;
         private readonly ILoggerService _loggerService;
         private readonly IErrorService _errorService;
 
@@ -34,7 +34,7 @@ namespace mars_marking_svc.ResourceTypes.Metadata
             ISimPlanClient simPlanClient,
             ISimRunClient simRunClient,
             IResultDataClient resultDataClient,
-            IDbMarkSessionClient dbMarkSessionClient,
+            IMarkSessionRepository markSessionRepository,
             ILoggerService loggerService,
             IErrorService errorService
         )
@@ -45,29 +45,29 @@ namespace mars_marking_svc.ResourceTypes.Metadata
             _simPlanClient = simPlanClient;
             _simRunClient = simRunClient;
             _resultDataClient = resultDataClient;
-            _dbMarkSessionClient = dbMarkSessionClient;
+            _markSessionRepository = markSessionRepository;
             _loggerService = loggerService;
             _errorService = errorService;
         }
 
         public async Task<IActionResult> MarkMetadataDependantResources(string metadataId, string projectId)
         {
-            var markSessionModel = new DbMarkSessionModel(metadataId, projectId, "metadata");
+            var markSessionModel = new MarkSessionModel(metadataId, projectId, "metadata");
 
             try
             {
-                await _dbMarkSessionClient.Create(markSessionModel);
+                await _markSessionRepository.Create(markSessionModel);
 
                 var markedSourceMetadata = await _metadataClient.MarkMetadata(metadataId);
                 markSessionModel.DependantResources.Add(markedSourceMetadata);
-                await _dbMarkSessionClient.Update(markSessionModel);
+                await _markSessionRepository.Update(markSessionModel);
 
                 var scenariosForMetadata = await _scenarioClient.GetScenariosForMetadata(metadataId);
                 foreach (var scenarioModel in scenariosForMetadata)
                 {
                     var markedScenario = await _scenarioClient.MarkScenario(scenarioModel);
                     markSessionModel.DependantResources.Add(markedScenario);
-                    await _dbMarkSessionClient.Update(markSessionModel);
+                    await _markSessionRepository.Update(markSessionModel);
                 }
 
                 var resultConfigsForMetadata = await _resultConfigClient.GetResultConfigsForMetadata(metadataId);
@@ -77,7 +77,7 @@ namespace mars_marking_svc.ResourceTypes.Metadata
                     var markedResultConfig =
                         await _resultConfigClient.CreateMarkedResultConfig(resultConfigModel);
                     markSessionModel.DependantResources.Add(markedResultConfig);
-                    await _dbMarkSessionClient.Update(markSessionModel);
+                    await _markSessionRepository.Update(markSessionModel);
                 }
 
                 var simPlansForScenarios = new List<SimPlanModel>();
@@ -91,7 +91,7 @@ namespace mars_marking_svc.ResourceTypes.Metadata
                 {
                     var markedSimPlan = await _simPlanClient.MarkSimPlan(simPlanModel, projectId);
                     markSessionModel.DependantResources.Add(markedSimPlan);
-                    await _dbMarkSessionClient.Update(markSessionModel);
+                    await _markSessionRepository.Update(markSessionModel);
                 }
 
                 var simRunsForSimPlans = new List<SimRunModel>();
@@ -105,18 +105,18 @@ namespace mars_marking_svc.ResourceTypes.Metadata
                 {
                     var stoppedSimRun = await _simRunClient.StopSimRun(simRunModel, projectId);
                     markSessionModel.DependantResources.Add(stoppedSimRun);
-                    await _dbMarkSessionClient.Update(markSessionModel);
+                    await _markSessionRepository.Update(markSessionModel);
                 }
 
                 foreach (var simRunModel in simRunsForSimPlans)
                 {
                     var resultData = await _resultDataClient.CreateMarkedResultData(simRunModel);
                     markSessionModel.DependantResources.Add(resultData);
-                    await _dbMarkSessionClient.Update(markSessionModel);
+                    await _markSessionRepository.Update(markSessionModel);
                 }
 
-                markSessionModel.State = DbMarkSessionModel.DoneState;
-                await _dbMarkSessionClient.Update(markSessionModel);
+                markSessionModel.State = MarkSessionModel.DoneState;
+                await _markSessionRepository.Update(markSessionModel);
                 _loggerService.LogUpdateEvent(markSessionModel.ToString());
 
                 return new OkObjectResult(markSessionModel.DependantResources);

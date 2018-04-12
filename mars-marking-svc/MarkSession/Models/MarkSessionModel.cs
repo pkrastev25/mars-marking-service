@@ -6,7 +6,7 @@ using static mars_marking_svc.Constants.Constants;
 namespace mars_marking_svc.MarkedResource.Models
 {
     [BsonIgnoreExtraElements(true)]
-    public class DbMarkSessionModel
+    public class MarkSessionModel
     {
         public const string MarkingState = "Marking";
 
@@ -24,18 +24,18 @@ namespace mars_marking_svc.MarkedResource.Models
 
         public long MarkSessionExpireTime { get; set; }
 
-        public MarkedResourceModel SourceDependency { get; set; }
+        public DependantResourceModel SourceDependency { get; set; }
 
-        public List<MarkedResourceModel> DependantResources { get; set; }
+        public List<DependantResourceModel> DependantResources { get; set; }
 
-        public DbMarkSessionModel(string resourceId, string projectId, string resourceType)
+        public MarkSessionModel(string resourceId, string projectId, string resourceType)
         {
             ResourceId = resourceId;
             ProjectId = projectId;
             ResourceType = resourceType;
             MarkSessionExpireTime = DateTime.Now.AddTicks(MarkSessionExpireIntervalForUpdateStateTicks).Ticks;
             State = MarkingState;
-            DependantResources = new List<MarkedResourceModel>();
+            DependantResources = new List<DependantResourceModel>();
         }
 
         public override string ToString()

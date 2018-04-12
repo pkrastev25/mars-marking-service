@@ -11,10 +11,10 @@ namespace mars_marking_svc.ResourceTypes.Metadata.Interfaces
 
         Task<List<MetadataModel>> GetMetadataForProject(string projectId);
 
-        Task<MarkedResourceModel> MarkMetadata(string metadataId);
+        Task<DependantResourceModel> MarkMetadata(string metadataId);
 
-        Task<MarkedResourceModel> MarkMetadata(MetadataModel metadataModel);
+        Task<DependantResourceModel> MarkMetadata(MetadataModel metadataModel);
 
-        Task UnmarkMetadata(MarkedResourceModel markedResourceModel);
+        Task UnmarkMetadata(DependantResourceModel dependantResourceModel);
     }
 }

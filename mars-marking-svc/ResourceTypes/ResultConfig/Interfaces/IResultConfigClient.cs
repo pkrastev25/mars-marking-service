@@ -11,8 +11,8 @@ namespace mars_marking_svc.ResourceTypes.ResultConfig.Interfaces
 
         Task<List<ResultConfigModel>> GetResultConfigsForMetadata(string metadataId);
 
-        Task<MarkedResourceModel> CreateMarkedResultConfig(string resultConfigId);
+        Task<DependantResourceModel> CreateMarkedResultConfig(string resultConfigId);
 
-        Task<MarkedResourceModel> CreateMarkedResultConfig(ResultConfigModel resultConfigModel);
+        Task<DependantResourceModel> CreateMarkedResultConfig(ResultConfigModel resultConfigModel);
     }
 }

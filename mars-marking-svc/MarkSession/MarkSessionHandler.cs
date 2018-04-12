@@ -11,26 +11,26 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace mars_marking_svc.ResourceTypes.MarkedResource
 {
-    public class DbMarkSessionHandler : IDbMarkSessionHandler
+    public class MarkSessionHandler : IMarkSessionHandler
     {
         private readonly IMetadataClient _metadataClient;
         private readonly IScenarioClient _scenarioClient;
         private readonly ISimPlanClient _simPlanClient;
-        private readonly IDbMarkSessionClient _dbMarkSessionClient;
+        private readonly IMarkSessionRepository _markSessionRepository;
         private readonly ILoggerService _loggerService;
 
-        public DbMarkSessionHandler(
+        public MarkSessionHandler(
             IMetadataClient metadataClient,
             IScenarioClient scenarioClient,
             ISimPlanClient simPlanClient,
-            IDbMarkSessionClient dbMarkSessionClient,
+            IMarkSessionRepository markSessionRepository,
             ILoggerService loggerService
         )
         {
             _metadataClient = metadataClient;
             _scenarioClient = scenarioClient;
             _simPlanClient = simPlanClient;
-            _dbMarkSessionClient = dbMarkSessionClient;
+            _markSessionRepository = markSessionRepository;
             _loggerService = loggerService;
         }
 
@@ -38,7 +38,7 @@ namespace mars_marking_svc.ResourceTypes.MarkedResource
         {
             try
             {
-                var markSession = await _dbMarkSessionClient.Get(resourceId);
+                var markSession = await _markSessionRepository.Get(resourceId);
                 await UnmarkResourcesForMarkSession(markSession);
 
                 return new OkResult();
@@ -51,22 +51,22 @@ namespace mars_marking_svc.ResourceTypes.MarkedResource
             }
         }
 
-        public async Task UnmarkResourcesForMarkSession(DbMarkSessionModel markSessionModel)
+        public async Task UnmarkResourcesForMarkSession(MarkSessionModel markSessionModel)
         {
             try
             {
-                markSessionModel.State = DbMarkSessionModel.AbortingState;
-                await _dbMarkSessionClient.Update(markSessionModel);
+                markSessionModel.State = MarkSessionModel.AbortingState;
+                await _markSessionRepository.Update(markSessionModel);
                 _loggerService.LogUpdateEvent(markSessionModel.ToString());
 
                 if (markSessionModel.SourceDependency != null)
                 {
                     await UnmarkMarkedResource(markSessionModel.SourceDependency, markSessionModel.ProjectId);
                     markSessionModel.SourceDependency = null;
-                    await _dbMarkSessionClient.Update(markSessionModel);
+                    await _markSessionRepository.Update(markSessionModel);
                 }
 
-                var markedDependantResources = new List<MarkedResourceModel>(markSessionModel.DependantResources);
+                var markedDependantResources = new List<DependantResourceModel>(markSessionModel.DependantResources);
 
                 foreach (var markedResourceModel in markedDependantResources)
                 {
@@ -75,10 +75,10 @@ namespace mars_marking_svc.ResourceTypes.MarkedResource
                     var index = markSessionModel.DependantResources.FindIndex(m =>
                         m.ResourceId == unmarkedResourceModel.ResourceId);
                     markSessionModel.DependantResources.RemoveAt(index);
-                    await _dbMarkSessionClient.Update(markSessionModel);
+                    await _markSessionRepository.Update(markSessionModel);
                 }
 
-                await _dbMarkSessionClient.Delete(markSessionModel);
+                await _markSessionRepository.Delete(markSessionModel);
             }
             catch (Exception e)
             {
@@ -86,49 +86,49 @@ namespace mars_marking_svc.ResourceTypes.MarkedResource
             }
         }
 
-        private async Task<MarkedResourceModel> UnmarkMarkedResource(
-            MarkedResourceModel markedResourceModel,
+        private async Task<DependantResourceModel> UnmarkMarkedResource(
+            DependantResourceModel dependantResourceModel,
             string projectId
         )
         {
-            switch (markedResourceModel.ResourceType)
+            switch (dependantResourceModel.ResourceType)
             {
                 case "metadata":
                 {
-                    await _metadataClient.UnmarkMetadata(markedResourceModel);
-                    return markedResourceModel;
+                    await _metadataClient.UnmarkMetadata(dependantResourceModel);
+                    return dependantResourceModel;
                 }
                 case "scenario":
                 {
-                    await _scenarioClient.UnmarkScenario(markedResourceModel);
-                    return markedResourceModel;
+                    await _scenarioClient.UnmarkScenario(dependantResourceModel);
+                    return dependantResourceModel;
                 }
                 case "resultConfig":
                 {
-                    _loggerService.LogSkipEvent(markedResourceModel.ToString());
-                    return markedResourceModel;
+                    _loggerService.LogSkipEvent(dependantResourceModel.ToString());
+                    return dependantResourceModel;
                 }
                 case "simPlan":
                 {
-                    await _simPlanClient.UnmarkSimPlan(markedResourceModel, projectId);
-                    return markedResourceModel;
+                    await _simPlanClient.UnmarkSimPlan(dependantResourceModel, projectId);
+                    return dependantResourceModel;
                 }
                 case "simRun":
                 {
-                    _loggerService.LogSkipEvent(markedResourceModel.ToString());
-                    return markedResourceModel;
+                    _loggerService.LogSkipEvent(dependantResourceModel.ToString());
+                    return dependantResourceModel;
                 }
                 case "resultData":
                 {
-                    _loggerService.LogSkipEvent(markedResourceModel.ToString());
-                    return markedResourceModel;
+                    _loggerService.LogSkipEvent(dependantResourceModel.ToString());
+                    return dependantResourceModel;
                 }
                 default:
                 {
                     _loggerService.LogWarningEvent(
-                        $"Unknown {markedResourceModel} is encountered while unmarking! This might lead to an error in the system!"
+                        $"Unknown {dependantResourceModel} is encountered while unmarking! This might lead to an error in the system!"
                     );
-                    return markedResourceModel;
+                    return dependantResourceModel;
                 }
             }
         }

@@ -5,6 +5,6 @@ namespace mars_marking_svc.Services.Models
 {
     public interface IDbMongoService
     {
-        IMongoCollection<DbMarkSessionModel> GetMarkSessionCollection();
+        IMongoCollection<MarkSessionModel> GetMarkSessionCollection();
     }
 }

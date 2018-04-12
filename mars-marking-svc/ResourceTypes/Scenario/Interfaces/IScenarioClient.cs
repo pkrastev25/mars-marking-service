@@ -13,10 +13,10 @@ namespace mars_marking_svc.ResourceTypes.Scenario.Interfaces
 
         Task<List<ScenarioModel>> GetScenariosForProject(string projectId);
 
-        Task<MarkedResourceModel> MarkScenario(string scenarioId);
+        Task<DependantResourceModel> MarkScenario(string scenarioId);
 
-        Task<MarkedResourceModel> MarkScenario(ScenarioModel scenarioModel);
+        Task<DependantResourceModel> MarkScenario(ScenarioModel scenarioModel);
 
-        Task UnmarkScenario(MarkedResourceModel markedResourceModel);
+        Task UnmarkScenario(DependantResourceModel dependantResourceModel);
     }
 }

@@ -75,7 +75,7 @@ namespace mars_marking_svc.ResourceTypes.SimRun
             return JsonConvert.DeserializeObject<List<SimRunModel>>(jsonResponse);
         }
 
-        public async Task<MarkedResourceModel> StopSimRun(string simRunId, string projectId)
+        public async Task<DependantResourceModel> StopSimRun(string simRunId, string projectId)
         {
             var simRun = await GetSimRun(simRunId, projectId);
             simRun.Id = simRunId;
@@ -83,7 +83,7 @@ namespace mars_marking_svc.ResourceTypes.SimRun
             return await StopSimRun(simRun, projectId);
         }
 
-        public async Task<MarkedResourceModel> StopSimRun(SimRunModel simRunModel, string projectId)
+        public async Task<DependantResourceModel> StopSimRun(SimRunModel simRunModel, string projectId)
         {
             var response = await _httpService.PutAsync(
                 "http://sim-runner-svc/simrun",
@@ -101,7 +101,7 @@ namespace mars_marking_svc.ResourceTypes.SimRun
                 );
             }
 
-            var markedResource = new MarkedResourceModel("simRun", simRunModel.Id);
+            var markedResource = new DependantResourceModel("simRun", simRunModel.Id);
             _loggerService.LogStopEvent(markedResource.ToString());
 
             return markedResource;

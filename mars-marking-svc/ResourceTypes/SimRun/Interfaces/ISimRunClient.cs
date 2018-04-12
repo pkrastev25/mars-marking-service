@@ -13,8 +13,8 @@ namespace mars_marking_svc.ResourceTypes.SimRun.Interfaces
 
         Task<List<SimRunModel>> GetSimRunsForProject(string projectId);
 
-        Task<MarkedResourceModel> StopSimRun(string simRunId, string projectId);
+        Task<DependantResourceModel> StopSimRun(string simRunId, string projectId);
 
-        Task<MarkedResourceModel> StopSimRun(SimRunModel simRunModel, string projectId);
+        Task<DependantResourceModel> StopSimRun(SimRunModel simRunModel, string projectId);
     }
 }

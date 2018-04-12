@@ -4,10 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace mars_marking_svc.MarkSession.Interfaces
 {
-    public interface IDbMarkSessionHandler
+    public interface IMarkSessionHandler
     {
         Task<IActionResult> UnmarkResourcesForMarkSession(string resourceId);
 
-        Task UnmarkResourcesForMarkSession(DbMarkSessionModel markSessionModel);
+        Task UnmarkResourcesForMarkSession(MarkSessionModel markSessionModel);
     }
 }

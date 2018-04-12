@@ -56,14 +56,14 @@ namespace mars_marking_svc.ResourceTypes.Metadata
             return JsonConvert.DeserializeObject<List<MetadataModel>>(jsonResponse);
         }
 
-        public async Task<MarkedResourceModel> MarkMetadata(string metadataId)
+        public async Task<DependantResourceModel> MarkMetadata(string metadataId)
         {
             var metadata = await GetMetadata(metadataId);
 
             return await MarkMetadata(metadata);
         }
 
-        public async Task<MarkedResourceModel> MarkMetadata(MetadataModel metadataModel)
+        public async Task<DependantResourceModel> MarkMetadata(MetadataModel metadataModel)
         {
             if (MetadataModel.ToBeDeletedState.Equals(metadataModel.State))
             {
@@ -96,7 +96,7 @@ namespace mars_marking_svc.ResourceTypes.Metadata
                 );
             }
 
-            var markedResource = new MarkedResourceModel("metadata", metadataModel.DataId)
+            var markedResource = new DependantResourceModel("metadata", metadataModel.DataId)
             {
                 PreviousState = metadataPreviousState
             };
@@ -105,18 +105,18 @@ namespace mars_marking_svc.ResourceTypes.Metadata
             return markedResource;
         }
 
-        public async Task UnmarkMetadata(MarkedResourceModel markedResourceModel)
+        public async Task UnmarkMetadata(DependantResourceModel dependantResourceModel)
         {
-            if (!await DoesMetadataExist(markedResourceModel.ResourceId))
+            if (!await DoesMetadataExist(dependantResourceModel.ResourceId))
             {
-                _loggerService.LogSkipEvent(markedResourceModel.ToString());
+                _loggerService.LogSkipEvent(dependantResourceModel.ToString());
                 return;
             }
 
             var metadataModel = new MetadataModel
             {
-                DataId = markedResourceModel.ResourceId,
-                State = markedResourceModel.PreviousState
+                DataId = dependantResourceModel.ResourceId,
+                State = dependantResourceModel.PreviousState
             };
 
             var response = await _httpService.PutAsync(
@@ -127,11 +127,11 @@ namespace mars_marking_svc.ResourceTypes.Metadata
             if (response.StatusCode != HttpStatusCode.OK)
             {
                 throw new FailedToUpdateResourceException(
-                    $"Failed to update {markedResourceModel} from metadata-svc!"
+                    $"Failed to update {dependantResourceModel} from metadata-svc!"
                 );
             }
 
-            _loggerService.LogUnmarkEvent(markedResourceModel.ToString());
+            _loggerService.LogUnmarkEvent(dependantResourceModel.ToString());
         }
 
         private async Task<bool> DoesMetadataExist(string metadataId)

@@ -9,19 +9,19 @@ namespace mars_marking_svc.Services
 {
     public class ErrorService : IErrorService
     {
-        private readonly IDbMarkSessionHandler _dbMarkSessionHandler;
+        private readonly IMarkSessionHandler _markSessionHandler;
         private readonly ILoggerService _loggerService;
 
         public ErrorService(
-            IDbMarkSessionHandler dbMarkSessionHandler,
+            IMarkSessionHandler markSessionHandler,
             ILoggerService loggerService
         )
         {
-            _dbMarkSessionHandler = dbMarkSessionHandler;
+            _markSessionHandler = markSessionHandler;
             _loggerService = loggerService;
         }
 
-        public void HandleError(Exception error, DbMarkSessionModel markSessionModel)
+        public void HandleError(Exception error, MarkSessionModel markSessionModel)
         {
             _loggerService.LogErrorEvent(error);
 
@@ -29,7 +29,7 @@ namespace mars_marking_svc.Services
                   error is FailedToCreateMarkSessionException)
             )
             {
-                var unused = _dbMarkSessionHandler.UnmarkResourcesForMarkSession(markSessionModel);
+                var unused = _markSessionHandler.UnmarkResourcesForMarkSession(markSessionModel);
             }
         }
 

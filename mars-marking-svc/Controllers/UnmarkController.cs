@@ -7,13 +7,13 @@ namespace mars_marking_svc.Controllers
     [Route("api/[controller]")]
     public class UnmarkController : Controller
     {
-        private readonly IDbMarkSessionHandler _dbMarkSessionHandler;
+        private readonly IMarkSessionHandler _markSessionHandler;
 
         public UnmarkController(
-            IDbMarkSessionHandler dbMarkSessionHandler
+            IMarkSessionHandler markSessionHandler
         )
         {
-            _dbMarkSessionHandler = dbMarkSessionHandler;
+            _markSessionHandler = markSessionHandler;
         }
 
         [HttpDelete("{resourceId}")]
@@ -26,7 +26,7 @@ namespace mars_marking_svc.Controllers
                 return BadRequest("resourceId is not specified!");
             }
 
-            return await _dbMarkSessionHandler.UnmarkResourcesForMarkSession(resourceId);
+            return await _markSessionHandler.UnmarkResourcesForMarkSession(resourceId);
         }
     }
 }

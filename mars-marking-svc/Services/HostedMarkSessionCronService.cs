@@ -13,18 +13,18 @@ namespace mars_marking_svc.Services
     /// </summary>
     public class HostedMarkSessionCronService : AHostedService
     {
-        private readonly IDbMarkSessionClient _dbMarkSessionClient;
-        private readonly IDbMarkSessionHandler _dbMarkSessionHandler;
+        private readonly IMarkSessionRepository _markSessionRepository;
+        private readonly IMarkSessionHandler _markSessionHandler;
         private readonly ILoggerService _loggerService;
 
         public HostedMarkSessionCronService(
-            IDbMarkSessionClient dbMarkSessionClient,
-            IDbMarkSessionHandler dbMarkSessionHandler,
+            IMarkSessionRepository markSessionRepository,
+            IMarkSessionHandler markSessionHandler,
             ILoggerService loggerService
         )
         {
-            _dbMarkSessionClient = dbMarkSessionClient;
-            _dbMarkSessionHandler = dbMarkSessionHandler;
+            _markSessionRepository = markSessionRepository;
+            _markSessionHandler = markSessionHandler;
             _loggerService = loggerService;
         }
 
@@ -46,13 +46,13 @@ namespace mars_marking_svc.Services
                 {
                     try
                     {
-                        var markSessions = await _dbMarkSessionClient.GetAll();
+                        var markSessions = await _markSessionRepository.GetAll();
 
                         foreach (var dbMarkSessionModel in markSessions)
                         {
                             if (dbMarkSessionModel.IsMarkSessionExpired())
                             {
-                                await _dbMarkSessionHandler.UnmarkResourcesForMarkSession(dbMarkSessionModel);
+                                await _markSessionHandler.UnmarkResourcesForMarkSession(dbMarkSessionModel);
                             }
                         }
                     }

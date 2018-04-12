@@ -72,7 +72,7 @@ namespace mars_marking_svc.ResourceTypes.Scenario
             return JsonConvert.DeserializeObject<List<ScenarioModel>>(jsonResponse);
         }
 
-        public async Task<MarkedResourceModel> MarkScenario(string scenarioId)
+        public async Task<DependantResourceModel> MarkScenario(string scenarioId)
         {
             var scenario = await GetScenario(scenarioId);
             scenario.ScenarioId = scenarioId;
@@ -80,7 +80,7 @@ namespace mars_marking_svc.ResourceTypes.Scenario
             return await MarkScenario(scenario);
         }
 
-        public async Task<MarkedResourceModel> MarkScenario(ScenarioModel scenarioModel)
+        public async Task<DependantResourceModel> MarkScenario(ScenarioModel scenarioModel)
         {
             if (scenarioModel.ToBeDeleted)
             {
@@ -103,23 +103,23 @@ namespace mars_marking_svc.ResourceTypes.Scenario
                 );
             }
 
-            var markedResource = new MarkedResourceModel("scenario", scenarioModel.ScenarioId);
+            var markedResource = new DependantResourceModel("scenario", scenarioModel.ScenarioId);
             _loggerService.LogMarkEvent(markedResource.ToString());
 
             return markedResource;
         }
 
-        public async Task UnmarkScenario(MarkedResourceModel markedResourceModel)
+        public async Task UnmarkScenario(DependantResourceModel dependantResourceModel)
         {
-            if (!await DoesScenarioExist(markedResourceModel.ResourceId))
+            if (!await DoesScenarioExist(dependantResourceModel.ResourceId))
             {
-                _loggerService.LogSkipEvent(markedResourceModel.ToString());
+                _loggerService.LogSkipEvent(dependantResourceModel.ToString());
                 return;
             }
 
             var scenarioModel = new ScenarioModel
             {
-                ScenarioId = markedResourceModel.ResourceId,
+                ScenarioId = dependantResourceModel.ResourceId,
                 ToBeDeleted = false
             };
 
@@ -131,11 +131,11 @@ namespace mars_marking_svc.ResourceTypes.Scenario
             if (response.StatusCode != HttpStatusCode.NoContent)
             {
                 throw new FailedToUpdateResourceException(
-                    $"Failed to update {markedResourceModel} from scenario-svc!"
+                    $"Failed to update {dependantResourceModel} from scenario-svc!"
                 );
             }
 
-            _loggerService.LogUnmarkEvent(markedResourceModel.ToString());
+            _loggerService.LogUnmarkEvent(dependantResourceModel.ToString());
         }
 
         private async Task<bool> DoesScenarioExist(string scenarioId)

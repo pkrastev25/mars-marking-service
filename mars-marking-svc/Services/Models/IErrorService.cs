@@ -6,7 +6,7 @@ namespace mars_marking_svc.Services.Models
 {
     public interface IErrorService
     {
-        void HandleError(Exception error, DbMarkSessionModel markSessionModel);
+        void HandleError(Exception error, MarkSessionModel markSessionModel);
 
         StatusCodeResult GetStatusCodeForError(Exception error);
     }

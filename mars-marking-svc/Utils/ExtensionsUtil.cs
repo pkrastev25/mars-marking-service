@@ -5,9 +5,9 @@ namespace mars_marking_svc.Utils
 {
     public static class ExtensionsUtil
     {
-        public static bool IsMarkSessionExpired(this DbMarkSessionModel dbMarkSessionModel)
+        public static bool IsMarkSessionExpired(this MarkSessionModel markSessionModel)
         {
-            return dbMarkSessionModel.MarkSessionExpireTime < DateTime.Now.Ticks;
+            return markSessionModel.MarkSessionExpireTime < DateTime.Now.Ticks;
         }
     }
 }

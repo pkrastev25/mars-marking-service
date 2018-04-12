@@ -62,18 +62,18 @@ namespace mars_marking_svc.ResourceTypes.ResultConfig
                 .ToList();
         }
 
-        public async Task<MarkedResourceModel> CreateMarkedResultConfig(string resultConfigId)
+        public async Task<DependantResourceModel> CreateMarkedResultConfig(string resultConfigId)
         {
             var resultConfig = await GetResultConfig(resultConfigId);
 
             return await CreateMarkedResultConfig(resultConfig);
         }
 
-        public async Task<MarkedResourceModel> CreateMarkedResultConfig(ResultConfigModel resultConfigModel)
+        public async Task<DependantResourceModel> CreateMarkedResultConfig(ResultConfigModel resultConfigModel)
         {
             return await Task.Run(() =>
             {
-                var markedResource = new MarkedResourceModel("resultConfig", resultConfigModel.ConfigId);
+                var markedResource = new DependantResourceModel("resultConfig", resultConfigModel.ConfigId);
                 _loggerService.LogSkipEvent(markedResource.ToString());
 
                 return markedResource;

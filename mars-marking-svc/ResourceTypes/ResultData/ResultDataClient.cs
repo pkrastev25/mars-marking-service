@@ -17,18 +17,18 @@ namespace mars_marking_svc.ResourceTypes.ResultData
             _loggerService = loggerService;
         }
 
-        public async Task<MarkedResourceModel> CreateMarkedResultData(string resultDataId)
+        public async Task<DependantResourceModel> CreateMarkedResultData(string resultDataId)
         {
             return await Task.Run(() =>
             {
-                var markedResources = new MarkedResourceModel("resultData", resultDataId);
+                var markedResources = new DependantResourceModel("resultData", resultDataId);
                 _loggerService.LogSkipEvent(markedResources.ToString());
 
                 return markedResources;
             });
         }
 
-        public async Task<MarkedResourceModel> CreateMarkedResultData(SimRunModel simRunModel)
+        public async Task<DependantResourceModel> CreateMarkedResultData(SimRunModel simRunModel)
         {
             return await CreateMarkedResultData(simRunModel.SimulationId);
         }

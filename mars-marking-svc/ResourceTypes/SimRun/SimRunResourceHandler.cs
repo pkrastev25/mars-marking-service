@@ -31,7 +31,7 @@ namespace mars_marking_svc.ResourceTypes.SimRun
 
         public async Task<IActionResult> MarkSimRunDependantResources(string simRunId, string projectId)
         {
-            var dependantResources = new List<MarkedResourceModel>();
+            var dependantResources = new List<DependantResourceModel>();
             _loggerService.LogWarningEvent(
                 $"Mark session for simPlan, id: {simRunId}, projectId: {projectId} will not be created, because simRuns do not have a mark! However, the simRun will be stopped!"
             );

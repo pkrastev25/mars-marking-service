@@ -1,16 +1,21 @@
-﻿using Newtonsoft.Json;
+﻿using MongoDB.Bson.Serialization.Attributes;
+using Newtonsoft.Json;
 
 namespace mars_marking_svc.MarkedResource.Models
 {
+    // TODO: Consider splitting into a DTO
     public class DependantResourceModel
     {
         [JsonProperty("resourceType")]
+        [BsonElement("resourceType")]
         public string ResourceType { get; set; }
 
         [JsonProperty("resourceId")]
+        [BsonElement("resourceId")]
         public string ResourceId { get; set; }
 
-        [JsonProperty("previousState", NullValueHandling = NullValueHandling.Ignore)]
+        [JsonIgnore]
+        [BsonElement("previousState")]
         public string PreviousState { get; set; }
 
         public DependantResourceModel(string resourceType, string resourceId)

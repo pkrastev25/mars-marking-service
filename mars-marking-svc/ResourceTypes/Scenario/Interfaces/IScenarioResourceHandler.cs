@@ -1,10 +1,10 @@
 ﻿using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+using mars_marking_svc.MarkedResource.Models;
 
 namespace mars_marking_svc.ResourceTypes.Scenario.Interfaces
 {
     public interface IScenarioResourceHandler
     {
-        Task<IActionResult> MarkScenarioDependantResources(string scenarioId, string projectId);
+        Task<MarkSessionModel> GatherResourcesForMarkSession(MarkSessionModel markSessionModel);
     }
 }

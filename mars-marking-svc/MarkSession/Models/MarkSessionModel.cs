@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using static mars_marking_svc.Constants.Constants;
 
 namespace mars_marking_svc.MarkedResource.Models
 {
-    [BsonIgnoreExtraElements(true)]
     public class MarkSessionModel
     {
         public const string MarkingState = "Marking";
@@ -14,33 +12,49 @@ namespace mars_marking_svc.MarkedResource.Models
 
         public const string DoneState = "Done";
 
+        [BsonId]
+        public ObjectId Id { get; set; }
+
+        [BsonElement("resourceId")]
         public string ResourceId { get; set; }
 
+        [BsonElement("projectId")]
         public string ProjectId { get; set; }
 
+        [BsonElement("resourceType")]
         public string ResourceType { get; set; }
 
+        [BsonElement("markSessionType")]
+        public string MarkSessionType { get; set; }
+
+        [BsonElement("state")]
         public string State { get; set; }
 
-        public long MarkSessionExpireTime { get; set; }
-
+        [BsonElement("sourceDependency")]
         public DependantResourceModel SourceDependency { get; set; }
 
+        [BsonElement("dependantResources")]
         public List<DependantResourceModel> DependantResources { get; set; }
 
-        public MarkSessionModel(string resourceId, string projectId, string resourceType)
+        public MarkSessionModel(
+            string resourceId,
+            string projectId,
+            string resourceType,
+            string markSessionType
+        )
         {
             ResourceId = resourceId;
             ProjectId = projectId;
             ResourceType = resourceType;
-            MarkSessionExpireTime = DateTime.Now.AddTicks(MarkSessionExpireIntervalForUpdateStateTicks).Ticks;
+            MarkSessionType = markSessionType;
             State = MarkingState;
             DependantResources = new List<DependantResourceModel>();
         }
 
         public override string ToString()
         {
-            return $"mark session for {ResourceType}, id: {ResourceId}, projectId: {ProjectId}, state: {State}";
+            return
+                $"mark session with id: {Id}, type: {MarkSessionType}, state: {State} for resourceType: {ResourceType}, resourceId: {ResourceId}, projectId: {ProjectId}";
         }
     }
 }

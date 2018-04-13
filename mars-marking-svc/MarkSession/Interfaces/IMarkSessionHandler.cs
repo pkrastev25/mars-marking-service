@@ -6,8 +6,32 @@ namespace mars_marking_svc.MarkSession.Interfaces
 {
     public interface IMarkSessionHandler
     {
-        Task<IActionResult> UnmarkResourcesForMarkSession(string resourceId);
+        Task<IActionResult> CreateMarkSession(
+            string resourceType,
+            string resourceId,
+            string markSessionType,
+            string projectId
+        );
 
-        Task UnmarkResourcesForMarkSession(MarkSessionModel markSessionModel);
+        Task<IActionResult> GetMarkSessionById(
+            string markSessionId
+        );
+
+        Task<IActionResult> GetMarkSessionsByMarkSessionType(
+            string markSessionType
+        );
+
+        Task<IActionResult> UpdateMarkSession(
+            string markSessionId,
+            string markSessionType
+        );
+
+        Task<IActionResult> DeleteMarkSession(
+            string markSessionId
+        );
+
+        Task FreeResourcesAndDeleteMarkSession(
+            MarkSessionModel markSessionModel
+        );
     }
 }

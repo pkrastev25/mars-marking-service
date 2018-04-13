@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using mars_marking_svc.Exceptions;
 using mars_marking_svc.MarkedResource.Models;
 using mars_marking_svc.ResourceTypes.ResultData.Interfaces;
 using mars_marking_svc.ResourceTypes.SimRun.Interfaces;
 using mars_marking_svc.Services.Models;
-using Microsoft.AspNetCore.Mvc;
 
 namespace mars_marking_svc.ResourceTypes.SimRun
 {
@@ -13,46 +11,41 @@ namespace mars_marking_svc.ResourceTypes.SimRun
     {
         private readonly ISimRunClient _simRunClient;
         private readonly IResultDataClient _resultDataClient;
-        private readonly ILoggerService _loggerService;
-        private readonly IErrorService _errorService;
+        private readonly IMarkSessionRepository _markSessionRepository;
 
         public SimRunResourceHandler(
             ISimRunClient simRunClient,
             IResultDataClient resultDataClient,
-            ILoggerService loggerService,
-            IErrorService errorService
+            IMarkSessionRepository markSessionRepository
         )
         {
             _simRunClient = simRunClient;
             _resultDataClient = resultDataClient;
-            _loggerService = loggerService;
-            _errorService = errorService;
+            _markSessionRepository = markSessionRepository;
         }
 
-        public async Task<IActionResult> MarkSimRunDependantResources(string simRunId, string projectId)
+        public async Task<MarkSessionModel> GatherResourcesForMarkSession(MarkSessionModel markSessionModel)
         {
-            var dependantResources = new List<DependantResourceModel>();
-            _loggerService.LogWarningEvent(
-                $"Mark session for simPlan, id: {simRunId}, projectId: {projectId} will not be created, because simRuns do not have a mark! However, the simRun will be stopped!"
-            );
+            var simRunId = markSessionModel.ResourceId;
+            var projectId = markSessionModel.ProjectId;
+            var sourceSimRun = await _simRunClient.GetSimRun(simRunId, projectId);
 
-            try
+            if (sourceSimRun.Status == "Running")
             {
-                var sourceSimRun = await _simRunClient.GetSimRun(simRunId, projectId);
-                var markedSourceSimRun = await _simRunClient.StopSimRun(simRunId, projectId);
-                dependantResources.Add(markedSourceSimRun);
-
-                var markedResultData = await _resultDataClient.CreateMarkedResultData(sourceSimRun);
-                dependantResources.Add(markedResultData);
-
-                return new OkObjectResult(dependantResources);
+                throw new CannotMarkResourceException(
+                    $"simRun with id: {simRunId} and projectId: {projectId} cannot be used, because it is still running!"
+                );
             }
-            catch (Exception e)
-            {
-                _loggerService.LogErrorEvent(e);
 
-                return _errorService.GetStatusCodeForError(e);
-            }
+            var markedSourceSimRun = await _simRunClient.StopSimRun(simRunId, projectId);
+            markSessionModel.DependantResources.Add(markedSourceSimRun);
+            await _markSessionRepository.Update(markSessionModel);
+
+            var markedResultData = await _resultDataClient.CreateMarkedResultData(sourceSimRun);
+            markSessionModel.DependantResources.Add(markedResultData);
+            await _markSessionRepository.Update(markSessionModel);
+
+            return markSessionModel;
         }
     }
 }

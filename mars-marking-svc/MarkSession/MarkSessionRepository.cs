@@ -5,7 +5,6 @@ using mars_marking_svc.Exceptions;
 using mars_marking_svc.MarkedResource.Models;
 using mars_marking_svc.Services.Models;
 using MongoDB.Driver;
-using static mars_marking_svc.Constants.Constants;
 
 public class MarkSessionRepository : IMarkSessionRepository
 {
@@ -50,9 +49,22 @@ public class MarkSessionRepository : IMarkSessionRepository
         }
     }
 
-    public async Task<MarkSessionModel> Get(string resourceId)
+    public async Task<MarkSessionModel> GetForFilter(FilterDefinition<MarkSessionModel> filterDefinition)
     {
-        return await FindMarkSessionByResourceId(resourceId);
+        var markSessionCursor = await _dbMongoService.GetMarkSessionCollection().FindAsync(
+            filterDefinition
+        );
+
+        return await markSessionCursor.FirstOrDefaultAsync();
+    }
+
+    public async Task<IEnumerable<MarkSessionModel>> GetAllForFilter(FilterDefinition<MarkSessionModel> filterDefinition)
+    {
+        var markSessionCursors = await _dbMongoService.GetMarkSessionCollection().FindAsync(
+            filterDefinition
+        );
+
+        return await markSessionCursors.ToListAsync();
     }
 
     public async Task<IEnumerable<MarkSessionModel>> GetAll()
@@ -62,18 +74,6 @@ public class MarkSessionRepository : IMarkSessionRepository
 
     public async Task Update(MarkSessionModel markSessionModel)
     {
-        if (MarkSessionModel.MarkingState.Equals(markSessionModel.State))
-        {
-            markSessionModel.MarkSessionExpireTime =
-                DateTime.Now.AddTicks(MarkSessionExpireIntervalForUpdateStateTicks).Ticks;
-        }
-
-        if (MarkSessionModel.DoneState.Equals(markSessionModel.State))
-        {
-            markSessionModel.MarkSessionExpireTime =
-                DateTime.Now.AddTicks(MarkSessionExpireIntervalForDoneStateTicks).Ticks;
-        }
-
         await _dbMongoService.GetMarkSessionCollection().ReplaceOneAsync(
             GetFilterDefinitionForResourceId(markSessionModel.ResourceId),
             markSessionModel

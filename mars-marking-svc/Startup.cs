@@ -1,4 +1,5 @@
 ﻿using System.Net.Http;
+using AutoMapper;
 using mars_marking_svc.MarkSession.Interfaces;
 using mars_marking_svc.ResourceTypes.MarkedResource;
 using mars_marking_svc.ResourceTypes.Metadata;
@@ -38,10 +39,11 @@ namespace mars_marking_svc
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+            services.AddAutoMapper();
 
             // Services
             services.AddSingleton<IDbMongoService, DbMongoService>();
-            services.AddSingleton<IHostedService, HostedMarkSessionCronService>();
+            services.AddSingleton<IHostedService, HostedStartupService>();
             services.AddTransient<IHttpService, HttpService>();
             services.AddTransient<ILoggerService, LoggerService>();
             services.AddTransient<IErrorService, ErrorService>();

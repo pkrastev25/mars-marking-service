@@ -1,9 +1,7 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using mars_marking_svc.MarkSession.Interfaces;
 using mars_marking_svc.Services.Models;
-using mars_marking_svc.Utils;
 using static mars_marking_svc.Constants.Constants;
 
 namespace mars_marking_svc.Services
@@ -11,13 +9,13 @@ namespace mars_marking_svc.Services
     /// <summary>
     /// Based on https://blog.maartenballiauw.be/post/2017/08/01/building-a-scheduled-cache-updater-in-aspnet-core-2.html
     /// </summary>
-    public class HostedMarkSessionCronService : AHostedService
+    public class HostedStartupService : AHostedService
     {
         private readonly IMarkSessionRepository _markSessionRepository;
         private readonly IMarkSessionHandler _markSessionHandler;
         private readonly ILoggerService _loggerService;
 
-        public HostedMarkSessionCronService(
+        public HostedStartupService(
             IMarkSessionRepository markSessionRepository,
             IMarkSessionHandler markSessionHandler,
             ILoggerService loggerService
@@ -41,6 +39,8 @@ namespace mars_marking_svc.Services
         {
             var taskFactory = new TaskFactory(cancellationToken);
 
+            // TODO: Start a long running unmarking job when the application is started and the markSession is in the Marking state!!!
+            /*
             await taskFactory.StartNew(
                 async () =>
                 {
@@ -61,6 +61,7 @@ namespace mars_marking_svc.Services
                         _loggerService.LogErrorEvent(e);
                     }
                 }, cancellationToken);
+                */
         }
     }
 }

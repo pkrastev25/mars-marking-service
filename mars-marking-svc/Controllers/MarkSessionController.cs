@@ -1,5 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using AutoMapper;
 using mars_marking_svc.MarkSession.Interfaces;
+using mars_marking_svc.ResourceTypes.MarkedResource.Dtos;
 using mars_marking_svc.Utils;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,12 +12,15 @@ namespace mars_marking_svc.Controllers
     public class MarkSessionController : Controller
     {
         private readonly IMarkSessionHandler _markSessionHandler;
+        private readonly IMapper _mapper;
 
         public MarkSessionController(
-            IMarkSessionHandler markSessionHandler
+            IMarkSessionHandler markSessionHandler,
+            IMapper mapper
         )
         {
             _markSessionHandler = markSessionHandler;
+            _mapper = mapper;
         }
 
         [HttpPost("{resourceType}/{resourceId}")]
@@ -47,17 +53,21 @@ namespace mars_marking_svc.Controllers
                 }
             }
 
-            if (ValidateEnumUtil.DoesResourceTypeExist(resourceType))
+            if (!ValidateEnumUtil.DoesResourceTypeExist(resourceType))
             {
-                return await _markSessionHandler.CreateMarkSession(
-                    resourceType,
-                    resourceId,
-                    markSessionType,
-                    projectId
-                );
+                return BadRequest("resourceType is not specified or the type is invalid!");
             }
 
-            return BadRequest("resourceType is not specified or the type is invalid!");
+            var createdMarkSessionModel = await _markSessionHandler.CreateMarkSession(
+                resourceId,
+                projectId,
+                resourceType,
+                markSessionType
+            );
+
+            return Ok(
+                _mapper.Map<MarkSessionForReturnDto>(createdMarkSessionModel)
+            );
         }
 
         [HttpGet("{markSessionId}")]
@@ -70,7 +80,11 @@ namespace mars_marking_svc.Controllers
                 return BadRequest("markSessionId is not specified!");
             }
 
-            return await _markSessionHandler.GetMarkSessionById(markSessionId);
+            var markSessionModel = await _markSessionHandler.GetMarkSessionById(markSessionId);
+
+            return Ok(
+                _mapper.Map<MarkSessionForReturnDto>(markSessionModel)
+            );
         }
 
         [HttpGet]
@@ -83,7 +97,11 @@ namespace mars_marking_svc.Controllers
                 return BadRequest("markSessionType is not specified or the type is invalid!");
             }
 
-            return await _markSessionHandler.GetMarkSessionsByMarkSessionType(markSessionType);
+            var markSessionModels = await _markSessionHandler.GetMarkSessionsByMarkSessionType(markSessionType);
+
+            return Ok(
+                _mapper.Map<List<MarkSessionForReturnDto>>(markSessionModels)
+            );
         }
 
         [HttpPut("{markSessionId}")]
@@ -102,7 +120,9 @@ namespace mars_marking_svc.Controllers
                 return BadRequest("markSessionType is not specified or the type is invalid!");
             }
 
-            return await _markSessionHandler.UpdateMarkSession(markSessionId, markSessionType);
+            await _markSessionHandler.UpdateMarkSession(markSessionId, markSessionType);
+
+            return Ok();
         }
 
         [HttpDelete("{markSessionId}")]
@@ -115,7 +135,9 @@ namespace mars_marking_svc.Controllers
                 return BadRequest("markSessionId is not specified!");
             }
 
-            return await _markSessionHandler.DeleteMarkSession(markSessionId);
+            await _markSessionHandler.DeleteMarkSession(markSessionId);
+
+            return Ok();
         }
     }
 }

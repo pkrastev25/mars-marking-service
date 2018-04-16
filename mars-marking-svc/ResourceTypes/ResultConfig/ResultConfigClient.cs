@@ -62,14 +62,14 @@ namespace mars_marking_svc.ResourceTypes.ResultConfig
                 .ToList();
         }
 
-        public async Task<DependantResourceModel> CreateMarkedResultConfig(string resultConfigId)
+        public async Task<DependantResourceModel> CreateDependantResultConfigResource(string resultConfigId)
         {
             var resultConfig = await GetResultConfig(resultConfigId);
 
-            return await CreateMarkedResultConfig(resultConfig);
+            return await CreateDependantResultConfigResource(resultConfig);
         }
 
-        public async Task<DependantResourceModel> CreateMarkedResultConfig(ResultConfigModel resultConfigModel)
+        public async Task<DependantResourceModel> CreateDependantResultConfigResource(ResultConfigModel resultConfigModel)
         {
             return await Task.Run(() =>
             {

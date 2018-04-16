@@ -75,36 +75,33 @@ namespace mars_marking_svc.ResourceTypes.SimRun
             return JsonConvert.DeserializeObject<List<SimRunModel>>(jsonResponse);
         }
 
-        public async Task<DependantResourceModel> StopSimRun(string simRunId, string projectId)
+        public async Task<DependantResourceModel> CreateDependantSimRunResource(string simRunId, string projectId)
         {
             var simRun = await GetSimRun(simRunId, projectId);
             simRun.Id = simRunId;
 
-            return await StopSimRun(simRun, projectId);
+            return await CreateDependantSimRunResource(simRun, projectId);
         }
 
-        public async Task<DependantResourceModel> StopSimRun(SimRunModel simRunModel, string projectId)
+        public async Task<DependantResourceModel> CreateDependantSimRunResource(
+            SimRunModel simRunModel,
+            string projectId
+        )
         {
-            var response = await _httpService.PutAsync(
-                "http://sim-runner-svc/simrun",
-                new SimRunUpdateModel
-                {
-                    SimRunId = simRunModel.Id,
-                    Verb = SimRunUpdateModel.AbortVerb
-                }
-            );
-
-            if (response.StatusCode != HttpStatusCode.OK)
+            return await Task.Run(() =>
             {
-                throw new FailedToUpdateResourceException(
-                    $"Failed to update simRun with id: {simRunModel.Id}, projectId: {projectId} from sim-runner-svc!"
-                );
-            }
+                if (simRunModel.Status == "Running")
+                {
+                    throw new CannotMarkResourceException(
+                        $"simRun with id: {simRunModel.Id} and projectId: {projectId} cannot be used, because it is still running!"
+                    );
+                }
 
-            var markedResource = new DependantResourceModel("simRun", simRunModel.Id);
-            _loggerService.LogStopEvent(markedResource.ToString());
+                var markedResource = new DependantResourceModel("simRun", simRunModel.Id);
+                _loggerService.LogSkipEvent(markedResource.ToString());
 
-            return markedResource;
+                return markedResource;
+            });
         }
     }
 }

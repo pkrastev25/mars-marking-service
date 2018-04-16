@@ -6,18 +6,24 @@ namespace mars_marking_svc.Services
 {
     public class DbMongoService : IDbMongoService
     {
+        public const string MongoDbConnection = "mongodb://mongodb:27017";
+        public const string MongoDbHangfireName = "hangfire-marking-svc";
+
+        private const string MongoDbMarkingServiceName = "marking-svc";
+        private const string MongoDbMarkSessionCollectionName = "mark-sessions";
+
         private readonly IMongoClient _mongoClient;
 
         public DbMongoService()
         {
-            _mongoClient = new MongoClient("mongodb://mongodb:27017");
+            _mongoClient = new MongoClient(MongoDbConnection);
         }
 
         public IMongoCollection<MarkSessionModel> GetMarkSessionCollection()
         {
             return _mongoClient
-                .GetDatabase("marked-resources")
-                .GetCollection<MarkSessionModel>("mark-session");
+                .GetDatabase(MongoDbMarkingServiceName)
+                .GetCollection<MarkSessionModel>(MongoDbMarkSessionCollectionName);
         }
     }
 }

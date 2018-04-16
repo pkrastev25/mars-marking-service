@@ -1,11 +1,14 @@
 ﻿using System.Net.Http;
 using AutoMapper;
+using Hangfire;
+using Hangfire.Mongo;
+using mars_marking_svc.DependantResource;
+using mars_marking_svc.DependantResource.Interfaces;
 using mars_marking_svc.MarkSession.Interfaces;
+using mars_marking_svc.Middlewares;
 using mars_marking_svc.ResourceTypes.MarkedResource;
 using mars_marking_svc.ResourceTypes.Metadata;
 using mars_marking_svc.ResourceTypes.Metadata.Interfaces;
-using mars_marking_svc.ResourceTypes.ProjectContents;
-using mars_marking_svc.ResourceTypes.ProjectContents.Interfaces;
 using mars_marking_svc.ResourceTypes.ResultConfig;
 using mars_marking_svc.ResourceTypes.ResultConfig.Interfaces;
 using mars_marking_svc.ResourceTypes.ResultData;
@@ -39,14 +42,21 @@ namespace mars_marking_svc
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+
+            // AutoMapper config
             services.AddAutoMapper();
+
+            // Hangfire config
+            services.AddHangfire(configuration =>
+            {
+                configuration.UseMongoStorage(DbMongoService.MongoDbConnection, DbMongoService.MongoDbHangfireName);
+            });
 
             // Services
             services.AddSingleton<IDbMongoService, DbMongoService>();
             services.AddSingleton<IHostedService, HostedStartupService>();
             services.AddTransient<IHttpService, HttpService>();
             services.AddTransient<ILoggerService, LoggerService>();
-            services.AddTransient<IErrorService, ErrorService>();
 
             // Clients
             services.AddSingleton<HttpClient>();
@@ -59,24 +69,26 @@ namespace mars_marking_svc
             services.AddTransient<IMarkSessionRepository, MarkSessionRepository>();
 
             // Handlers
-            services.AddTransient<IProjectResourceHandler, ProjectResourceHandler>();
-            services.AddTransient<IMetadataResourceHandler, MetadataResourceHandler>();
-            services.AddTransient<IScenarioResourceHandler, ScenarioResourceHandler>();
-            services.AddTransient<IResultConfigResourceHandler, ResultConfigResourceHandler>();
-            services.AddTransient<ISimPlanResourceHandler, SimPlanResourceHandler>();
-            services.AddTransient<ISimRunResourceHandler, SimRunResourceHandler>();
             services.AddTransient<IMarkSessionHandler, MarkSessionHandler>();
+            services.AddTransient<IDependantResourceHandler, DependantResourceHandler>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            // Must always be on top !!!
+            app.UseMiddleware<ErrorHandlerMiddleware>();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
             app.UseMvc();
+
+            // Hangfire config
+            app.UseHangfireDashboard();
+            app.UseHangfireServer();
         }
     }
 }

@@ -1,37 +1,33 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using mars_marking_svc.MarkedResource.Models;
-using Microsoft.AspNetCore.Mvc;
 
 namespace mars_marking_svc.MarkSession.Interfaces
 {
     public interface IMarkSessionHandler
     {
-        Task<IActionResult> CreateMarkSession(
-            string resourceType,
+        Task<MarkSessionModel> CreateMarkSession(
             string resourceId,
-            string markSessionType,
-            string projectId
-        );
-
-        Task<IActionResult> GetMarkSessionById(
-            string markSessionId
-        );
-
-        Task<IActionResult> GetMarkSessionsByMarkSessionType(
+            string projectId,
+            string resourceType,
             string markSessionType
         );
 
-        Task<IActionResult> UpdateMarkSession(
+        Task<MarkSessionModel> GetMarkSessionById(
+            string markSessionId
+        );
+
+        Task<IEnumerable<MarkSessionModel>> GetMarkSessionsByMarkSessionType(
+            string markSessionType
+        );
+
+        Task UpdateMarkSession(
             string markSessionId,
             string markSessionType
         );
 
-        Task<IActionResult> DeleteMarkSession(
+        Task DeleteMarkSession(
             string markSessionId
-        );
-
-        Task FreeResourcesAndDeleteMarkSession(
-            MarkSessionModel markSessionModel
         );
     }
 }

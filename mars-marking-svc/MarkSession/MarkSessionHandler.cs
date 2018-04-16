@@ -1,19 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using AutoMapper;
+using Hangfire;
+using mars_marking_svc.DependantResource.Interfaces;
 using mars_marking_svc.Exceptions;
 using mars_marking_svc.MarkedResource.Models;
 using mars_marking_svc.MarkSession.Interfaces;
-using mars_marking_svc.ResourceTypes.MarkedResource.Dtos;
-using mars_marking_svc.ResourceTypes.Metadata.Interfaces;
-using mars_marking_svc.ResourceTypes.ProjectContents.Interfaces;
-using mars_marking_svc.ResourceTypes.ResultConfig.Interfaces;
-using mars_marking_svc.ResourceTypes.Scenario.Interfaces;
-using mars_marking_svc.ResourceTypes.SimPlan.Interfaces;
-using mars_marking_svc.ResourceTypes.SimRun.Interfaces;
 using mars_marking_svc.Services.Models;
-using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 using MongoDB.Driver;
 
@@ -21,56 +14,26 @@ namespace mars_marking_svc.ResourceTypes.MarkedResource
 {
     public class MarkSessionHandler : IMarkSessionHandler
     {
-        private readonly IMetadataClient _metadataClient;
-        private readonly IScenarioClient _scenarioClient;
-        private readonly ISimPlanClient _simPlanClient;
         private readonly IMarkSessionRepository _markSessionRepository;
+        private readonly IDependantResourceHandler _dependantResourceHandler;
         private readonly ILoggerService _loggerService;
-        private readonly IProjectResourceHandler _projectResourceHandler;
-        private readonly IMetadataResourceHandler _metadataResourceHandler;
-        private readonly IScenarioResourceHandler _scenarioResourceHandler;
-        private readonly IResultConfigResourceHandler _resultConfigResourceHandler;
-        private readonly ISimPlanResourceHandler _simPlanResourceHandler;
-        private readonly ISimRunResourceHandler _simRunResourceHandler;
-        private readonly IErrorService _errorService;
-        private readonly IMapper _mapper;
 
         public MarkSessionHandler(
-            IMetadataClient metadataClient,
-            IScenarioClient scenarioClient,
-            ISimPlanClient simPlanClient,
             IMarkSessionRepository markSessionRepository,
-            ILoggerService loggerService,
-            IProjectResourceHandler projectResourceHandler,
-            IMetadataResourceHandler metadataResourceHandler,
-            IScenarioResourceHandler scenarioResourceHandler,
-            IResultConfigResourceHandler resultConfigResourceHandler,
-            ISimPlanResourceHandler simPlanResourceHandler,
-            ISimRunResourceHandler simRunResourceHandler,
-            IErrorService errorService,
-            IMapper mapper
+            IDependantResourceHandler dependantResourceHandler,
+            ILoggerService loggerService
         )
         {
-            _metadataClient = metadataClient;
-            _scenarioClient = scenarioClient;
-            _simPlanClient = simPlanClient;
             _markSessionRepository = markSessionRepository;
+            _dependantResourceHandler = dependantResourceHandler;
             _loggerService = loggerService;
-            _projectResourceHandler = projectResourceHandler;
-            _metadataResourceHandler = metadataResourceHandler;
-            _scenarioResourceHandler = scenarioResourceHandler;
-            _resultConfigResourceHandler = resultConfigResourceHandler;
-            _simPlanResourceHandler = simPlanResourceHandler;
-            _simRunResourceHandler = simRunResourceHandler;
-            _errorService = errorService;
-            _mapper = mapper;
         }
 
-        public async Task<IActionResult> CreateMarkSession(
-            string resourceType,
+        public async Task<MarkSessionModel> CreateMarkSession(
             string resourceId,
-            string markSessionType,
-            string projectId
+            string projectId,
+            string resourceType,
+            string markSessionType
         )
         {
             var markSessionModel = new MarkSessionModel(resourceId, projectId, resourceType, markSessionType);
@@ -78,126 +41,105 @@ namespace mars_marking_svc.ResourceTypes.MarkedResource
             try
             {
                 await _markSessionRepository.Create(markSessionModel);
+                await _dependantResourceHandler.GatherResourcesForMarkSession(markSessionModel);
 
-                switch (resourceType)
-                {
-                    case "project":
-                        markSessionModel =
-                            await _projectResourceHandler.GatherResourcesForMarkSession(markSessionModel);
-                        break;
-                    case "metadata":
-                        markSessionModel =
-                            await _metadataResourceHandler.GatherResourcesForMarkSession(markSessionModel);
-                        break;
-                    case "scenario":
-                        markSessionModel =
-                            await _scenarioResourceHandler.GatherResourcesForMarkSession(markSessionModel);
-                        break;
-                    case "resultConfig":
-                        markSessionModel =
-                            await _resultConfigResourceHandler.GatherResourcesForMarkSession(markSessionModel);
-                        break;
-                    case "simPlan":
-                        markSessionModel =
-                            await _simPlanResourceHandler.GatherResourcesForMarkSession(markSessionModel);
-                        break;
-                    case "simRun":
-                        markSessionModel = await _simRunResourceHandler.GatherResourcesForMarkSession(markSessionModel);
-                        break;
-                }
-            }
-            catch (Exception e)
-            {
-                // TODO: Start the long running process of unmarking !
-                FreeResourcesAndDeleteMarkSession(markSessionModel);
-
-                _loggerService.LogErrorEvent(e);
-
-                return _errorService.GetStatusCodeResultForError(e);
-            }
-            _loggerService.LogUpdateEvent(markSessionModel.ToString());
-            var markSessionForReturnDto = _mapper.Map<MarkSessionForReturnDto>(markSessionModel);
-
-            return new OkObjectResult(markSessionForReturnDto);
-        }
-
-        public async Task<IActionResult> GetMarkSessionById(string markSessionId)
-        {
-            try
-            {
-                var markSessionModel = await FindMarkSessionById(markSessionId);
-                var markSessionForReturnDto = _mapper.Map<MarkSessionForReturnDto>(markSessionModel);
-
-                return new OkObjectResult(markSessionForReturnDto);
-            }
-            catch (Exception e)
-            {
-                _loggerService.LogErrorEvent(e);
-
-                return _errorService.GetStatusCodeResultForError(e);
-            }
-        }
-
-        public async Task<IActionResult> GetMarkSessionsByMarkSessionType(string markSessionType)
-        {
-            try
-            {
-                var markSessionModels = await _markSessionRepository.GetAllForFilter(
-                    Builders<MarkSessionModel>.Filter.Where(entry => entry.MarkSessionType == markSessionType)
-                );
-                var markSessionsForReturnDto = _mapper.Map<List<MarkSessionForReturnDto>>(markSessionModels);
-
-                return new OkObjectResult(markSessionsForReturnDto);
-            }
-            catch (Exception e)
-            {
-                _loggerService.LogErrorEvent(e);
-
-                return _errorService.GetStatusCodeResultForError(e);
-            }
-        }
-
-        public async Task<IActionResult> UpdateMarkSession(string markSessionId, string markSessionType)
-        {
-            try
-            {
-                var markSessionModel = await FindMarkSessionById(markSessionId);
-
-                markSessionModel.MarkSessionType = markSessionType;
+                markSessionModel.State = MarkSessionModel.DoneState;
                 await _markSessionRepository.Update(markSessionModel);
-
-                return new OkResult();
+                _loggerService.LogUpdateEvent(markSessionModel.ToString());
             }
             catch (Exception e)
             {
-                _loggerService.LogErrorEvent(e);
+                if (!(e is FailedToCreateMarkSessionException || e is MarkSessionAlreadyExistsException))
+                {
+                    await DeleteMarkSession(markSessionModel.Id.ToString());
+                }
 
-                return _errorService.GetStatusCodeResultForError(e);
+                throw;
             }
+
+            return markSessionModel;
         }
 
-        public async Task<IActionResult> DeleteMarkSession(string markSessionId)
+        public async Task<MarkSessionModel> GetMarkSessionById(string markSessionId)
         {
-            try
-            {
-                var markSessionModel = await FindMarkSessionById(markSessionId);
-                // TODO: FIX
-                FreeResourcesAndDeleteMarkSession(markSessionModel);
+            return await FindMarkSessionById(markSessionId);
+        }
 
-                return new OkResult();
-            }
-            catch (Exception e)
-            {
-                _loggerService.LogErrorEvent(e);
+        public async Task<IEnumerable<MarkSessionModel>> GetMarkSessionsByMarkSessionType(string markSessionType)
+        {
+            return await _markSessionRepository.GetAllForFilter(
+                Builders<MarkSessionModel>.Filter.Where(entry =>
+                    entry.MarkSessionType == markSessionType && entry.State == MarkSessionModel.DoneState
+                )
+            );
+        }
 
-                return _errorService.GetStatusCodeResultForError(e);
+        public async Task UpdateMarkSession(string markSessionId, string markSessionType)
+        {
+            var markSessionModel = await FindMarkSessionById(markSessionId);
+
+            markSessionModel.MarkSessionType = markSessionType;
+            await _markSessionRepository.Update(markSessionModel);
+        }
+
+        public async Task DeleteMarkSession(string markSessionId)
+        {
+            await FindMarkSessionById(markSessionId);
+            await Task.Run(() => { BackgroundJob.Enqueue(() => StartDeletionProcess(markSessionId)); });
+        }
+
+        public async Task StartDeletionProcess(string markSessionId)
+        {
+            var isMarkSessionDeleted = false;
+            var taskExecutionDelayInSeconds = 1;
+
+            while (!isMarkSessionDeleted)
+            {
+                try
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(taskExecutionDelayInSeconds));
+
+                    var markSessionModel = await FindMarkSessionById(markSessionId);
+
+                    markSessionModel.State = MarkSessionModel.AbortingState;
+                    await _markSessionRepository.Update(markSessionModel);
+                    _loggerService.LogUpdateEvent(markSessionModel.ToString());
+
+                    await _dependantResourceHandler.FreeResourcesForMarkSession(markSessionModel);
+
+                    await _markSessionRepository.Delete(markSessionModel);
+                    isMarkSessionDeleted = true;
+                }
+                catch (MarkSessionDoesNotExistException)
+                {
+                    isMarkSessionDeleted = true;
+                }
+                catch (Exception e)
+                {
+                    _loggerService.LogErrorEvent(e);
+                    taskExecutionDelayInSeconds *= 2;
+                }
             }
         }
 
         private async Task<MarkSessionModel> FindMarkSessionById(string markSessionId)
         {
+            BsonObjectId bsonObjectId;
+
+            try
+            {
+                bsonObjectId = new BsonObjectId(new ObjectId(markSessionId));
+            }
+            catch (Exception e)
+            {
+                throw new MarkSessionDoesNotExistException(
+                    $"mark session with id: {markSessionId} does not exist!",
+                    e
+                );
+            }
+
             var markSessionModel = await _markSessionRepository.GetForFilter(
-                Builders<MarkSessionModel>.Filter.Eq("_id", new BsonObjectId(new ObjectId(markSessionId)))
+                Builders<MarkSessionModel>.Filter.Eq("_id", bsonObjectId)
             );
 
             if (markSessionModel == null)
@@ -208,83 +150,6 @@ namespace mars_marking_svc.ResourceTypes.MarkedResource
             }
 
             return markSessionModel;
-        }
-
-        // TODO: Use something more stable for running this process than the Tasks !!!
-        public async Task FreeResourcesAndDeleteMarkSession(MarkSessionModel markSessionModel)
-        {
-            markSessionModel.State = MarkSessionModel.AbortingState;
-            await _markSessionRepository.Update(markSessionModel);
-            _loggerService.LogUpdateEvent(markSessionModel.ToString());
-
-            if (markSessionModel.SourceDependency != null)
-            {
-                await FreeDependantResource(markSessionModel.SourceDependency, markSessionModel.ProjectId);
-                markSessionModel.SourceDependency = null;
-                await _markSessionRepository.Update(markSessionModel);
-            }
-
-            var markedDependantResources = new List<DependantResourceModel>(markSessionModel.DependantResources);
-
-            foreach (var markedResourceModel in markedDependantResources)
-            {
-                var unmarkedResourceModel =
-                    await FreeDependantResource(markedResourceModel, markSessionModel.ProjectId);
-                var index = markSessionModel.DependantResources.FindIndex(m =>
-                    m.ResourceId == unmarkedResourceModel.ResourceId
-                );
-                markSessionModel.DependantResources.RemoveAt(index);
-                await _markSessionRepository.Update(markSessionModel);
-            }
-
-            await _markSessionRepository.Delete(markSessionModel);
-        }
-
-        private async Task<DependantResourceModel> FreeDependantResource(
-            DependantResourceModel dependantResourceModel,
-            string projectId
-        )
-        {
-            switch (dependantResourceModel.ResourceType)
-            {
-                case "metadata":
-                {
-                    await _metadataClient.UnmarkMetadata(dependantResourceModel);
-                    return dependantResourceModel;
-                }
-                case "scenario":
-                {
-                    await _scenarioClient.UnmarkScenario(dependantResourceModel);
-                    return dependantResourceModel;
-                }
-                case "resultConfig":
-                {
-                    _loggerService.LogSkipEvent(dependantResourceModel.ToString());
-                    return dependantResourceModel;
-                }
-                case "simPlan":
-                {
-                    await _simPlanClient.UnmarkSimPlan(dependantResourceModel, projectId);
-                    return dependantResourceModel;
-                }
-                case "simRun":
-                {
-                    _loggerService.LogSkipEvent(dependantResourceModel.ToString());
-                    return dependantResourceModel;
-                }
-                case "resultData":
-                {
-                    _loggerService.LogSkipEvent(dependantResourceModel.ToString());
-                    return dependantResourceModel;
-                }
-                default:
-                {
-                    _loggerService.LogWarningEvent(
-                        $"Unknown {dependantResourceModel} is encountered while unmarking! This might lead to an error in the system!"
-                    );
-                    return dependantResourceModel;
-                }
-            }
         }
     }
 }

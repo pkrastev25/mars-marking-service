@@ -7,5 +7,9 @@ namespace mars_marking_svc.Exceptions
         public MarkSessionDoesNotExistException(string message) : base(message)
         {
         }
+
+        public MarkSessionDoesNotExistException(string message, Exception exception) : base(message, exception)
+        {
+        }
     }
 }

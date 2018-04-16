@@ -85,7 +85,7 @@ namespace mars_marking_svc.ResourceTypes.Metadata
             metadataModel.State = MetadataModel.ToBeDeletedState;
 
             var response = await _httpService.PutAsync(
-                $"http://metadata-svc/metadata/{metadataModel.DataId}?state={MetadataModel.ToBeDeletedState}",
+                $"http://metadata-svc/metadata/{metadataModel.DataId}/state?state={MetadataModel.ToBeDeletedState}",
                 metadataModel
             );
 
@@ -120,11 +120,11 @@ namespace mars_marking_svc.ResourceTypes.Metadata
             };
 
             var response = await _httpService.PutAsync(
-                $"http://metadata-svc/metadata/{metadataModel.DataId}?state={MetadataModel.FinishedState}",
+                $"http://metadata-svc/metadata/{metadataModel.DataId}/state?state={MetadataModel.FinishedState}",
                 metadataModel
             );
 
-            if (response.StatusCode != HttpStatusCode.OK)
+            if (response.StatusCode != HttpStatusCode.OK && response.StatusCode != HttpStatusCode.Created)
             {
                 throw new FailedToUpdateResourceException(
                     $"Failed to update {dependantResourceModel} from metadata-svc!"

@@ -1,8 +1,8 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using mars_marking_svc.MarkSession.Interfaces;
 using mars_marking_svc.Services.Models;
-using static mars_marking_svc.Constants.Constants;
 
 namespace mars_marking_svc.Services
 {
@@ -28,40 +28,27 @@ namespace mars_marking_svc.Services
 
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            while (!cancellationToken.IsCancellationRequested)
-            {
-                await CleanMarkSessions(cancellationToken);
-                await Task.Delay(MarkSessionCronServiceTimeInterval, cancellationToken);
-            }
+            await CleanMarkSessions();
         }
 
-        private async Task CleanMarkSessions(CancellationToken cancellationToken)
+        private async Task CleanMarkSessions()
         {
-            var taskFactory = new TaskFactory(cancellationToken);
+            try
+            {
+                var markSessionModels = await _markSessionRepository.GetAll();
 
-            // TODO: Start a long running unmarking job when the application is started and the markSession is in the Marking state!!!
-            /*
-            await taskFactory.StartNew(
-                async () =>
+                foreach (var markSessionModel in markSessionModels)
                 {
-                    try
+                    if (markSessionModel.State == "Marking")
                     {
-                        var markSessions = await _markSessionRepository.GetAll();
-
-                        foreach (var dbMarkSessionModel in markSessions)
-                        {
-                            if (dbMarkSessionModel.IsMarkSessionExpired())
-                            {
-                                await _markSessionHandler.UnmarkResourcesForMarkSession(dbMarkSessionModel);
-                            }
-                        }
+                        await _markSessionHandler.DeleteMarkSession(markSessionModel.Id.ToString());
                     }
-                    catch (Exception e)
-                    {
-                        _loggerService.LogErrorEvent(e);
-                    }
-                }, cancellationToken);
-                */
+                }
+            }
+            catch (Exception e)
+            {
+                _loggerService.LogErrorEvent(e);
+            }
         }
     }
 }

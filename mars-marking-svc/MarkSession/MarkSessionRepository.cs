@@ -58,7 +58,9 @@ public class MarkSessionRepository : IMarkSessionRepository
         return await markSessionCursor.FirstOrDefaultAsync();
     }
 
-    public async Task<IEnumerable<MarkSessionModel>> GetAllForFilter(FilterDefinition<MarkSessionModel> filterDefinition)
+    public async Task<IEnumerable<MarkSessionModel>> GetAllForFilter(
+        FilterDefinition<MarkSessionModel> filterDefinition
+    )
     {
         var markSessionCursors = await _dbMongoService.GetMarkSessionCollection().FindAsync(
             filterDefinition

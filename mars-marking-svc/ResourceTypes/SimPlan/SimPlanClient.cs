@@ -6,7 +6,7 @@ using mars_marking_svc.MarkedResource.Models;
 using mars_marking_svc.ResourceTypes.SimPlan.Interfaces;
 using mars_marking_svc.ResourceTypes.SimPlan.Models;
 using mars_marking_svc.Services.Models;
-using Newtonsoft.Json;
+using mars_marking_svc.Utils;
 
 namespace mars_marking_svc.ResourceTypes.SimPlan
 {
@@ -26,72 +26,65 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
 
         public async Task<SimPlanModel> GetSimPlan(string simPlanId, string projectId)
         {
-            var response =
-                await _httpService.GetAsync($"http://sim-runner-svc/simplan?id={simPlanId}&projectid={projectId}");
+            var response = await _httpService.GetAsync(
+                $"http://sim-runner-svc/simplan?id={simPlanId}&projectid={projectId}"
+            );
 
-            if (response.StatusCode != HttpStatusCode.OK)
-            {
-                throw new FailedToGetResourceException(
-                    $"Failed to get simPlan with id: {simPlanId}, projectId: {projectId} from sim-runner-svc!"
-                );
-            }
-
-            var jsonResponse = await response.Content.ReadAsStringAsync();
+            response.ThrowExceptionIfNotSuccessfulResponse(
+                new FailedToGetResourceException(
+                    $"Failed to get simPlan with id: {simPlanId}, projectId: {projectId} from sim-runner-svc! The response status code is {response.StatusCode}"
+                )
+            );
 
             // TODO: Potentially fix this in the sim-runner-svc!
-            return JsonConvert.DeserializeObject<List<SimPlanModel>>(jsonResponse)[0];
+            var simPlanModels = await response.Deserialize<List<SimPlanModel>>();
+
+            return simPlanModels[0];
         }
 
         public async Task<List<SimPlanModel>> GetSimPlansForScenario(string scenarioId, string projectId)
         {
-            var response =
-                await _httpService.GetAsync(
-                    $"http://sim-runner-svc/simplan?scenarioid={scenarioId}&projectid={projectId}");
+            var response = await _httpService.GetAsync(
+                $"http://sim-runner-svc/simplan?scenarioid={scenarioId}&projectid={projectId}"
+            );
 
-            if (response.StatusCode != HttpStatusCode.OK)
-            {
-                throw new FailedToGetResourceException(
-                    $"Failed to get simPlans for scenarioId: {scenarioId}, projectId: {projectId} from sim-runner-svc!"
-                );
-            }
+            response.ThrowExceptionIfNotSuccessfulResponse(
+                new FailedToGetResourceException(
+                    $"Failed to get simPlans for scenarioId: {scenarioId}, projectId: {projectId} from sim-runner-svc! The response status code is {response.StatusCode}"
+                )
+            );
 
-            var jsonResponse = await response.Content.ReadAsStringAsync();
-
-            return JsonConvert.DeserializeObject<List<SimPlanModel>>(jsonResponse);
+            return await response.Deserialize<List<SimPlanModel>>();
         }
 
         public async Task<List<SimPlanModel>> GetSimPlansForResultConfig(string resultConfigId, string projectId)
         {
-            var response =
-                await _httpService.GetAsync(
-                    $"http://sim-runner-svc/simplan?resultconfigid={resultConfigId}&projectid={projectId}");
+            var response = await _httpService.GetAsync(
+                $"http://sim-runner-svc/simplan?resultconfigid={resultConfigId}&projectid={projectId}"
+            );
 
-            if (response.StatusCode != HttpStatusCode.OK)
-            {
-                throw new FailedToGetResourceException(
-                    $"Failed to get simPlans for resultConfigId: {resultConfigId}, projectId: {projectId} from sim-runner-svc!"
-                );
-            }
+            response.ThrowExceptionIfNotSuccessfulResponse(
+                new FailedToGetResourceException(
+                    $"Failed to get simPlans for resultConfigId: {resultConfigId}, projectId: {projectId} from sim-runner-svc! The response status code is {response.StatusCode}"
+                )
+            );
 
-            var jsonResponse = await response.Content.ReadAsStringAsync();
-
-            return JsonConvert.DeserializeObject<List<SimPlanModel>>(jsonResponse);
+            return await response.Deserialize<List<SimPlanModel>>();
         }
 
         public async Task<List<SimPlanModel>> GetSimPlansForProject(string projectId)
         {
-            var response = await _httpService.GetAsync($"http://sim-runner-svc/simplan?projectid={projectId}");
+            var response = await _httpService.GetAsync(
+                $"http://sim-runner-svc/simplan?projectid={projectId}"
+            );
 
-            if (response.StatusCode != HttpStatusCode.OK)
-            {
-                throw new FailedToGetResourceException(
-                    $"Failed to get simPlans for projectId: {projectId} from sim-runner-svc!"
-                );
-            }
+            response.ThrowExceptionIfNotSuccessfulResponse(
+                new FailedToGetResourceException(
+                    $"Failed to get simPlans for projectId: {projectId} from sim-runner-svc! The response status code is {response.StatusCode}"
+                )
+            );
 
-            var jsonResponse = await response.Content.ReadAsStringAsync();
-
-            return JsonConvert.DeserializeObject<List<SimPlanModel>>(jsonResponse);
+            return await response.Deserialize<List<SimPlanModel>>();
         }
 
         public async Task<DependantResourceModel> MarkSimPlan(string simPlanId, string projectId)
@@ -118,12 +111,11 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
                 simPlanModel
             );
 
-            if (response.StatusCode != HttpStatusCode.OK)
-            {
-                throw new FailedToUpdateResourceException(
-                    $"Failed to update simPlan with id: {simPlanModel.Id}, projectId: {projectId} from sim-runner-svc!"
-                );
-            }
+            response.ThrowExceptionIfNotSuccessfulResponse(
+                new FailedToUpdateResourceException(
+                    $"Failed to update simPlan with id: {simPlanModel.Id}, projectId: {projectId} from sim-runner-svc! The response status code is {response.StatusCode}"
+                )
+            );
 
             var markedResource = new DependantResourceModel("simPlan", simPlanModel.Id);
             _loggerService.LogMarkEvent(markedResource.ToString());
@@ -147,34 +139,32 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
                 simPlanModel
             );
 
-            if (response.StatusCode != HttpStatusCode.OK)
-            {
-                throw new FailedToUpdateResourceException(
-                    $"Failed to update simPlan with id: {simPlanModel.Id}, projectId: {projectId} from sim-runner-svc!"
-                );
-            }
+            response.ThrowExceptionIfNotSuccessfulResponse(
+                new FailedToUpdateResourceException(
+                    $"Failed to update simPlan with id: {simPlanModel.Id}, projectId: {projectId} from sim-runner-svc! The response status code is {response.StatusCode}"
+                )
+            );
 
             _loggerService.LogUnmarkEvent(dependantResourceModel.ToString());
         }
 
         private async Task<bool> DoesSimPlanExist(string simPlanId, string projectId)
         {
-            var response =
-                await _httpService.GetAsync($"http://sim-runner-svc/simplan?id={simPlanId}&projectid={projectId}");
-
-            if (response.StatusCode == HttpStatusCode.OK)
-            {
-                return true;
-            }
-
-            if (response.StatusCode == HttpStatusCode.NoContent)
-            {
-                return false;
-            }
-
-            throw new FailedToGetResourceException(
-                $"Failed to get simPlan with id: {simPlanId}, projectId: {projectId} from sim-runner-svc!"
+            var response = await _httpService.GetAsync(
+                $"http://sim-runner-svc/simplan?id={simPlanId}&projectid={projectId}"
             );
+
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.OK:
+                    return true;
+                case HttpStatusCode.NoContent:
+                    return false;
+                default:
+                    throw new FailedToGetResourceException(
+                        $"Failed to get simPlan with id: {simPlanId}, projectId: {projectId} from sim-runner-svc! The response status code is {response.StatusCode}"
+                    );
+            }
         }
     }
 }

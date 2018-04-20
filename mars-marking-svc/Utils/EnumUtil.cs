@@ -1,6 +1,6 @@
 ﻿namespace mars_marking_svc.Utils
 {
-    public class ValidateEnumUtil
+    public class EnumUtil
     {
         public static bool DoesResourceTypeExist(string resourceType)
         {
@@ -12,6 +12,7 @@
                 case "resultConfig":
                 case "simPlan":
                 case "simRun":
+                case "resultData":
                     return true;
                 default:
                     return false;

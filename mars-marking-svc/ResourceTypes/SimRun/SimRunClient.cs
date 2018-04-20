@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
-using System.Net;
 using System.Threading.Tasks;
 using mars_marking_svc.Exceptions;
 using mars_marking_svc.MarkedResource.Models;
 using mars_marking_svc.ResourceTypes.SimRun.Interfaces;
 using mars_marking_svc.ResourceTypes.SimRun.Models;
 using mars_marking_svc.Services.Models;
-using Newtonsoft.Json;
+using mars_marking_svc.Utils;
 
 namespace mars_marking_svc.ResourceTypes.SimRun
 {
@@ -26,53 +25,50 @@ namespace mars_marking_svc.ResourceTypes.SimRun
 
         public async Task<SimRunModel> GetSimRun(string simRunId, string projectId)
         {
-            var response =
-                await _httpService.GetAsync($"http://sim-runner-svc/simrun?simRunId={simRunId}&projectid={projectId}");
+            var response = await _httpService.GetAsync(
+                $"http://sim-runner-svc/simrun?simRunId={simRunId}&projectid={projectId}"
+            );
 
-            if (response.StatusCode != HttpStatusCode.OK)
-            {
-                throw new FailedToGetResourceException(
-                    $"Failed to get simRun with id: {simRunId}, projectId: {projectId} from sim-runner-svc!"
-                );
-            }
+            response.ThrowExceptionIfNotSuccessfulResponse(
+                new FailedToGetResourceException(
+                    $"Failed to get simRun with id: {simRunId}, projectId: {projectId} from sim-runner-svc! The response status code is {response.StatusCode}"
+                )
+            );
 
-            var jsonResponse = await response.Content.ReadAsStringAsync();
+            // TODO: Potentially fix this in the sim-runner-svc!
+            var simPlanModels = await response.Deserialize<List<SimRunModel>>();
 
-            return JsonConvert.DeserializeObject<List<SimRunModel>>(jsonResponse)[0];
+            return simPlanModels[0];
         }
 
         public async Task<List<SimRunModel>> GetSimRunsForSimPlan(string simPlanId, string projectId)
         {
-            var response =
-                await _httpService.GetAsync(
-                    $"http://sim-runner-svc/simrun?simPlanId={simPlanId}&projectid={projectId}");
+            var response = await _httpService.GetAsync(
+                $"http://sim-runner-svc/simrun?simPlanId={simPlanId}&projectid={projectId}"
+            );
 
-            if (response.StatusCode != HttpStatusCode.OK)
-            {
-                throw new FailedToGetResourceException(
-                    $"Failed to get simRuns for simPlanId: {simPlanId}, projectId: {projectId} from sim-runner-svc!"
-                );
-            }
+            response.ThrowExceptionIfNotSuccessfulResponse(
+                new FailedToGetResourceException(
+                    $"Failed to get simRuns for simPlanId: {simPlanId}, projectId: {projectId} from sim-runner-svc! The response status code is {response.StatusCode}"
+                )
+            );
 
-            var jsonResponse = await response.Content.ReadAsStringAsync();
-
-            return JsonConvert.DeserializeObject<List<SimRunModel>>(jsonResponse);
+            return await response.Deserialize<List<SimRunModel>>();
         }
 
         public async Task<List<SimRunModel>> GetSimRunsForProject(string projectId)
         {
-            var response = await _httpService.GetAsync($"http://sim-runner-svc/simrun?projectid={projectId}");
+            var response = await _httpService.GetAsync(
+                $"http://sim-runner-svc/simrun?projectid={projectId}"
+            );
 
-            if (response.StatusCode != HttpStatusCode.OK)
-            {
-                throw new FailedToGetResourceException(
-                    $"Failed to get simRuns for projectId: {projectId} from sim-runner-svc!"
-                );
-            }
+            response.ThrowExceptionIfNotSuccessfulResponse(
+                new FailedToGetResourceException(
+                    $"Failed to get simRuns for projectId: {projectId} from sim-runner-svc! The response status code is {response.StatusCode}"
+                )
+            );
 
-            var jsonResponse = await response.Content.ReadAsStringAsync();
-
-            return JsonConvert.DeserializeObject<List<SimRunModel>>(jsonResponse);
+            return await response.Deserialize<List<SimRunModel>>();
         }
 
         public async Task<DependantResourceModel> CreateDependantSimRunResource(string simRunId, string projectId)

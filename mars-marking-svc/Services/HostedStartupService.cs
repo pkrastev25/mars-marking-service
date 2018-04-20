@@ -28,10 +28,10 @@ namespace mars_marking_svc.Services
 
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
-            await CleanMarkSessions();
+            await CleanMarkSessions(cancellationToken);
         }
 
-        private async Task CleanMarkSessions()
+        private async Task CleanMarkSessions(CancellationToken cancellationToken)
         {
             try
             {
@@ -39,6 +39,11 @@ namespace mars_marking_svc.Services
 
                 foreach (var markSessionModel in markSessionModels)
                 {
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        break;
+                    }
+
                     if (markSessionModel.State == "Marking")
                     {
                         await _markSessionHandler.DeleteMarkSession(markSessionModel.Id.ToString());

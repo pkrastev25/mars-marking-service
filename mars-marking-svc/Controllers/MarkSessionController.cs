@@ -36,7 +36,7 @@ namespace mars_marking_svc.Controllers
                 return BadRequest("resourceId is not specified!");
             }
 
-            if (!ValidateEnumUtil.DoesMarkSessionTypeExist(markSessionType))
+            if (!EnumUtil.DoesMarkSessionTypeExist(markSessionType))
             {
                 return BadRequest("markSessionType is not specified or the type is invalid!");
             }
@@ -53,7 +53,7 @@ namespace mars_marking_svc.Controllers
                 }
             }
 
-            if (!ValidateEnumUtil.DoesResourceTypeExist(resourceType))
+            if (!EnumUtil.DoesResourceTypeExist(resourceType))
             {
                 return BadRequest("resourceType is not specified or the type is invalid!");
             }
@@ -92,7 +92,7 @@ namespace mars_marking_svc.Controllers
             [FromQuery(Name = "markSessionType")] string markSessionType
         )
         {
-            if (!ValidateEnumUtil.DoesMarkSessionTypeExist(markSessionType))
+            if (!EnumUtil.DoesMarkSessionTypeExist(markSessionType))
             {
                 return BadRequest("markSessionType is not specified or the type is invalid!");
             }
@@ -115,7 +115,7 @@ namespace mars_marking_svc.Controllers
                 return BadRequest("markSessionId is not specified!");
             }
 
-            if (!ValidateEnumUtil.DoesMarkSessionTypeExist(markSessionType))
+            if (!EnumUtil.DoesMarkSessionTypeExist(markSessionType))
             {
                 return BadRequest("markSessionType is not specified or the type is invalid!");
             }

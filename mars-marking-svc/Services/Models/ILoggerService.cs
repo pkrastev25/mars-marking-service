@@ -16,10 +16,6 @@ namespace mars_marking_svc.Services.Models
 
         void LogSkipEvent(string message);
 
-        void LogStopEvent(string message);
-
         void LogErrorEvent(Exception error);
-
-        void LogWarningEvent(string message);
     }
 }

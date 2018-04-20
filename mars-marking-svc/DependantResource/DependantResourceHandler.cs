@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using mars_marking_svc.DependantResource.Interfaces;
+using mars_marking_svc.Exceptions;
 using mars_marking_svc.MarkedResource.Models;
 using mars_marking_svc.ResourceTypes.Metadata.Interfaces;
 using mars_marking_svc.ResourceTypes.ResultConfig.Interfaces;
@@ -69,6 +70,13 @@ namespace mars_marking_svc.DependantResource
                 case "simRun":
                     await GatherResourcesForSimRunMarkSession(markSessionModel);
                     break;
+                case "resultData":
+                    await GatherResourcesForResultDataMarkSession(markSessionModel);
+                    break;
+                default:
+                    throw new UnknownResourceTypeException(
+                        $"{markSessionModel.ResourceType} is unknown!"
+                    );
             }
         }
 
@@ -274,7 +282,8 @@ namespace mars_marking_svc.DependantResource
             markSessionModel.SourceDependency = sourceDependantResource;
             await _markSessionRepository.Update(markSessionModel);
 
-            var markedSourceResultConfig = await _resultConfigClient.CreateDependantResultConfigResource(resultConfigId);
+            var markedSourceResultConfig =
+                await _resultConfigClient.CreateDependantResultConfigResource(resultConfigId);
             markSessionModel.DependantResources.Add(markedSourceResultConfig);
             await _markSessionRepository.Update(markSessionModel);
 
@@ -353,6 +362,17 @@ namespace mars_marking_svc.DependantResource
             await _markSessionRepository.Update(markSessionModel);
         }
 
+        private async Task GatherResourcesForResultDataMarkSession(
+            MarkSessionModel markSessionModel
+        )
+        {
+            var resultDataId = markSessionModel.ResourceId;
+
+            var dependantResourceModel = await _resultDataClient.GatherResultDataDependantResource(resultDataId);
+            markSessionModel.DependantResources.Add(dependantResourceModel);
+            await _markSessionRepository.Update(markSessionModel);
+        }
+
         private async Task<DependantResourceModel> FreeDependantResource(
             DependantResourceModel dependantResourceModel,
             string projectId
@@ -384,10 +404,9 @@ namespace mars_marking_svc.DependantResource
                 }
                 default:
                 {
-                    _loggerService.LogWarningEvent(
-                        $"Unknown {dependantResourceModel} is encountered while unmarking! This might lead to an error in the system!"
+                    throw new UnknownResourceTypeException(
+                        $"{dependantResourceModel} is unknown!"
                     );
-                    return dependantResourceModel;
                 }
             }
         }

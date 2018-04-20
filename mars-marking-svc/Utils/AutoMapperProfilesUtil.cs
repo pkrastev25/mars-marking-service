@@ -11,6 +11,8 @@ namespace mars_marking_svc.Utils
             CreateMap<MarkSessionModel, MarkSessionForReturnDto>()
                 .ForMember(destination => destination.MarkSessionId,
                     option => { option.MapFrom(src => src.Id.ToString()); }
+                ).ForMember(destination => destination.ProjectId,
+                    option => { option.MapFrom(src => src.ProjectId); }
                 ).ForMember(destination => destination.DependantResources,
                     option => { option.MapFrom(src => src.DependantResources); }
                 );

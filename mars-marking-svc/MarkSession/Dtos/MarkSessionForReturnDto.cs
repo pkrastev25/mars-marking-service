@@ -9,6 +9,9 @@ namespace mars_marking_svc.ResourceTypes.MarkedResource.Dtos
         [JsonProperty("markSessionId")]
         public string MarkSessionId { get; set; }
 
+        [JsonProperty("projectId")]
+        public string ProjectId { get; set; }
+
         [JsonProperty("dependantResources")]
         public List<DependantResourceModel> DependantResources { get; set; }
     }

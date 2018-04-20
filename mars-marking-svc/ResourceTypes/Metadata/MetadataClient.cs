@@ -6,7 +6,7 @@ using mars_marking_svc.MarkedResource.Models;
 using mars_marking_svc.ResourceTypes.Metadata.Interfaces;
 using mars_marking_svc.ResourceTypes.Metadata.Models;
 using mars_marking_svc.Services.Models;
-using Newtonsoft.Json;
+using mars_marking_svc.Utils;
 
 namespace mars_marking_svc.ResourceTypes.Metadata
 {
@@ -26,34 +26,32 @@ namespace mars_marking_svc.ResourceTypes.Metadata
 
         public async Task<MetadataModel> GetMetadata(string metadataId)
         {
-            var response = await _httpService.GetAsync($"http://metadata-svc/metadata/{metadataId}");
+            var response = await _httpService.GetAsync(
+                $"http://metadata-svc/metadata/{metadataId}"
+            );
 
-            if (response.StatusCode != HttpStatusCode.OK)
-            {
-                throw new FailedToGetResourceException(
-                    $"Failed to get metadata with id: {metadataId} from metadata-svc!"
-                );
-            }
+            response.ThrowExceptionIfNotSuccessfulResponse(
+                new FailedToGetResourceException(
+                    $"Failed to get metadata with id: {metadataId} from metadata-svc! The response status code is {response.StatusCode}"
+                )
+            );
 
-            var jsonResponse = await response.Content.ReadAsStringAsync();
-
-            return JsonConvert.DeserializeObject<MetadataModel>(jsonResponse);
+            return await response.Deserialize<MetadataModel>();
         }
 
         public async Task<List<MetadataModel>> GetMetadataForProject(string projectId)
         {
-            var response = await _httpService.GetAsync($"http://metadata-svc/metadata?project={projectId}");
+            var response = await _httpService.GetAsync(
+                $"http://metadata-svc/metadata?project={projectId}"
+            );
 
-            if (response.StatusCode != HttpStatusCode.OK)
-            {
-                throw new FailedToGetResourceException(
-                    $"Failed to get metadata for projectId: {projectId} from metadata-svc!"
-                );
-            }
+            response.ThrowExceptionIfNotSuccessfulResponse(
+                new FailedToGetResourceException(
+                    $"Failed to get metadata for projectId: {projectId} from metadata-svc! The response status code is {response.StatusCode}"
+                )
+            );
 
-            var jsonResponse = await response.Content.ReadAsStringAsync();
-
-            return JsonConvert.DeserializeObject<List<MetadataModel>>(jsonResponse);
+            return await response.Deserialize<List<MetadataModel>>();
         }
 
         public async Task<DependantResourceModel> MarkMetadata(string metadataId)
@@ -89,12 +87,11 @@ namespace mars_marking_svc.ResourceTypes.Metadata
                 metadataModel
             );
 
-            if (response.StatusCode != HttpStatusCode.OK)
-            {
-                throw new FailedToUpdateResourceException(
-                    $"Failed to update metadata with id: {metadataModel.DataId} from metadata-svc!"
-                );
-            }
+            response.ThrowExceptionIfNotSuccessfulResponse(
+                new FailedToUpdateResourceException(
+                    $"Failed to update metadata with id: {metadataModel.DataId} from metadata-svc! The response status code is {response.StatusCode}"
+                )
+            );
 
             var markedResource = new DependantResourceModel("metadata", metadataModel.DataId)
             {
@@ -124,33 +121,32 @@ namespace mars_marking_svc.ResourceTypes.Metadata
                 metadataModel
             );
 
-            if (response.StatusCode != HttpStatusCode.OK && response.StatusCode != HttpStatusCode.Created)
-            {
-                throw new FailedToUpdateResourceException(
-                    $"Failed to update {dependantResourceModel} from metadata-svc!"
-                );
-            }
+            response.ThrowExceptionIfNotSuccessfulResponse(
+                new FailedToUpdateResourceException(
+                    $"Failed to update {dependantResourceModel} from metadata-svc! The response status code is {response.StatusCode}"
+                )
+            );
 
             _loggerService.LogUnmarkEvent(dependantResourceModel.ToString());
         }
 
         private async Task<bool> DoesMetadataExist(string metadataId)
         {
-            var response = await _httpService.GetAsync($"http://metadata-svc/metadata/{metadataId}");
-
-            if (response.StatusCode == HttpStatusCode.OK)
-            {
-                return true;
-            }
-
-            if (response.StatusCode == HttpStatusCode.NotFound)
-            {
-                return false;
-            }
-
-            throw new FailedToGetResourceException(
-                $"Failed to get metadata with id: {metadataId} from metadata-svc!"
+            var response = await _httpService.GetAsync(
+                $"http://metadata-svc/metadata/{metadataId}"
             );
+
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.OK:
+                    return true;
+                case HttpStatusCode.NotFound:
+                    return false;
+                default:
+                    throw new FailedToGetResourceException(
+                        $"Failed to get metadata with id: {metadataId} from metadata-svc! The response status code is {response.StatusCode}"
+                    );
+            }
         }
     }
 }

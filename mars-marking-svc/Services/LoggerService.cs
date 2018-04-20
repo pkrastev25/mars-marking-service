@@ -35,20 +35,10 @@ namespace mars_marking_svc.Services
             Console.WriteLine($"[SKIP] {message}");
         }
 
-        public void LogStopEvent(string message)
-        {
-            Console.WriteLine($"[STOP] {message}");
-        }
-
         public void LogErrorEvent(Exception error)
         {
             Console.Error.WriteLine($"[ERROR] {error.Message}");
             Console.Error.WriteLine(error.StackTrace);
-        }
-
-        public void LogWarningEvent(string message)
-        {
-            Console.WriteLine($"[WARNING] {message}");
         }
     }
 }

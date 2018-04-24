@@ -45,7 +45,7 @@ namespace mars_marking_svc.ResourceTypes.Metadata
         )
         {
             var response = await _httpService.GetAsync(
-                $"http://metadata-svc/metadata?project={projectId}"
+                $"http://metadata-svc/metadata?projectId={projectId}"
             );
 
             response.ThrowExceptionIfNotSuccessfulResponse(

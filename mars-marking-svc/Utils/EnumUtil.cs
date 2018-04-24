@@ -2,7 +2,9 @@
 {
     public class EnumUtil
     {
-        public static bool DoesResourceTypeExist(string resourceType)
+        public static bool DoesResourceTypeExist(
+            string resourceType
+        )
         {
             switch (resourceType)
             {
@@ -19,7 +21,9 @@
             }
         }
 
-        public static bool DoesMarkSessionTypeExist(string markSessionType)
+        public static bool DoesMarkSessionTypeExist(
+            string markSessionType
+        )
         {
             switch (markSessionType)
             {

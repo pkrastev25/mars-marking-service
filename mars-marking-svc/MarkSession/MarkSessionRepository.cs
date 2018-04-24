@@ -20,7 +20,9 @@ public class MarkSessionRepository : IMarkSessionRepository
         _loggerService = loggerService;
     }
 
-    public async Task Create(MarkSessionModel markSessionModel)
+    public async Task Create(
+        MarkSessionModel markSessionModel
+    )
     {
         try
         {
@@ -49,7 +51,9 @@ public class MarkSessionRepository : IMarkSessionRepository
         }
     }
 
-    public async Task<MarkSessionModel> GetForFilter(FilterDefinition<MarkSessionModel> filterDefinition)
+    public async Task<MarkSessionModel> GetForFilter(
+        FilterDefinition<MarkSessionModel> filterDefinition
+    )
     {
         var markSessionCursor = await _dbMongoService.GetMarkSessionCollection().FindAsync(
             filterDefinition
@@ -74,15 +78,21 @@ public class MarkSessionRepository : IMarkSessionRepository
         return await _dbMongoService.GetMarkSessionCollection().Find(x => true).ToListAsync();
     }
 
-    public async Task Update(MarkSessionModel markSessionModel)
+    public async Task Update(
+        MarkSessionModel markSessionModel
+    )
     {
+        markSessionModel.LatestUpdateTimestampInTicks = DateTime.Now.Ticks;
+
         await _dbMongoService.GetMarkSessionCollection().ReplaceOneAsync(
             GetFilterDefinitionForResourceId(markSessionModel.ResourceId),
             markSessionModel
         );
     }
 
-    public async Task Delete(MarkSessionModel markSessionModel)
+    public async Task Delete(
+        MarkSessionModel markSessionModel
+    )
     {
         if (markSessionModel.DependantResources.Count != 0)
         {
@@ -104,12 +114,16 @@ public class MarkSessionRepository : IMarkSessionRepository
         _loggerService.LogDeleteEvent(markSessionModel.ToString());
     }
 
-    private FilterDefinition<MarkSessionModel> GetFilterDefinitionForResourceId(string resourceId)
+    private FilterDefinition<MarkSessionModel> GetFilterDefinitionForResourceId(
+        string resourceId
+    )
     {
-        return Builders<MarkSessionModel>.Filter.Eq("ResourceId", resourceId);
+        return Builders<MarkSessionModel>.Filter.Eq(MarkSessionModel.BsonElementDefinitionResourceId, resourceId);
     }
 
-    private async Task<MarkSessionModel> FindMarkSessionByResourceId(string resourceId)
+    private async Task<MarkSessionModel> FindMarkSessionByResourceId(
+        string resourceId
+    )
     {
         var markSessionCursor = await _dbMongoService.GetMarkSessionCollection().FindAsync(
             GetFilterDefinitionForResourceId(resourceId)

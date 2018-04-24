@@ -48,7 +48,9 @@ namespace mars_marking_svc.DependantResource
             _loggerService = loggerService;
         }
 
-        public async Task GatherResourcesForMarkSession(MarkSessionModel markSessionModel)
+        public async Task GatherResourcesForMarkSession(
+            MarkSessionModel markSessionModel
+        )
         {
             switch (markSessionModel.ResourceType)
             {
@@ -80,7 +82,9 @@ namespace mars_marking_svc.DependantResource
             }
         }
 
-        public async Task FreeResourcesForMarkSession(MarkSessionModel markSessionModel)
+        public async Task FreeResourcesForMarkSession(
+            MarkSessionModel markSessionModel
+        )
         {
             if (markSessionModel.SourceDependency != null)
             {

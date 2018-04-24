@@ -49,7 +49,10 @@ namespace mars_marking_svc
             // Hangfire config
             services.AddHangfire(configuration =>
             {
-                configuration.UseMongoStorage(DbMongoService.MongoDbConnection, DbMongoService.MongoDbHangfireName);
+                configuration.UseMongoStorage(
+                    DbMongoService.MongoDbConnection,
+                    DbMongoService.MongoDbHangfireName
+                );
             });
 
             // Services

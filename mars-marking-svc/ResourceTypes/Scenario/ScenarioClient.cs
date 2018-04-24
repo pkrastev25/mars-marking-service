@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Net;
 using System.Threading.Tasks;
 using mars_marking_svc.Exceptions;
 using mars_marking_svc.MarkedResource.Models;
@@ -24,7 +23,9 @@ namespace mars_marking_svc.ResourceTypes.Scenario
             _loggerService = loggerService;
         }
 
-        public async Task<ScenarioModel> GetScenario(string scenarioId)
+        public async Task<ScenarioModel> GetScenario(
+            string scenarioId
+        )
         {
             var response = await _httpService.GetAsync(
                 $"http://scenario-svc/scenarios/{scenarioId}"
@@ -39,7 +40,9 @@ namespace mars_marking_svc.ResourceTypes.Scenario
             return await response.Deserialize<ScenarioModel>();
         }
 
-        public async Task<List<ScenarioModel>> GetScenariosForMetadata(string metadataId)
+        public async Task<List<ScenarioModel>> GetScenariosForMetadata(
+            string metadataId
+        )
         {
             var response = await _httpService.GetAsync(
                 $"http://scenario-svc/scenarios?DataId={metadataId}"
@@ -54,7 +57,9 @@ namespace mars_marking_svc.ResourceTypes.Scenario
             return await response.Deserialize<List<ScenarioModel>>();
         }
 
-        public async Task<List<ScenarioModel>> GetScenariosForProject(string projectId)
+        public async Task<List<ScenarioModel>> GetScenariosForProject(
+            string projectId
+        )
         {
             var response = await _httpService.GetAsync(
                 $"http://scenario-svc/scenarios?Project={projectId}"
@@ -69,7 +74,9 @@ namespace mars_marking_svc.ResourceTypes.Scenario
             return await response.Deserialize<List<ScenarioModel>>();
         }
 
-        public async Task<DependantResourceModel> MarkScenario(string scenarioId)
+        public async Task<DependantResourceModel> MarkScenario(
+            string scenarioId
+        )
         {
             var scenario = await GetScenario(scenarioId);
             scenario.ScenarioId = scenarioId;
@@ -77,7 +84,9 @@ namespace mars_marking_svc.ResourceTypes.Scenario
             return await MarkScenario(scenario);
         }
 
-        public async Task<DependantResourceModel> MarkScenario(ScenarioModel scenarioModel)
+        public async Task<DependantResourceModel> MarkScenario(
+            ScenarioModel scenarioModel
+        )
         {
             if (scenarioModel.ToBeDeleted)
             {
@@ -87,6 +96,7 @@ namespace mars_marking_svc.ResourceTypes.Scenario
             }
 
             scenarioModel.ToBeDeleted = true;
+            scenarioModel.ReadOnly = true;
 
             var response = await _httpService.PatchAsync(
                 $"http://scenario-svc/scenarios/{scenarioModel.ScenarioId}/metadata",
@@ -105,18 +115,15 @@ namespace mars_marking_svc.ResourceTypes.Scenario
             return markedResource;
         }
 
-        public async Task UnmarkScenario(DependantResourceModel dependantResourceModel)
+        public async Task UnmarkScenario(
+            DependantResourceModel dependantResourceModel
+        )
         {
-            if (!await DoesScenarioExist(dependantResourceModel.ResourceId))
-            {
-                _loggerService.LogSkipEvent(dependantResourceModel.ToString());
-                return;
-            }
-
             var scenarioModel = new ScenarioModel
             {
                 ScenarioId = dependantResourceModel.ResourceId,
-                ToBeDeleted = false
+                ToBeDeleted = false,
+                ReadOnly = false
             };
 
             var response = await _httpService.PatchAsync(
@@ -124,32 +131,13 @@ namespace mars_marking_svc.ResourceTypes.Scenario
                 scenarioModel
             );
 
-            response.ThrowExceptionIfNotSuccessfulResponse(
+            response.ThrowExceptionIfNotSuccessfulResponseOrNot404Response(
                 new FailedToUpdateResourceException(
                     $"Failed to update {dependantResourceModel} from scenario-svc! The response status code is {response.StatusCode}"
                 )
             );
 
             _loggerService.LogUnmarkEvent(dependantResourceModel.ToString());
-        }
-
-        private async Task<bool> DoesScenarioExist(string scenarioId)
-        {
-            var response = await _httpService.GetAsync(
-                $"http://scenario-svc/scenarios/{scenarioId}"
-            );
-
-            switch (response.StatusCode)
-            {
-                case HttpStatusCode.OK:
-                    return true;
-                case HttpStatusCode.NotFound:
-                    return false;
-                default:
-                    throw new FailedToGetResourceException(
-                        $"Failed to get scenario with id: {scenarioId} from scenario-svc! The response status code is {response.StatusCode}"
-                    );
-            }
         }
     }
 }

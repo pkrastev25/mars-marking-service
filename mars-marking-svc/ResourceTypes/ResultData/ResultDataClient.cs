@@ -17,7 +17,9 @@ namespace mars_marking_svc.ResourceTypes.ResultData
             _loggerService = loggerService;
         }
 
-        public async Task<DependantResourceModel> GatherResultDataDependantResource(string resultDataId)
+        public async Task<DependantResourceModel> GatherResultDataDependantResource(
+            string resultDataId
+        )
         {
             return await Task.Run(() =>
             {
@@ -28,7 +30,9 @@ namespace mars_marking_svc.ResourceTypes.ResultData
             });
         }
 
-        public async Task<DependantResourceModel> GatherResultDataDependantResource(SimRunModel simRunModel)
+        public async Task<DependantResourceModel> GatherResultDataDependantResource(
+            SimRunModel simRunModel
+        )
         {
             return await GatherResultDataDependantResource(simRunModel.SimulationId);
         }

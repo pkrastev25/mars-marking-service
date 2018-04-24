@@ -24,7 +24,9 @@ namespace mars_marking_svc.ResourceTypes.ResultConfig
             _loggerService = loggerService;
         }
 
-        public async Task<ResultConfigModel> GetResultConfig(string resultConfigId)
+        public async Task<ResultConfigModel> GetResultConfig(
+            string resultConfigId
+        )
         {
             var response = await _httpService.GetAsync(
                 $"http://resultcfg-svc/api/ResultConfigs/{resultConfigId}"
@@ -41,7 +43,9 @@ namespace mars_marking_svc.ResourceTypes.ResultConfig
             return resultConfigResponseModel.ResultConfigModel;
         }
 
-        public async Task<List<ResultConfigModel>> GetResultConfigsForMetadata(string metadataId)
+        public async Task<List<ResultConfigModel>> GetResultConfigsForMetadata(
+            string metadataId
+        )
         {
             var response = await _httpService.GetAsync(
                 $"http://resultcfg-svc/api/ResultConfigs?modelDataId={metadataId}"
@@ -49,7 +53,7 @@ namespace mars_marking_svc.ResourceTypes.ResultConfig
 
             response.ThrowExceptionIfNotSuccessfulResponse(
                 new FailedToGetResourceException(
-                    $"Failed to get resultConfigs for metadataId: {metadataId} from resultcfg-svc! The response status is {response.StatusCode}!"
+                    $"Failed to get resultConfigs for metadataId: {metadataId} from resultcfg-svc! The response status code is {response.StatusCode}"
                 )
             );
 
@@ -60,7 +64,9 @@ namespace mars_marking_svc.ResourceTypes.ResultConfig
                 .ToList();
         }
 
-        public async Task<DependantResourceModel> CreateDependantResultConfigResource(string resultConfigId)
+        public async Task<DependantResourceModel> CreateDependantResultConfigResource(
+            string resultConfigId
+        )
         {
             var resultConfig = await GetResultConfig(resultConfigId);
 

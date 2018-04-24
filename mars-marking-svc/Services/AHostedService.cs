@@ -12,7 +12,9 @@ namespace mars_marking_svc.Services
         private Task _executingTask;
         private CancellationTokenSource _cancellationTokenSource;
 
-        public Task StartAsync(CancellationToken cancellationToken)
+        public Task StartAsync(
+            CancellationToken cancellationToken
+        )
         {
             _cancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
@@ -21,7 +23,9 @@ namespace mars_marking_svc.Services
             return _executingTask.IsCanceled ? _executingTask : Task.CompletedTask;
         }
 
-        public async Task StopAsync(CancellationToken cancellationToken)
+        public async Task StopAsync(
+            CancellationToken cancellationToken
+        )
         {
             if (_executingTask == null)
             {
@@ -35,6 +39,8 @@ namespace mars_marking_svc.Services
             cancellationToken.ThrowIfCancellationRequested();
         }
 
-        protected abstract Task ExecuteAsync(CancellationToken cancellationToken);
+        protected abstract Task ExecuteAsync(
+            CancellationToken cancellationToken
+        );
     }
 }

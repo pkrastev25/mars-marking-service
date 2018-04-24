@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using mars_marking_svc.MarkedResource.Models;
 using mars_marking_svc.MarkSession.Interfaces;
 using mars_marking_svc.Services.Models;
+using mars_marking_svc.Utils;
 
 namespace mars_marking_svc.Services
 {
@@ -26,12 +28,16 @@ namespace mars_marking_svc.Services
             _loggerService = loggerService;
         }
 
-        protected override async Task ExecuteAsync(CancellationToken cancellationToken)
+        protected override async Task ExecuteAsync(
+            CancellationToken cancellationToken
+        )
         {
             await CleanMarkSessions(cancellationToken);
         }
 
-        private async Task CleanMarkSessions(CancellationToken cancellationToken)
+        private async Task CleanMarkSessions(
+            CancellationToken cancellationToken
+        )
         {
             try
             {
@@ -44,7 +50,9 @@ namespace mars_marking_svc.Services
                         break;
                     }
 
-                    if (markSessionModel.State == "Marking")
+                    if (markSessionModel.State == MarkSessionModel.StateMarking &&
+                        !markSessionModel.IsMarkSessionRecentlyUpdated()
+                    )
                     {
                         await _markSessionHandler.DeleteMarkSession(markSessionModel.Id.ToString());
                     }

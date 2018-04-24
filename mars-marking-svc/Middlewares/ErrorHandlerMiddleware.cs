@@ -24,7 +24,9 @@ namespace mars_marking_svc.Middlewares
             _loggerService = loggerService;
         }
 
-        public async Task Invoke(HttpContext httpContext)
+        public async Task Invoke(
+            HttpContext httpContext
+        )
         {
             try
             {
@@ -37,7 +39,10 @@ namespace mars_marking_svc.Middlewares
             }
         }
 
-        private Task HandleException(HttpContext httpContext, Exception exception)
+        private Task HandleException(
+            HttpContext httpContext,
+            Exception exception
+        )
         {
             var errorResponseMessage = "";
             httpContext.Response.StatusCode = GetStatusCodeForError(exception);
@@ -45,7 +50,9 @@ namespace mars_marking_svc.Middlewares
             return httpContext.Response.WriteAsync(errorResponseMessage);
         }
 
-        private int GetStatusCodeForError(Exception exception)
+        private int GetStatusCodeForError(
+            Exception exception
+        )
         {
             switch (exception)
             {

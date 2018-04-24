@@ -7,16 +7,26 @@ namespace mars_marking_svc.Services.Models
 {
     public interface IMarkSessionRepository
     {
-        Task Create(MarkSessionModel markSessionModel);
+        Task Create(
+            MarkSessionModel markSessionModel
+        );
 
-        Task<MarkSessionModel> GetForFilter(FilterDefinition<MarkSessionModel> filterDefinition);
+        Task<MarkSessionModel> GetForFilter(
+            FilterDefinition<MarkSessionModel> filterDefinition
+        );
 
-        Task<IEnumerable<MarkSessionModel>> GetAllForFilter(FilterDefinition<MarkSessionModel> filterDefinition);
+        Task<IEnumerable<MarkSessionModel>> GetAllForFilter(
+            FilterDefinition<MarkSessionModel> filterDefinition
+        );
 
         Task<IEnumerable<MarkSessionModel>> GetAll();
 
-        Task Update(MarkSessionModel markSessionModel);
+        Task Update(
+            MarkSessionModel markSessionModel
+        );
 
-        Task Delete(MarkSessionModel markSessionModel);
+        Task Delete(
+            MarkSessionModel markSessionModel
+        );
     }
 }

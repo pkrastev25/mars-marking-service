@@ -43,7 +43,7 @@ namespace mars_marking_svc.ResourceTypes.MarkedResource
                 await _markSessionRepository.Create(markSessionModel);
                 await _dependantResourceHandler.GatherResourcesForMarkSession(markSessionModel);
 
-                markSessionModel.State = MarkSessionModel.DoneState;
+                markSessionModel.State = MarkSessionModel.StateDone;
                 await _markSessionRepository.Update(markSessionModel);
                 _loggerService.LogUpdateEvent(markSessionModel.ToString());
             }
@@ -60,21 +60,28 @@ namespace mars_marking_svc.ResourceTypes.MarkedResource
             return markSessionModel;
         }
 
-        public async Task<MarkSessionModel> GetMarkSessionById(string markSessionId)
+        public async Task<MarkSessionModel> GetMarkSessionById(
+            string markSessionId
+        )
         {
             return await FindMarkSessionById(markSessionId);
         }
 
-        public async Task<IEnumerable<MarkSessionModel>> GetMarkSessionsByMarkSessionType(string markSessionType)
+        public async Task<IEnumerable<MarkSessionModel>> GetMarkSessionsByMarkSessionType(
+            string markSessionType
+        )
         {
             return await _markSessionRepository.GetAllForFilter(
                 Builders<MarkSessionModel>.Filter.Where(entry =>
-                    entry.MarkSessionType == markSessionType && entry.State == MarkSessionModel.DoneState
+                    entry.MarkSessionType == markSessionType && entry.State == MarkSessionModel.StateDone
                 )
             );
         }
 
-        public async Task UpdateMarkSession(string markSessionId, string markSessionType)
+        public async Task UpdateMarkSession(
+            string markSessionId,
+            string markSessionType
+        )
         {
             var markSessionModel = await FindMarkSessionById(markSessionId);
 
@@ -82,13 +89,17 @@ namespace mars_marking_svc.ResourceTypes.MarkedResource
             await _markSessionRepository.Update(markSessionModel);
         }
 
-        public async Task DeleteMarkSession(string markSessionId)
+        public async Task DeleteMarkSession(
+            string markSessionId
+        )
         {
             await FindMarkSessionById(markSessionId);
             await Task.Run(() => { BackgroundJob.Enqueue(() => StartDeletionProcess(markSessionId)); });
         }
 
-        public async Task StartDeletionProcess(string markSessionId)
+        public async Task StartDeletionProcess(
+            string markSessionId
+        )
         {
             var isMarkSessionDeleted = false;
             var taskExecutionDelayInSeconds = 1;
@@ -101,7 +112,7 @@ namespace mars_marking_svc.ResourceTypes.MarkedResource
 
                     var markSessionModel = await FindMarkSessionById(markSessionId);
 
-                    markSessionModel.State = MarkSessionModel.AbortingState;
+                    markSessionModel.State = MarkSessionModel.StateAborting;
                     await _markSessionRepository.Update(markSessionModel);
                     _loggerService.LogUpdateEvent(markSessionModel.ToString());
 
@@ -122,7 +133,9 @@ namespace mars_marking_svc.ResourceTypes.MarkedResource
             }
         }
 
-        private async Task<MarkSessionModel> FindMarkSessionById(string markSessionId)
+        private async Task<MarkSessionModel> FindMarkSessionById(
+            string markSessionId
+        )
         {
             BsonObjectId bsonObjectId;
 
@@ -139,7 +152,7 @@ namespace mars_marking_svc.ResourceTypes.MarkedResource
             }
 
             var markSessionModel = await _markSessionRepository.GetForFilter(
-                Builders<MarkSessionModel>.Filter.Eq("_id", bsonObjectId)
+                Builders<MarkSessionModel>.Filter.Eq(MarkSessionModel.BsomElementDefinitionId, bsonObjectId)
             );
 
             if (markSessionModel == null)

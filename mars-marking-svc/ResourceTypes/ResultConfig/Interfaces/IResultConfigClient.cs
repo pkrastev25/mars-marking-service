@@ -7,12 +7,20 @@ namespace mars_marking_svc.ResourceTypes.ResultConfig.Interfaces
 {
     public interface IResultConfigClient
     {
-        Task<ResultConfigModel> GetResultConfig(string resultConfigId);
+        Task<ResultConfigModel> GetResultConfig(
+            string resultConfigId
+        );
 
-        Task<List<ResultConfigModel>> GetResultConfigsForMetadata(string metadataId);
+        Task<List<ResultConfigModel>> GetResultConfigsForMetadata(
+            string metadataId
+        );
 
-        Task<DependantResourceModel> CreateDependantResultConfigResource(string resultConfigId);
+        Task<DependantResourceModel> CreateDependantResultConfigResource(
+            string resultConfigId
+        );
 
-        Task<DependantResourceModel> CreateDependantResultConfigResource(ResultConfigModel resultConfigModel);
+        Task<DependantResourceModel> CreateDependantResultConfigResource(
+            ResultConfigModel resultConfigModel
+        );
     }
 }

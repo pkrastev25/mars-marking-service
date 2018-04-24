@@ -7,14 +7,24 @@ namespace mars_marking_svc.ResourceTypes.Metadata.Interfaces
 {
     public interface IMetadataClient
     {
-        Task<MetadataModel> GetMetadata(string metadataId);
+        Task<MetadataModel> GetMetadata(
+            string metadataId
+        );
 
-        Task<List<MetadataModel>> GetMetadataForProject(string projectId);
+        Task<List<MetadataModel>> GetMetadataForProject(
+            string projectId
+        );
 
-        Task<DependantResourceModel> MarkMetadata(string metadataId);
+        Task<DependantResourceModel> MarkMetadata(
+            string metadataId
+        );
 
-        Task<DependantResourceModel> MarkMetadata(MetadataModel metadataModel);
+        Task<DependantResourceModel> MarkMetadata(
+            MetadataModel metadataModel
+        );
 
-        Task UnmarkMetadata(DependantResourceModel dependantResourceModel);
+        Task UnmarkMetadata(
+            DependantResourceModel dependantResourceModel
+        );
     }
 }

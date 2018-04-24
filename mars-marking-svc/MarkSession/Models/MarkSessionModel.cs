@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
@@ -6,16 +7,17 @@ namespace mars_marking_svc.MarkedResource.Models
 {
     public class MarkSessionModel
     {
-        public const string MarkingState = "Marking";
+        public const string StateMarking = "Marking";
+        public const string StateAborting = "Aborting";
+        public const string StateDone = "Done";
 
-        public const string AbortingState = "Aborting";
-
-        public const string DoneState = "Done";
+        public const string BsomElementDefinitionId = "_id";
+        public const string BsonElementDefinitionResourceId = "resourceId";
 
         [BsonId]
         public ObjectId Id { get; set; }
 
-        [BsonElement("resourceId")]
+        [BsonElement(BsonElementDefinitionResourceId)]
         public string ResourceId { get; set; }
 
         [BsonElement("projectId")]
@@ -29,6 +31,9 @@ namespace mars_marking_svc.MarkedResource.Models
 
         [BsonElement("state")]
         public string State { get; set; }
+
+        [BsonElement("latestUpdateTimestampInTicks")]
+        public long LatestUpdateTimestampInTicks { get; set; }
 
         [BsonElement("sourceDependency")]
         public DependantResourceModel SourceDependency { get; set; }
@@ -47,7 +52,8 @@ namespace mars_marking_svc.MarkedResource.Models
             ProjectId = projectId;
             ResourceType = resourceType;
             MarkSessionType = markSessionType;
-            State = MarkingState;
+            State = StateMarking;
+            LatestUpdateTimestampInTicks = DateTime.Now.Ticks;
             DependantResources = new List<DependantResourceModel>();
         }
 

@@ -9,5 +9,8 @@ namespace mars_marking_svc.ResourceTypes.Scenario.Models
 
         [JsonProperty("ToBeDeleted")]
         public bool ToBeDeleted { get; set; }
+
+        [JsonProperty("ReadOnly")]
+        public bool ReadOnly { get; set; }
     }
 }

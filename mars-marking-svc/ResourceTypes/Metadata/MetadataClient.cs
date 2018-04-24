@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Net;
 using System.Threading.Tasks;
 using mars_marking_svc.Exceptions;
 using mars_marking_svc.MarkedResource.Models;
@@ -24,7 +23,9 @@ namespace mars_marking_svc.ResourceTypes.Metadata
             _loggerService = loggerService;
         }
 
-        public async Task<MetadataModel> GetMetadata(string metadataId)
+        public async Task<MetadataModel> GetMetadata(
+            string metadataId
+        )
         {
             var response = await _httpService.GetAsync(
                 $"http://metadata-svc/metadata/{metadataId}"
@@ -39,7 +40,9 @@ namespace mars_marking_svc.ResourceTypes.Metadata
             return await response.Deserialize<MetadataModel>();
         }
 
-        public async Task<List<MetadataModel>> GetMetadataForProject(string projectId)
+        public async Task<List<MetadataModel>> GetMetadataForProject(
+            string projectId
+        )
         {
             var response = await _httpService.GetAsync(
                 $"http://metadata-svc/metadata?project={projectId}"
@@ -54,14 +57,18 @@ namespace mars_marking_svc.ResourceTypes.Metadata
             return await response.Deserialize<List<MetadataModel>>();
         }
 
-        public async Task<DependantResourceModel> MarkMetadata(string metadataId)
+        public async Task<DependantResourceModel> MarkMetadata(
+            string metadataId
+        )
         {
             var metadata = await GetMetadata(metadataId);
 
             return await MarkMetadata(metadata);
         }
 
-        public async Task<DependantResourceModel> MarkMetadata(MetadataModel metadataModel)
+        public async Task<DependantResourceModel> MarkMetadata(
+            MetadataModel metadataModel
+        )
         {
             if (MetadataModel.ToBeDeletedState.Equals(metadataModel.State))
             {
@@ -102,14 +109,10 @@ namespace mars_marking_svc.ResourceTypes.Metadata
             return markedResource;
         }
 
-        public async Task UnmarkMetadata(DependantResourceModel dependantResourceModel)
+        public async Task UnmarkMetadata(
+            DependantResourceModel dependantResourceModel
+        )
         {
-            if (!await DoesMetadataExist(dependantResourceModel.ResourceId))
-            {
-                _loggerService.LogSkipEvent(dependantResourceModel.ToString());
-                return;
-            }
-
             var metadataModel = new MetadataModel
             {
                 DataId = dependantResourceModel.ResourceId,
@@ -121,32 +124,13 @@ namespace mars_marking_svc.ResourceTypes.Metadata
                 metadataModel
             );
 
-            response.ThrowExceptionIfNotSuccessfulResponse(
+            response.ThrowExceptionIfNotSuccessfulResponseOrNot404Response(
                 new FailedToUpdateResourceException(
                     $"Failed to update {dependantResourceModel} from metadata-svc! The response status code is {response.StatusCode}"
                 )
             );
 
             _loggerService.LogUnmarkEvent(dependantResourceModel.ToString());
-        }
-
-        private async Task<bool> DoesMetadataExist(string metadataId)
-        {
-            var response = await _httpService.GetAsync(
-                $"http://metadata-svc/metadata/{metadataId}"
-            );
-
-            switch (response.StatusCode)
-            {
-                case HttpStatusCode.OK:
-                    return true;
-                case HttpStatusCode.NotFound:
-                    return false;
-                default:
-                    throw new FailedToGetResourceException(
-                        $"Failed to get metadata with id: {metadataId} from metadata-svc! The response status code is {response.StatusCode}"
-                    );
-            }
         }
     }
 }

@@ -23,7 +23,10 @@ namespace mars_marking_svc.ResourceTypes.SimRun
             _loggerService = loggerService;
         }
 
-        public async Task<SimRunModel> GetSimRun(string simRunId, string projectId)
+        public async Task<SimRunModel> GetSimRun(
+            string simRunId,
+            string projectId
+        )
         {
             var response = await _httpService.GetAsync(
                 $"http://sim-runner-svc/simrun?simRunId={simRunId}&projectid={projectId}"
@@ -41,7 +44,10 @@ namespace mars_marking_svc.ResourceTypes.SimRun
             return simPlanModels[0];
         }
 
-        public async Task<List<SimRunModel>> GetSimRunsForSimPlan(string simPlanId, string projectId)
+        public async Task<List<SimRunModel>> GetSimRunsForSimPlan(
+            string simPlanId,
+            string projectId
+        )
         {
             var response = await _httpService.GetAsync(
                 $"http://sim-runner-svc/simrun?simPlanId={simPlanId}&projectid={projectId}"
@@ -56,7 +62,9 @@ namespace mars_marking_svc.ResourceTypes.SimRun
             return await response.Deserialize<List<SimRunModel>>();
         }
 
-        public async Task<List<SimRunModel>> GetSimRunsForProject(string projectId)
+        public async Task<List<SimRunModel>> GetSimRunsForProject(
+            string projectId
+        )
         {
             var response = await _httpService.GetAsync(
                 $"http://sim-runner-svc/simrun?projectid={projectId}"
@@ -71,7 +79,10 @@ namespace mars_marking_svc.ResourceTypes.SimRun
             return await response.Deserialize<List<SimRunModel>>();
         }
 
-        public async Task<DependantResourceModel> CreateDependantSimRunResource(string simRunId, string projectId)
+        public async Task<DependantResourceModel> CreateDependantSimRunResource(
+            string simRunId,
+            string projectId
+        )
         {
             var simRun = await GetSimRun(simRunId, projectId);
             simRun.Id = simRunId;
@@ -86,7 +97,12 @@ namespace mars_marking_svc.ResourceTypes.SimRun
         {
             return await Task.Run(() =>
             {
-                if (simRunModel.Status == "Running")
+                if (simRunModel.Status == "Creating")
+                {
+                    // TODO: Consider stopping the sim run
+                }
+
+                if (simRunModel.Status != "Aborted" || simRunModel.Status != "Finished")
                 {
                     throw new CannotMarkResourceException(
                         $"simRun with id: {simRunModel.Id} and projectId: {projectId} cannot be used, because it is still running!"

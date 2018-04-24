@@ -18,7 +18,10 @@ namespace mars_marking_svc.MarkedResource.Models
         [BsonElement("previousState")]
         public string PreviousState { get; set; }
 
-        public DependantResourceModel(string resourceType, string resourceId)
+        public DependantResourceModel(
+            string resourceType,
+            string resourceId
+        )
         {
             ResourceType = resourceType;
             ResourceId = resourceId;

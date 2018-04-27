@@ -39,7 +39,6 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
                 )
             );
 
-            // TODO: Potentially fix this in the sim-runner-svc!
             var simPlanModels = await response.Deserialize<List<SimPlanModel>>();
 
             return simPlanModels[0];
@@ -60,6 +59,11 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
                 )
             );
 
+            if (response.IsEmptyResponse())
+            {
+                return new List<SimPlanModel>();
+            }
+
             return await response.Deserialize<List<SimPlanModel>>();
         }
 
@@ -77,6 +81,11 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
                     $"Failed to get simPlans for resultConfigId: {resultConfigId}, projectId: {projectId} from sim-runner-svc! The response status code is {response.StatusCode}"
                 )
             );
+            
+            if (response.IsEmptyResponse())
+            {
+                return new List<SimPlanModel>();
+            }
 
             return await response.Deserialize<List<SimPlanModel>>();
         }
@@ -94,6 +103,11 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
                     $"Failed to get simPlans for projectId: {projectId} from sim-runner-svc! The response status code is {response.StatusCode}"
                 )
             );
+            
+            if (response.IsEmptyResponse())
+            {
+                return new List<SimPlanModel>();
+            }
 
             return await response.Deserialize<List<SimPlanModel>>();
         }

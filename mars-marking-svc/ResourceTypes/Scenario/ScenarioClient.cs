@@ -54,6 +54,11 @@ namespace mars_marking_svc.ResourceTypes.Scenario
                 )
             );
 
+            if (response.IsEmptyResponse())
+            {
+                return new List<ScenarioModel>();
+            }
+
             return await response.Deserialize<List<ScenarioModel>>();
         }
 
@@ -70,6 +75,11 @@ namespace mars_marking_svc.ResourceTypes.Scenario
                     $"Failed to get scenarios for projectId: {projectId} from scenario-svc! The response status code is {response.StatusCode}"
                 )
             );
+
+            if (response.IsEmptyResponse())
+            {
+                return new List<ScenarioModel>();
+            }
 
             return await response.Deserialize<List<ScenarioModel>>();
         }
@@ -96,7 +106,8 @@ namespace mars_marking_svc.ResourceTypes.Scenario
             }
 
             scenarioModel.ToBeDeleted = true;
-            scenarioModel.ReadOnly = true;
+            // TODO: Fix in the scenario-svc !
+            //scenarioModel.ReadOnly = true;
 
             var response = await _httpService.PatchAsync(
                 $"http://scenario-svc/scenarios/{scenarioModel.ScenarioId}/metadata",

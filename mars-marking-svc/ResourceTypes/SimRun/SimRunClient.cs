@@ -38,7 +38,6 @@ namespace mars_marking_svc.ResourceTypes.SimRun
                 )
             );
 
-            // TODO: Potentially fix this in the sim-runner-svc!
             var simPlanModels = await response.Deserialize<List<SimRunModel>>();
 
             return simPlanModels[0];
@@ -59,6 +58,11 @@ namespace mars_marking_svc.ResourceTypes.SimRun
                 )
             );
 
+            if (response.IsEmptyResponse())
+            {
+                return new List<SimRunModel>();
+            }
+
             return await response.Deserialize<List<SimRunModel>>();
         }
 
@@ -75,6 +79,11 @@ namespace mars_marking_svc.ResourceTypes.SimRun
                     $"Failed to get simRuns for projectId: {projectId} from sim-runner-svc! The response status code is {response.StatusCode}"
                 )
             );
+
+            if (response.IsEmptyResponse())
+            {
+                return new List<SimRunModel>();
+            }
 
             return await response.Deserialize<List<SimRunModel>>();
         }
@@ -102,10 +111,10 @@ namespace mars_marking_svc.ResourceTypes.SimRun
                     // TODO: Consider stopping the sim run
                 }
 
-                if (simRunModel.Status != "Aborted" || simRunModel.Status != "Finished")
+                if (simRunModel.Status != "Aborted" && simRunModel.Status != "Finished")
                 {
                     throw new CannotMarkResourceException(
-                        $"simRun with id: {simRunModel.Id} and projectId: {projectId} cannot be used, because it is still running!"
+                        $"simRun with id: {simRunModel.Id} and projectId: {projectId} cannot be used, because it is state: {simRunModel.Status}! It must be Aborted or Finished beforehand!"
                     );
                 }
 

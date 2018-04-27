@@ -32,7 +32,7 @@ namespace mars_marking_svc.Utils
                 throw exception;
             }
         }
-        
+
         public static void ThrowExceptionIfNotSuccessfulResponseOrNot404Response(
             this HttpResponseMessage httpResponseMessage,
             Exception exception
@@ -46,6 +46,20 @@ namespace mars_marking_svc.Utils
             if (!httpResponseMessage.IsSuccessStatusCode && httpResponseMessage.StatusCode != HttpStatusCode.NotFound)
             {
                 throw exception;
+            }
+        }
+
+        public static bool IsEmptyResponse(
+            this HttpResponseMessage httpResponseMessage
+        )
+        {
+            switch (httpResponseMessage.StatusCode)
+            {
+                case HttpStatusCode.NoContent:
+                case HttpStatusCode.NotFound:
+                    return true;
+                default:
+                    return false;
             }
         }
     }

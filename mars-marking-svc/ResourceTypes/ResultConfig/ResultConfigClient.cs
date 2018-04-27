@@ -57,6 +57,11 @@ namespace mars_marking_svc.ResourceTypes.ResultConfig
                 )
             );
 
+            if (response.IsEmptyResponse())
+            {
+                return new List<ResultConfigModel>();
+            }
+
             var resultConfigResponseModels = await response.Deserialize<List<ResultConfigResponseModel>>();
 
             return resultConfigResponseModels

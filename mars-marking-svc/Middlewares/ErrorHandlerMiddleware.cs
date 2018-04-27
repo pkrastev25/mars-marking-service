@@ -44,7 +44,7 @@ namespace mars_marking_svc.Middlewares
             Exception exception
         )
         {
-            var errorResponseMessage = "";
+            var errorResponseMessage = exception.Message;
             httpContext.Response.StatusCode = GetStatusCodeForError(exception);
 
             return httpContext.Response.WriteAsync(errorResponseMessage);

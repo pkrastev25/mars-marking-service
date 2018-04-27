@@ -48,11 +48,16 @@ namespace mars_marking_svc.ResourceTypes.Metadata
                 $"http://metadata-svc/metadata?projectId={projectId}"
             );
 
-            response.ThrowExceptionIfNotSuccessfulResponse(
+            response.ThrowExceptionIfNotSuccessfulResponseOrNot404Response(
                 new FailedToGetResourceException(
                     $"Failed to get metadata for projectId: {projectId} from metadata-svc! The response status code is {response.StatusCode}"
                 )
             );
+
+            if (response.IsEmptyResponse())
+            {
+                return new List<MetadataModel>();
+            }
 
             return await response.Deserialize<List<MetadataModel>>();
         }

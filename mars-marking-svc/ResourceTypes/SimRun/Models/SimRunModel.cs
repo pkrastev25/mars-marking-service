@@ -4,6 +4,9 @@ namespace mars_marking_svc.ResourceTypes.SimRun.Models
 {
     public class SimRunModel
     {
+        public const string StatusFinished = "Finished";
+        public const string StatusAborted = "Aborted";
+        
         [JsonProperty("id")]
         public string Id { get; set; }
 

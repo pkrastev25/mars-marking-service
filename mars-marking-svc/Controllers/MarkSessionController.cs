@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using AutoMapper;
 using mars_marking_svc.MarkSession.Interfaces;
+using mars_marking_svc.ResourceTypes;
 using mars_marking_svc.ResourceTypes.MarkedResource.Dtos;
 using mars_marking_svc.Utils;
 using Microsoft.AspNetCore.Mvc;
@@ -43,7 +44,7 @@ namespace mars_marking_svc.Controllers
 
             if (string.IsNullOrEmpty(projectId))
             {
-                if (resourceType == "project")
+                if (resourceType == ResourceTypeEnum.Project)
                 {
                     projectId = resourceId;
                 }

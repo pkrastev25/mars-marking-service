@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 using mars_marking_svc.Exceptions;
 using mars_marking_svc.MarkedResource.Models;
@@ -34,7 +35,8 @@ namespace mars_marking_svc.ResourceTypes.SimRun
 
             response.ThrowExceptionIfNotSuccessfulResponse(
                 new FailedToGetResourceException(
-                    $"Failed to get simRun with id: {simRunId}, projectId: {projectId} from sim-runner-svc! The response status code is {response.StatusCode}"
+                    $"Failed to get simRun with id: {simRunId}, projectId: {projectId} from sim-runner-svc!" +
+                    await response.IncludeStatusCodeAndMessageFromResponse()
                 )
             );
 
@@ -54,7 +56,8 @@ namespace mars_marking_svc.ResourceTypes.SimRun
 
             response.ThrowExceptionIfNotSuccessfulResponse(
                 new FailedToGetResourceException(
-                    $"Failed to get simRuns for simPlanId: {simPlanId}, projectId: {projectId} from sim-runner-svc! The response status code is {response.StatusCode}"
+                    $"Failed to get simRuns for simPlanId: {simPlanId}, projectId: {projectId} from sim-runner-svc!" +
+                    await response.IncludeStatusCodeAndMessageFromResponse()
                 )
             );
 
@@ -76,7 +79,8 @@ namespace mars_marking_svc.ResourceTypes.SimRun
 
             response.ThrowExceptionIfNotSuccessfulResponse(
                 new FailedToGetResourceException(
-                    $"Failed to get simRuns for projectId: {projectId} from sim-runner-svc! The response status code is {response.StatusCode}"
+                    $"Failed to get simRuns for projectId: {projectId} from sim-runner-svc!" +
+                    await response.IncludeStatusCodeAndMessageFromResponse()
                 )
             );
 
@@ -88,7 +92,7 @@ namespace mars_marking_svc.ResourceTypes.SimRun
             return await response.Deserialize<List<SimRunModel>>();
         }
 
-        public async Task<DependantResourceModel> CreateDependantSimRunResource(
+        public async Task<DependantResourceModel> MarkSimRun(
             string simRunId,
             string projectId
         )
@@ -96,33 +100,65 @@ namespace mars_marking_svc.ResourceTypes.SimRun
             var simRun = await GetSimRun(simRunId, projectId);
             simRun.Id = simRunId;
 
-            return await CreateDependantSimRunResource(simRun, projectId);
+            return await MarkSimRun(simRun, projectId);
         }
 
-        public async Task<DependantResourceModel> CreateDependantSimRunResource(
+        public async Task<DependantResourceModel> MarkSimRun(
             SimRunModel simRunModel,
             string projectId
         )
         {
-            return await Task.Run(() =>
+            if (simRunModel.ToBeDeleted)
             {
-                if (simRunModel.Status == "Creating")
-                {
-                    // TODO: Consider stopping the sim run
-                }
+                throw new ResourceAlreadyMarkedException(
+                    $"Cannot mark simRun with id: {simRunModel.Id}, projectId: {projectId}, it is already marked!"
+                );
+            }
 
-                if (simRunModel.Status != "Aborted" && simRunModel.Status != "Finished")
-                {
+            var simRunMarkUpdateModel = new SimRunMarkUpdateModel(simRunModel.Id, true);
+
+            var response = await _httpService.PutAsync(
+                "http://sim-runner-svc/simrun/marks",
+                simRunMarkUpdateModel
+            );
+
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.OK:
+                    var markedResource = new DependantResourceModel(ResourceTypeEnum.SimRun, simRunModel.Id);
+                    _loggerService.LogMarkEvent(markedResource.ToString());
+
+                    return markedResource;
+                case HttpStatusCode.Conflict:
                     throw new CannotMarkResourceException(
-                        $"simRun with id: {simRunModel.Id} and projectId: {projectId} cannot be used, because it is state: {simRunModel.Status}! It must be Aborted or Finished beforehand!"
+                        $"Cannot mark simRun with id: {simRunModel.Id}, projectId: {projectId} it must be in state: {SimRunModel.StatusFinished} or state: {SimRunModel.StatusAborted} beforehand!" +
+                        await response.IncludeStatusCodeAndMessageFromResponse()
                     );
-                }
+                default:
+                    throw new FailedToUpdateResourceException(
+                        $"Failed to update simRun with id: {simRunModel.Id}, projectId: {projectId} from sim-runner-svc!" +
+                        await response.IncludeStatusCodeAndMessageFromResponse()
+                    );
+            }
+        }
 
-                var markedResource = new DependantResourceModel("simRun", simRunModel.Id);
-                _loggerService.LogSkipEvent(markedResource.ToString());
+        public async Task UnmarkSimRun(DependantResourceModel dependantResourceModel)
+        {
+            var simRunMarkUpdateModel = new SimRunMarkUpdateModel(dependantResourceModel.ResourceId, false);
 
-                return markedResource;
-            });
+            var response = await _httpService.PutAsync(
+                "http://sim-runner-svc/simrun/marks",
+                simRunMarkUpdateModel
+            );
+
+            response.ThrowExceptionIfNotSuccessfulResponseOrNot404Response(
+                new FailedToUpdateResourceException(
+                    $"Failed to update simRun with id: {dependantResourceModel.ResourceId} from sim-runner-svc!" +
+                    await response.IncludeStatusCodeAndMessageFromResponse()
+                )
+            );
+
+            _loggerService.LogUnmarkEvent(dependantResourceModel.ToString());
         }
     }
 }

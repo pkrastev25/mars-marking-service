@@ -33,7 +33,8 @@ namespace mars_marking_svc.ResourceTypes.Scenario
 
             response.ThrowExceptionIfNotSuccessfulResponse(
                 new FailedToGetResourceException(
-                    $"Failed to get scenario with id: {scenarioId} from scenario-svc! The response status code is {response.StatusCode}"
+                    $"Failed to get scenario with id: {scenarioId} from scenario-svc!" +
+                    await response.IncludeStatusCodeAndMessageFromResponse()
                 )
             );
 
@@ -50,7 +51,8 @@ namespace mars_marking_svc.ResourceTypes.Scenario
 
             response.ThrowExceptionIfNotSuccessfulResponse(
                 new FailedToGetResourceException(
-                    $"Failed to get scenarios for metadataId: {metadataId} from scenario-svc! The response status code is {response.StatusCode}"
+                    $"Failed to get scenarios for metadataId: {metadataId} from scenario-svc!" +
+                    await response.IncludeStatusCodeAndMessageFromResponse()
                 )
             );
 
@@ -72,7 +74,8 @@ namespace mars_marking_svc.ResourceTypes.Scenario
 
             response.ThrowExceptionIfNotSuccessfulResponse(
                 new FailedToGetResourceException(
-                    $"Failed to get scenarios for projectId: {projectId} from scenario-svc! The response status code is {response.StatusCode}"
+                    $"Failed to get scenarios for projectId: {projectId} from scenario-svc!" +
+                    await response.IncludeStatusCodeAndMessageFromResponse()
                 )
             );
 
@@ -106,8 +109,7 @@ namespace mars_marking_svc.ResourceTypes.Scenario
             }
 
             scenarioModel.ToBeDeleted = true;
-            // TODO: Fix in the scenario-svc !
-            //scenarioModel.ReadOnly = true;
+            scenarioModel.ReadOnly = true;
 
             var response = await _httpService.PatchAsync(
                 $"http://scenario-svc/scenarios/{scenarioModel.ScenarioId}/metadata",
@@ -116,11 +118,12 @@ namespace mars_marking_svc.ResourceTypes.Scenario
 
             response.ThrowExceptionIfNotSuccessfulResponse(
                 new FailedToUpdateResourceException(
-                    $"Failed to update scenario {scenarioModel} from scenario-svc! The response status code is {response.StatusCode}"
+                    $"Failed to update scenario {scenarioModel} from scenario-svc!" +
+                    await response.IncludeStatusCodeAndMessageFromResponse()
                 )
             );
 
-            var markedResource = new DependantResourceModel("scenario", scenarioModel.ScenarioId);
+            var markedResource = new DependantResourceModel(ResourceTypeEnum.Scenario, scenarioModel.ScenarioId);
             _loggerService.LogMarkEvent(markedResource.ToString());
 
             return markedResource;
@@ -144,7 +147,8 @@ namespace mars_marking_svc.ResourceTypes.Scenario
 
             response.ThrowExceptionIfNotSuccessfulResponseOrNot404Response(
                 new FailedToUpdateResourceException(
-                    $"Failed to update {dependantResourceModel} from scenario-svc! The response status code is {response.StatusCode}"
+                    $"Failed to update {dependantResourceModel} from scenario-svc!" +
+                    await response.IncludeStatusCodeAndMessageFromResponse()
                 )
             );
 

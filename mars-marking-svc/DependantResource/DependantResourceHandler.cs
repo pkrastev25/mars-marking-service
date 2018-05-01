@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using mars_marking_svc.DependantResource.Interfaces;
 using mars_marking_svc.Exceptions;
 using mars_marking_svc.MarkedResource.Models;
+using mars_marking_svc.ResourceTypes;
 using mars_marking_svc.ResourceTypes.Metadata.Interfaces;
 using mars_marking_svc.ResourceTypes.ResultConfig.Interfaces;
 using mars_marking_svc.ResourceTypes.ResultConfig.Models;
@@ -54,31 +55,47 @@ namespace mars_marking_svc.DependantResource
         {
             switch (markSessionModel.ResourceType)
             {
-                case "project":
+                case ResourceTypeEnum.Project:
+                {
                     await GatherResourcesForProjectMarkSession(markSessionModel);
                     break;
-                case "metadata":
+                }
+                case ResourceTypeEnum.Metadata:
+                {
                     await GatherResourcesForMetadataMarkSession(markSessionModel);
                     break;
-                case "scenario":
+                }
+                case ResourceTypeEnum.Scenario:
+                {
                     await GatherResourcesForScenarioMarkSession(markSessionModel);
                     break;
-                case "resultConfig":
+                }
+                case ResourceTypeEnum.ResultConfig:
+                {
                     await GatherResourcesForResultConfigMarkSession(markSessionModel);
                     break;
-                case "simPlan":
+                }
+                case ResourceTypeEnum.SimPlan:
+                {
                     await GatherResourcesForSimPlanMarkSession(markSessionModel);
                     break;
-                case "simRun":
+                }
+                case ResourceTypeEnum.SimRun:
+                {
                     await GatherResourcesForSimRunMarkSession(markSessionModel);
                     break;
-                case "resultData":
+                }
+                case ResourceTypeEnum.ResultData:
+                {
                     await GatherResourcesForResultDataMarkSession(markSessionModel);
                     break;
+                }
                 default:
+                {
                     throw new UnknownResourceTypeException(
                         $"{markSessionModel.ResourceType} is unknown!"
                     );
+                }
             }
         }
 
@@ -88,7 +105,7 @@ namespace mars_marking_svc.DependantResource
         {
             if (markSessionModel.SourceDependency != null)
             {
-                await FreeDependantResource(markSessionModel.SourceDependency, markSessionModel.ProjectId);
+                await UnmarkResource(markSessionModel.SourceDependency, markSessionModel.ProjectId);
                 markSessionModel.SourceDependency = null;
                 await _markSessionRepository.Update(markSessionModel);
             }
@@ -96,10 +113,9 @@ namespace mars_marking_svc.DependantResource
             var dependantResourceModels = new List<DependantResourceModel>(markSessionModel.DependantResources);
             foreach (var markedResourceModel in dependantResourceModels)
             {
-                var freeResourceModel =
-                    await FreeDependantResource(markedResourceModel, markSessionModel.ProjectId);
+                var unmarkedResourceModel = await UnmarkResource(markedResourceModel, markSessionModel.ProjectId);
                 var index = markSessionModel.DependantResources.FindIndex(m =>
-                    m.ResourceId == freeResourceModel.ResourceId
+                    m.ResourceId == unmarkedResourceModel.ResourceId
                 );
                 markSessionModel.DependantResources.RemoveAt(index);
                 await _markSessionRepository.Update(markSessionModel);
@@ -155,14 +171,14 @@ namespace mars_marking_svc.DependantResource
             var simRunsForProject = await _simRunClient.GetSimRunsForProject(projectId);
             foreach (var simRunModel in simRunsForProject)
             {
-                var markedSimRun = await _simRunClient.CreateDependantSimRunResource(simRunModel, projectId);
+                var markedSimRun = await _simRunClient.MarkSimRun(simRunModel, projectId);
                 markSessionModel.DependantResources.Add(markedSimRun);
                 await _markSessionRepository.Update(markSessionModel);
             }
 
             foreach (var simRunModel in simRunsForProject)
             {
-                var markedResultData = await _resultDataClient.GatherResultDataDependantResource(simRunModel);
+                var markedResultData = await _resultDataClient.MarkResultData(simRunModel);
                 markSessionModel.DependantResources.Add(markedResultData);
                 await _markSessionRepository.Update(markSessionModel);
             }
@@ -220,15 +236,15 @@ namespace mars_marking_svc.DependantResource
             }
             foreach (var simRunModel in simRunsForSimPlans)
             {
-                var stoppedSimRun = await _simRunClient.CreateDependantSimRunResource(simRunModel, projectId);
-                markSessionModel.DependantResources.Add(stoppedSimRun);
+                var markedSimRun = await _simRunClient.MarkSimRun(simRunModel, projectId);
+                markSessionModel.DependantResources.Add(markedSimRun);
                 await _markSessionRepository.Update(markSessionModel);
             }
 
             foreach (var simRunModel in simRunsForSimPlans)
             {
-                var resultData = await _resultDataClient.GatherResultDataDependantResource(simRunModel);
-                markSessionModel.DependantResources.Add(resultData);
+                var markedResultData = await _resultDataClient.MarkResultData(simRunModel);
+                markSessionModel.DependantResources.Add(markedResultData);
                 await _markSessionRepository.Update(markSessionModel);
             }
         }
@@ -261,14 +277,14 @@ namespace mars_marking_svc.DependantResource
             }
             foreach (var simRunModel in simRunsForSimPlans)
             {
-                var markedSimRun = await _simRunClient.CreateDependantSimRunResource(simRunModel.Id, projectId);
+                var markedSimRun = await _simRunClient.MarkSimRun(simRunModel.Id, projectId);
                 markSessionModel.DependantResources.Add(markedSimRun);
                 await _markSessionRepository.Update(markSessionModel);
             }
 
             foreach (var simRunModel in simRunsForSimPlans)
             {
-                var markedResultData = await _resultDataClient.GatherResultDataDependantResource(simRunModel);
+                var markedResultData = await _resultDataClient.MarkResultData(simRunModel);
                 markSessionModel.DependantResources.Add(markedResultData);
                 await _markSessionRepository.Update(markSessionModel);
             }
@@ -282,7 +298,8 @@ namespace mars_marking_svc.DependantResource
             var projectId = markSessionModel.ProjectId;
 
             var sourceResultConfig = await _resultConfigClient.GetResultConfig(resultConfigId);
-            var sourceDependantResource = new DependantResourceModel("metadata", sourceResultConfig.ModelId);
+            var sourceDependantResource =
+                new DependantResourceModel(ResourceTypeEnum.Metadata, sourceResultConfig.ModelId);
             markSessionModel.SourceDependency = sourceDependantResource;
             await _markSessionRepository.Update(markSessionModel);
 
@@ -309,14 +326,14 @@ namespace mars_marking_svc.DependantResource
             }
             foreach (var simRunModel in simRunsForSimPlans)
             {
-                var markedSimSun = await _simRunClient.CreateDependantSimRunResource(simRunModel, projectId);
+                var markedSimSun = await _simRunClient.MarkSimRun(simRunModel, projectId);
                 markSessionModel.DependantResources.Add(markedSimSun);
                 await _markSessionRepository.Update(markSessionModel);
             }
 
             foreach (var simRunModel in simRunsForSimPlans)
             {
-                var markedResultData = await _resultDataClient.GatherResultDataDependantResource(simRunModel);
+                var markedResultData = await _resultDataClient.MarkResultData(simRunModel);
                 markSessionModel.DependantResources.Add(markedResultData);
                 await _markSessionRepository.Update(markSessionModel);
             }
@@ -336,14 +353,14 @@ namespace mars_marking_svc.DependantResource
             var simRunsForSimPlan = await _simRunClient.GetSimRunsForSimPlan(simPlanId, projectId);
             foreach (var simRunModel in simRunsForSimPlan)
             {
-                var markedSimRun = await _simRunClient.CreateDependantSimRunResource(simRunModel, projectId);
+                var markedSimRun = await _simRunClient.MarkSimRun(simRunModel, projectId);
                 markSessionModel.DependantResources.Add(markedSimRun);
                 await _markSessionRepository.Update(markSessionModel);
             }
 
             foreach (var simRunModel in simRunsForSimPlan)
             {
-                var markedResultData = await _resultDataClient.GatherResultDataDependantResource(simRunModel);
+                var markedResultData = await _resultDataClient.MarkResultData(simRunModel);
                 markSessionModel.DependantResources.Add(markedResultData);
                 await _markSessionRepository.Update(markSessionModel);
             }
@@ -357,11 +374,11 @@ namespace mars_marking_svc.DependantResource
             var projectId = markSessionModel.ProjectId;
             var sourceSimRun = await _simRunClient.GetSimRun(simRunId, projectId);
 
-            var markedSourceSimRun = await _simRunClient.CreateDependantSimRunResource(simRunId, projectId);
+            var markedSourceSimRun = await _simRunClient.MarkSimRun(simRunId, projectId);
             markSessionModel.DependantResources.Add(markedSourceSimRun);
             await _markSessionRepository.Update(markSessionModel);
 
-            var markedResultData = await _resultDataClient.GatherResultDataDependantResource(sourceSimRun);
+            var markedResultData = await _resultDataClient.MarkResultData(sourceSimRun);
             markSessionModel.DependantResources.Add(markedResultData);
             await _markSessionRepository.Update(markSessionModel);
         }
@@ -370,40 +387,46 @@ namespace mars_marking_svc.DependantResource
             MarkSessionModel markSessionModel
         )
         {
-            var resultDataId = markSessionModel.ResourceId;
-
-            var dependantResourceModel = await _resultDataClient.GatherResultDataDependantResource(resultDataId);
-            markSessionModel.DependantResources.Add(dependantResourceModel);
+            var markedResulrData = await _resultDataClient.MarkResultData(markSessionModel.ResourceId);
+            markSessionModel.DependantResources.Add(markedResulrData);
             await _markSessionRepository.Update(markSessionModel);
         }
 
-        private async Task<DependantResourceModel> FreeDependantResource(
+        private async Task<DependantResourceModel> UnmarkResource(
             DependantResourceModel dependantResourceModel,
             string projectId
         )
         {
             switch (dependantResourceModel.ResourceType)
             {
-                case "metadata":
+                case ResourceTypeEnum.Metadata:
                 {
                     await _metadataClient.UnmarkMetadata(dependantResourceModel);
                     return dependantResourceModel;
                 }
-                case "scenario":
+                case ResourceTypeEnum.Scenario:
                 {
                     await _scenarioClient.UnmarkScenario(dependantResourceModel);
                     return dependantResourceModel;
                 }
-                case "simPlan":
+                case ResourceTypeEnum.ResultConfig:
+                {
+                    _loggerService.LogSkipEvent(dependantResourceModel.ToString());
+                    return dependantResourceModel;
+                }
+                case ResourceTypeEnum.SimPlan:
                 {
                     await _simPlanClient.UnmarkSimPlan(dependantResourceModel, projectId);
                     return dependantResourceModel;
                 }
-                case "resultConfig":
-                case "simRun":
-                case "resultData":
+                case ResourceTypeEnum.SimRun:
                 {
-                    _loggerService.LogSkipEvent(dependantResourceModel.ToString());
+                    await _simRunClient.UnmarkSimRun(dependantResourceModel);
+                    return dependantResourceModel;
+                }
+                case ResourceTypeEnum.ResultData:
+                {
+                    await _resultDataClient.UnmarkResultData(dependantResourceModel);
                     return dependantResourceModel;
                 }
                 default:

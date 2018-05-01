@@ -5,6 +5,11 @@ namespace mars_marking_svc.Services.Models
 {
     public interface IHttpService
     {
+        Task<HttpResponseMessage> PostAsync<T>(
+            string requestUri,
+            T newModel
+        );
+
         Task<HttpResponseMessage> GetAsync(
             string requestUri
         );
@@ -17,6 +22,10 @@ namespace mars_marking_svc.Services.Models
         Task<HttpResponseMessage> PatchAsync<T>(
             string requestUri,
             T updatedModel
+        );
+
+        Task<HttpResponseMessage> DeleteAsync(
+            string requestUri
         );
     }
 }

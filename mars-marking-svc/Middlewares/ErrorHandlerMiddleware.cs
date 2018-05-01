@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using mars_marking_svc.Exceptions;
 using mars_marking_svc.Services.Models;
 using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
 
 namespace mars_marking_svc.Middlewares
 {
@@ -44,10 +45,11 @@ namespace mars_marking_svc.Middlewares
             Exception exception
         )
         {
-            var errorResponseMessage = exception.Message;
+            var result = JsonConvert.SerializeObject(new {error = exception.Message});
+            httpContext.Response.ContentType = "application/json";
             httpContext.Response.StatusCode = GetStatusCodeForError(exception);
 
-            return httpContext.Response.WriteAsync(errorResponseMessage);
+            return httpContext.Response.WriteAsync(result);
         }
 
         private int GetStatusCodeForError(

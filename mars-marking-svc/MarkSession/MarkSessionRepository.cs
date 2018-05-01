@@ -26,21 +26,23 @@ public class MarkSessionRepository : IMarkSessionRepository
     {
         try
         {
-            var existingMarkSession = await FindMarkSessionByResourceId(markSessionModel.ResourceId);
-
-            if (existingMarkSession != null)
+            await EnsureUniqueFieldForMarkSession(MarkSessionModel.BsonElementDefinitionResourceId);
+            await _dbMongoService.GetMarkSessionCollection().InsertOneAsync(markSessionModel);
+            _loggerService.LodCreateEvent(markSessionModel.ToString());
+        }
+        catch (MongoWriteException e)
+        {
+            if (e.WriteError.Category == ServerErrorCategory.DuplicateKey)
             {
                 throw new MarkSessionAlreadyExistsException(
                     $"Cannot create {markSessionModel}, it already exists!"
                 );
             }
 
-            await _dbMongoService.GetMarkSessionCollection().InsertOneAsync(markSessionModel);
-            _loggerService.LodCreateEvent(markSessionModel.ToString());
-        }
-        catch (MarkSessionAlreadyExistsException)
-        {
-            throw;
+            throw new FailedToCreateMarkSessionException(
+                $"Failed to create {markSessionModel}",
+                e
+            );
         }
         catch (Exception e)
         {
@@ -121,14 +123,14 @@ public class MarkSessionRepository : IMarkSessionRepository
         return Builders<MarkSessionModel>.Filter.Eq(MarkSessionModel.BsonElementDefinitionResourceId, resourceId);
     }
 
-    private async Task<MarkSessionModel> FindMarkSessionByResourceId(
-        string resourceId
+    private async Task EnsureUniqueFieldForMarkSession(
+        string uniqueFieldDefinition
     )
     {
-        var markSessionCursor = await _dbMongoService.GetMarkSessionCollection().FindAsync(
-            GetFilterDefinitionForResourceId(resourceId)
-        );
+        var options = new CreateIndexOptions {Unique = true};
+        var field = new StringFieldDefinition<MarkSessionModel>(uniqueFieldDefinition);
+        var indexDefinition = new IndexKeysDefinitionBuilder<MarkSessionModel>().Ascending(field);
 
-        return await markSessionCursor.FirstOrDefaultAsync();
+        await _dbMongoService.GetMarkSessionCollection().Indexes.CreateOneAsync(indexDefinition, options);
     }
 }

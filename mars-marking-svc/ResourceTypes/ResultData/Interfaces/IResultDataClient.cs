@@ -6,12 +6,16 @@ namespace mars_marking_svc.ResourceTypes.ResultData.Interfaces
 {
     public interface IResultDataClient
     {
-        Task<DependantResourceModel> GatherResultDataDependantResource(
+        Task<DependantResourceModel> MarkResultData(
             string resultDataId
         );
 
-        Task<DependantResourceModel> GatherResultDataDependantResource(
+        Task<DependantResourceModel> MarkResultData(
             SimRunModel simRunModel
+        );
+
+        Task UnmarkResultData(
+            DependantResourceModel dependantResourceModel
         );
     }
 }

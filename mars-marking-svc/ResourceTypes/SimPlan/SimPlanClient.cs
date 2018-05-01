@@ -35,7 +35,8 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
 
             response.ThrowExceptionIfNotSuccessfulResponse(
                 new FailedToGetResourceException(
-                    $"Failed to get simPlan with id: {simPlanId}, projectId: {projectId} from sim-runner-svc! The response status code is {response.StatusCode}"
+                    $"Failed to get simPlan with id: {simPlanId}, projectId: {projectId} from sim-runner-svc!" +
+                    await response.IncludeStatusCodeAndMessageFromResponse()
                 )
             );
 
@@ -55,7 +56,8 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
 
             response.ThrowExceptionIfNotSuccessfulResponse(
                 new FailedToGetResourceException(
-                    $"Failed to get simPlans for scenarioId: {scenarioId}, projectId: {projectId} from sim-runner-svc! The response status code is {response.StatusCode}"
+                    $"Failed to get simPlans for scenarioId: {scenarioId}, projectId: {projectId} from sim-runner-svc!" +
+                    await response.IncludeStatusCodeAndMessageFromResponse()
                 )
             );
 
@@ -78,10 +80,11 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
 
             response.ThrowExceptionIfNotSuccessfulResponse(
                 new FailedToGetResourceException(
-                    $"Failed to get simPlans for resultConfigId: {resultConfigId}, projectId: {projectId} from sim-runner-svc! The response status code is {response.StatusCode}"
+                    $"Failed to get simPlans for resultConfigId: {resultConfigId}, projectId: {projectId} from sim-runner-svc!" +
+                    await response.IncludeStatusCodeAndMessageFromResponse()
                 )
             );
-            
+
             if (response.IsEmptyResponse())
             {
                 return new List<SimPlanModel>();
@@ -100,10 +103,11 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
 
             response.ThrowExceptionIfNotSuccessfulResponse(
                 new FailedToGetResourceException(
-                    $"Failed to get simPlans for projectId: {projectId} from sim-runner-svc! The response status code is {response.StatusCode}"
+                    $"Failed to get simPlans for projectId: {projectId} from sim-runner-svc!" +
+                    await response.IncludeStatusCodeAndMessageFromResponse()
                 )
             );
-            
+
             if (response.IsEmptyResponse())
             {
                 return new List<SimPlanModel>();
@@ -144,11 +148,12 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
 
             response.ThrowExceptionIfNotSuccessfulResponse(
                 new FailedToUpdateResourceException(
-                    $"Failed to update simPlan with id: {simPlanModel.Id}, projectId: {projectId} from sim-runner-svc! The response status code is {response.StatusCode}"
+                    $"Failed to update simPlan with id: {simPlanModel.Id}, projectId: {projectId} from sim-runner-svc!" +
+                    await response.IncludeStatusCodeAndMessageFromResponse()
                 )
             );
 
-            var markedResource = new DependantResourceModel("simPlan", simPlanModel.Id);
+            var markedResource = new DependantResourceModel(ResourceTypeEnum.SimPlan, simPlanModel.Id);
             _loggerService.LogMarkEvent(markedResource.ToString());
 
             return markedResource;
@@ -171,7 +176,8 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
 
                 response.ThrowExceptionIfNotSuccessfulResponse(
                     new FailedToUpdateResourceException(
-                        $"Failed to update simPlan with id: {simPlanModel.Id}, projectId: {projectId} from sim-runner-svc! The response status code is {response.StatusCode}"
+                        $"Failed to update simPlan with id: {simPlanModel.Id}, projectId: {projectId} from sim-runner-svc!" +
+                        await response.IncludeStatusCodeAndMessageFromResponse()
                     )
                 );
             }
@@ -199,7 +205,8 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
             }
 
             throw new FailedToGetResourceException(
-                $"Failed to get simPlan with id: {simPlanId}, projectId: {projectId} from sim-runner-svc! The response status code is {response.StatusCode}"
+                $"Failed to get simPlan with id: {simPlanId}, projectId: {projectId} from sim-runner-svc!" +
+                await response.IncludeStatusCodeAndMessageFromResponse()
             );
         }
     }

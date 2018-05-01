@@ -1,4 +1,7 @@
-﻿namespace mars_marking_svc.Utils
+﻿using mars_marking_svc.ResourceTypes;
+using mars_marking_svc.ResourceTypes.MarkedResource.Enums;
+
+namespace mars_marking_svc.Utils
 {
     public class EnumUtil
     {
@@ -8,13 +11,13 @@
         {
             switch (resourceType)
             {
-                case "project":
-                case "metadata":
-                case "scenario":
-                case "resultConfig":
-                case "simPlan":
-                case "simRun":
-                case "resultData":
+                case ResourceTypeEnum.Project:
+                case ResourceTypeEnum.Metadata:
+                case ResourceTypeEnum.Scenario:
+                case ResourceTypeEnum.ResultConfig:
+                case ResourceTypeEnum.SimPlan:
+                case ResourceTypeEnum.SimRun:
+                case ResourceTypeEnum.ResultData:
                     return true;
                 default:
                     return false;
@@ -27,8 +30,8 @@
         {
             switch (markSessionType)
             {
-                case "TO_BE_DELETED":
-                case "TO_BE_ARCHIVED":
+                case MarkSessionTypeEnum.ToBeDeleted:
+                case MarkSessionTypeEnum.ToBeArchived:
                     return true;
                 default:
                     return false;

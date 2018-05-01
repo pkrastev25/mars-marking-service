@@ -34,7 +34,8 @@ namespace mars_marking_svc.ResourceTypes.ResultConfig
 
             response.ThrowExceptionIfNotSuccessfulResponse(
                 new FailedToGetResourceException(
-                    $"Failed to get resultConfig with id: {resultConfigId} from resultcfg-svc! The response status code is {response.StatusCode}"
+                    $"Failed to get resultConfig with id: {resultConfigId} from resultcfg-svc!" +
+                    await response.IncludeStatusCodeAndMessageFromResponse()
                 )
             );
 
@@ -53,7 +54,8 @@ namespace mars_marking_svc.ResourceTypes.ResultConfig
 
             response.ThrowExceptionIfNotSuccessfulResponse(
                 new FailedToGetResourceException(
-                    $"Failed to get resultConfigs for metadataId: {metadataId} from resultcfg-svc! The response status code is {response.StatusCode}"
+                    $"Failed to get resultConfigs for metadataId: {metadataId} from resultcfg-svc!" +
+                    await response.IncludeStatusCodeAndMessageFromResponse()
                 )
             );
 
@@ -84,7 +86,8 @@ namespace mars_marking_svc.ResourceTypes.ResultConfig
         {
             return await Task.Run(() =>
             {
-                var markedResource = new DependantResourceModel("resultConfig", resultConfigModel.ConfigId);
+                var markedResource =
+                    new DependantResourceModel(ResourceTypeEnum.ResultConfig, resultConfigModel.ConfigId);
                 _loggerService.LogSkipEvent(markedResource.ToString());
 
                 return markedResource;

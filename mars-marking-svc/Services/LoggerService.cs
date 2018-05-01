@@ -9,50 +9,54 @@ namespace mars_marking_svc.Services
             string message
         )
         {
-            Console.WriteLine($"[CREATE] {message}");
+            Console.WriteLine($"{IncludeTimestamp()} [CREATE] {message}");
         }
 
         public void LogUpdateEvent(
             string message
         )
         {
-            Console.WriteLine($"[UPDATE] {message}");
+            Console.WriteLine($"{IncludeTimestamp()} [UPDATE] {message}");
         }
 
         public void LogDeleteEvent(
             string message
         )
         {
-            Console.WriteLine($"[DELETE] {message}");
+            Console.WriteLine($"{IncludeTimestamp()} [DELETE] {message}");
         }
 
         public void LogMarkEvent(
             string message
         )
         {
-            Console.WriteLine($"[MARK] {message}");
+            Console.WriteLine($"{IncludeTimestamp()} [MARK] {message}");
         }
 
         public void LogUnmarkEvent(
             string message
         )
         {
-            Console.WriteLine($"[UNMARK] {message}");
+            Console.WriteLine($"{IncludeTimestamp()} [UNMARK] {message}");
         }
 
         public void LogSkipEvent(
             string message
         )
         {
-            Console.WriteLine($"[SKIP] {message}");
+            Console.WriteLine($"{IncludeTimestamp()} [SKIP] {message}");
         }
 
         public void LogErrorEvent(
             Exception error
         )
         {
-            Console.Error.WriteLine($"[ERROR] {error.Message}");
-            Console.Error.WriteLine(error.StackTrace);
+            Console.Error.WriteLine($"{IncludeTimestamp()} [ERROR] {error.Message}\n{error.StackTrace}");
+        }
+
+        private string IncludeTimestamp()
+        {
+            return $"- {DateTime.Now} -";
         }
     }
 }

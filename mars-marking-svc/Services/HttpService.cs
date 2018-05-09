@@ -20,7 +20,7 @@ namespace mars_marking_svc.Services
 
         public async Task<HttpResponseMessage> PostAsync<T>(string requestUri, T newModel)
         {
-            return await ExecuteRequest(
+            return await ExecuteRequestAndFormatExceptionIfThrown(
                 _httpClient.PostAsync(requestUri, CreateStringContent(newModel))
             );
         }
@@ -29,7 +29,7 @@ namespace mars_marking_svc.Services
             string requestUri
         )
         {
-            return await ExecuteRequest(
+            return await ExecuteRequestAndFormatExceptionIfThrown(
                 _httpClient.GetAsync(requestUri)
             );
         }
@@ -39,7 +39,7 @@ namespace mars_marking_svc.Services
             T updatedModel
         )
         {
-            return await ExecuteRequest(
+            return await ExecuteRequestAndFormatExceptionIfThrown(
                 _httpClient.PutAsync(requestUri, CreateStringContent(updatedModel))
             );
         }
@@ -55,14 +55,14 @@ namespace mars_marking_svc.Services
                 Content = CreateStringContent(updatedModel)
             };
 
-            return await ExecuteRequest(
+            return await ExecuteRequestAndFormatExceptionIfThrown(
                 _httpClient.SendAsync(request)
             );
         }
 
         public async Task<HttpResponseMessage> DeleteAsync(string requestUri)
         {
-            return await ExecuteRequest(
+            return await ExecuteRequestAndFormatExceptionIfThrown(
                 _httpClient.DeleteAsync(requestUri)
             );
         }
@@ -78,7 +78,7 @@ namespace mars_marking_svc.Services
             );
         }
 
-        private async Task<HttpResponseMessage> ExecuteRequest(
+        private async Task<HttpResponseMessage> ExecuteRequestAndFormatExceptionIfThrown(
             Task<HttpResponseMessage> request
         )
         {
@@ -90,7 +90,10 @@ namespace mars_marking_svc.Services
             {
                 if (!string.IsNullOrEmpty(e.InnerException?.Message))
                 {
-                    throw new Exception($"{e.Message} {e.InnerException.Message}");
+                    throw new Exception(
+                        $"{e.Message} {e.InnerException.Message}",
+                        e
+                    );
                 }
 
                 throw;

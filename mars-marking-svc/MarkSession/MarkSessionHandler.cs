@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Hangfire;
+using mars_marking_svc.BackgroundJobs.Interfaces;
 using mars_marking_svc.DependantResource.Interfaces;
 using mars_marking_svc.Exceptions;
 using mars_marking_svc.MarkedResource.Models;
@@ -16,16 +16,19 @@ namespace mars_marking_svc.ResourceTypes.MarkedResource
     {
         private readonly IMarkSessionRepository _markSessionRepository;
         private readonly IDependantResourceHandler _dependantResourceHandler;
+        private readonly IBackgroundJobsHandler _backgroundJobsHandler;
         private readonly ILoggerService _loggerService;
 
         public MarkSessionHandler(
             IMarkSessionRepository markSessionRepository,
             IDependantResourceHandler dependantResourceHandler,
+            IBackgroundJobsHandler backgroundJobsHandler,
             ILoggerService loggerService
         )
         {
             _markSessionRepository = markSessionRepository;
             _dependantResourceHandler = dependantResourceHandler;
+            _backgroundJobsHandler = backgroundJobsHandler;
             _loggerService = loggerService;
         }
 
@@ -89,12 +92,26 @@ namespace mars_marking_svc.ResourceTypes.MarkedResource
             await _markSessionRepository.Update(markSessionModel);
         }
 
-        public async Task DeleteMarkSession(
+        public async Task<string> DeleteMarkSession(
             string markSessionId
         )
         {
             await FindMarkSessionById(markSessionId);
-            await Task.Run(() => { BackgroundJob.Enqueue(() => StartDeletionProcess(markSessionId)); });
+
+            return await _backgroundJobsHandler.CreateBackgroundJob(
+                () => StartDeletionProcess(markSessionId)
+            );
+        }
+
+        public async Task DeleteEmptyMarkSession(
+            string markSessionId
+        )
+        {
+            var markSessionModel = await FindMarkSessionById(markSessionId);
+            markSessionModel.SourceDependency = null;
+            markSessionModel.DependantResources = new List<DependantResourceModel>();
+
+            await _markSessionRepository.Delete(markSessionModel);
         }
 
         public async Task StartDeletionProcess(

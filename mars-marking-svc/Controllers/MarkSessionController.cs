@@ -136,7 +136,24 @@ namespace mars_marking_svc.Controllers
                 return BadRequest("markSessionId is not specified!");
             }
 
-            await _markSessionHandler.DeleteMarkSession(markSessionId);
+            var backgroundJobId = await _markSessionHandler.DeleteMarkSession(markSessionId);
+
+            return Accepted(
+                value: backgroundJobId
+            );
+        }
+
+        [HttpDelete("{markSessionId}/emptySession")]
+        public async Task<IActionResult> DeleteEmptyMarkSession(
+            string markSessionId
+        )
+        {
+            if (string.IsNullOrEmpty(markSessionId))
+            {
+                return BadRequest("markSessionId is not specified!");
+            }
+
+            await _markSessionHandler.DeleteEmptyMarkSession(markSessionId);
 
             return Ok();
         }

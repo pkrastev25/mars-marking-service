@@ -2,6 +2,8 @@
 using AutoMapper;
 using Hangfire;
 using Hangfire.Mongo;
+using mars_marking_svc.BackgroundJobs;
+using mars_marking_svc.BackgroundJobs.Interfaces;
 using mars_marking_svc.DependantResource;
 using mars_marking_svc.DependantResource.Interfaces;
 using mars_marking_svc.MarkSession.Interfaces;
@@ -74,6 +76,7 @@ namespace mars_marking_svc
             // Handlers
             services.AddTransient<IMarkSessionHandler, MarkSessionHandler>();
             services.AddTransient<IDependantResourceHandler, DependantResourceHandler>();
+            services.AddTransient<IBackgroundJobsHandler, BackgroundJobsHandler>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -9,6 +9,7 @@ namespace mars_marking_svc.Middlewares
 {
     public class ErrorHandlerMiddleware
     {
+        private const int StatusCodeNoContent = 204;
         private const int StatusCodeNotFound = 404;
         private const int StatusCodeConflict = 409;
         private const int StatusCodeInternalServerError = 500;
@@ -58,6 +59,8 @@ namespace mars_marking_svc.Middlewares
         {
             switch (exception)
             {
+                case BackgroundJobDoesNotExistException _:
+                    return StatusCodeNoContent;
                 case MarkSessionDoesNotExistException _:
                     return StatusCodeNotFound;
                 case CannotMarkResourceException _:

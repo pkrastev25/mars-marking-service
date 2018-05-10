@@ -93,12 +93,9 @@ namespace mars_marking_svc.ResourceTypes.Metadata
                 );
             }
 
-            var metadataPreviousState = metadataModel.State;
-            metadataModel.State = MetadataModel.ToBeDeletedState;
-
             var response = await _httpService.PutAsync(
                 $"http://metadata-svc/metadata/{metadataModel.DataId}/state?state={MetadataModel.ToBeDeletedState}",
-                metadataModel
+                ""
             );
 
             response.ThrowExceptionIfNotSuccessfulResponse(
@@ -110,7 +107,7 @@ namespace mars_marking_svc.ResourceTypes.Metadata
 
             var markedResource = new DependantResourceModel(ResourceTypeEnum.Metadata, metadataModel.DataId)
             {
-                PreviousState = metadataPreviousState
+                PreviousState = metadataModel.State
             };
             _loggerService.LogMarkEvent(markedResource.ToString());
 
@@ -121,15 +118,9 @@ namespace mars_marking_svc.ResourceTypes.Metadata
             DependantResourceModel dependantResourceModel
         )
         {
-            var metadataModel = new MetadataModel
-            {
-                DataId = dependantResourceModel.ResourceId,
-                State = dependantResourceModel.PreviousState
-            };
-
             var response = await _httpService.PutAsync(
-                $"http://metadata-svc/metadata/{metadataModel.DataId}/state?state={MetadataModel.FinishedState}",
-                metadataModel
+                $"http://metadata-svc/metadata/{dependantResourceModel.ResourceId}/state?state={dependantResourceModel.PreviousState}",
+                ""
             );
 
             response.ThrowExceptionIfNotSuccessfulResponseOrNot404Response(

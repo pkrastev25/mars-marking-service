@@ -60,23 +60,23 @@ namespace mars_marking_svc
             // Services
             services.AddSingleton<IDbMongoService, DbMongoService>();
             services.AddSingleton<IHostedService, HostedStartupService>();
-            services.AddTransient<IHttpService, HttpService>();
-            services.AddTransient<ILoggerService, LoggerService>();
+            services.AddScoped<IHttpService, HttpService>();
+            services.AddScoped<ILoggerService, LoggerService>();
 
             // Clients
-            services.AddSingleton<HttpClient>();
-            services.AddTransient<IMetadataClient, MetadataClient>();
-            services.AddTransient<IScenarioClient, ScenarioClient>();
-            services.AddTransient<IResultConfigClient, ResultConfigClient>();
-            services.AddTransient<ISimPlanClient, SimPlanClient>();
-            services.AddTransient<ISimRunClient, SimRunClient>();
-            services.AddTransient<IResultDataClient, ResultDataClient>();
-            services.AddTransient<IMarkSessionRepository, MarkSessionRepository>();
+            services.AddScoped<HttpClient>();
+            services.AddScoped<IMetadataClient, MetadataClient>();
+            services.AddScoped<IScenarioClient, ScenarioClient>();
+            services.AddScoped<IResultConfigClient, ResultConfigClient>();
+            services.AddScoped<ISimPlanClient, SimPlanClient>();
+            services.AddScoped<ISimRunClient, SimRunClient>();
+            services.AddScoped<IResultDataClient, ResultDataClient>();
+            services.AddScoped<IMarkSessionRepository, MarkSessionRepository>();
 
             // Handlers
-            services.AddTransient<IMarkSessionHandler, MarkSessionHandler>();
-            services.AddTransient<IDependantResourceHandler, DependantResourceHandler>();
-            services.AddTransient<IBackgroundJobsHandler, BackgroundJobsHandler>();
+            services.AddScoped<IMarkSessionHandler, MarkSessionHandler>();
+            services.AddScoped<IDependantResourceHandler, DependantResourceHandler>();
+            services.AddScoped<IBackgroundJobsHandler, BackgroundJobsHandler>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

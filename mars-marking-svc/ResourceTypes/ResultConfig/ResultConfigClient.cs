@@ -52,7 +52,7 @@ namespace mars_marking_svc.ResourceTypes.ResultConfig
                 $"http://resultcfg-svc/api/ResultConfigs?modelDataId={metadataId}"
             );
 
-            response.ThrowExceptionIfNotSuccessfulResponse(
+            response.ThrowExceptionIfNotSuccessfulResponseOrNot404Response(
                 new FailedToGetResourceException(
                     $"Failed to get resultConfigs for metadataId: {metadataId} from resultcfg-svc!" +
                     await response.IncludeStatusCodeAndMessageFromResponse()

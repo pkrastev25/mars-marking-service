@@ -121,7 +121,7 @@ namespace mars_marking_svc.Controllers
                 return BadRequest("markSessionType is not specified or the type is invalid!");
             }
 
-            await _markSessionHandler.UpdateMarkSession(markSessionId, markSessionType);
+            await _markSessionHandler.UpdateMarkSessionType(markSessionId, markSessionType);
 
             return Ok();
         }

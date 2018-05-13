@@ -54,7 +54,7 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
                 $"http://sim-runner-svc/simplan?scenarioid={scenarioId}&projectid={projectId}"
             );
 
-            response.ThrowExceptionIfNotSuccessfulResponse(
+            response.ThrowExceptionIfNotSuccessfulResponseOrNot404Response(
                 new FailedToGetResourceException(
                     $"Failed to get simPlans for scenarioId: {scenarioId}, projectId: {projectId} from sim-runner-svc!" +
                     await response.IncludeStatusCodeAndMessageFromResponse()
@@ -78,7 +78,7 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
                 $"http://sim-runner-svc/simplan?resultconfigid={resultConfigId}&projectid={projectId}"
             );
 
-            response.ThrowExceptionIfNotSuccessfulResponse(
+            response.ThrowExceptionIfNotSuccessfulResponseOrNot404Response(
                 new FailedToGetResourceException(
                     $"Failed to get simPlans for resultConfigId: {resultConfigId}, projectId: {projectId} from sim-runner-svc!" +
                     await response.IncludeStatusCodeAndMessageFromResponse()
@@ -101,7 +101,7 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
                 $"http://sim-runner-svc/simplan?projectid={projectId}"
             );
 
-            response.ThrowExceptionIfNotSuccessfulResponse(
+            response.ThrowExceptionIfNotSuccessfulResponseOrNot404Response(
                 new FailedToGetResourceException(
                     $"Failed to get simPlans for projectId: {projectId} from sim-runner-svc!" +
                     await response.IncludeStatusCodeAndMessageFromResponse()

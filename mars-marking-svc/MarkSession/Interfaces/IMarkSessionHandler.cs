@@ -21,7 +21,7 @@ namespace mars_marking_svc.MarkSession.Interfaces
             string markSessionType
         );
 
-        Task UpdateMarkSession(
+        Task UpdateMarkSessionType(
             string markSessionId,
             string markSessionType
         );

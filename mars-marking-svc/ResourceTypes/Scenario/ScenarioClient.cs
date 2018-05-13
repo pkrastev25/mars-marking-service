@@ -49,7 +49,7 @@ namespace mars_marking_svc.ResourceTypes.Scenario
                 $"http://scenario-svc/scenarios?DataId={metadataId}"
             );
 
-            response.ThrowExceptionIfNotSuccessfulResponse(
+            response.ThrowExceptionIfNotSuccessfulResponseOrNot404Response(
                 new FailedToGetResourceException(
                     $"Failed to get scenarios for metadataId: {metadataId} from scenario-svc!" +
                     await response.IncludeStatusCodeAndMessageFromResponse()
@@ -72,7 +72,7 @@ namespace mars_marking_svc.ResourceTypes.Scenario
                 $"http://scenario-svc/scenarios?Project={projectId}"
             );
 
-            response.ThrowExceptionIfNotSuccessfulResponse(
+            response.ThrowExceptionIfNotSuccessfulResponseOrNot404Response(
                 new FailedToGetResourceException(
                     $"Failed to get scenarios for projectId: {projectId} from scenario-svc!" +
                     await response.IncludeStatusCodeAndMessageFromResponse()

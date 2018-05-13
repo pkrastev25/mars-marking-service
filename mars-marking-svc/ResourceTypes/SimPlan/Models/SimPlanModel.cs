@@ -32,7 +32,7 @@ namespace mars_marking_svc.ResourceTypes.SimPlan.Models
         public string DockerImageName { get; set; }
 
         [JsonProperty("DockerImageCreated")]
-        public string DockerImageCreated { get; set; }
+        public bool DockerImageCreated { get; set; }
 
         [JsonProperty("ToBeDeleted")]
         public bool ToBeDeleted { get; set; }

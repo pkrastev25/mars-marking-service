@@ -44,7 +44,7 @@ namespace mars_marking_svc.ResourceTypes.MarkedResource
             try
             {
                 await _markSessionRepository.Create(markSessionModel);
-                await _dependantResourceHandler.GatherResourcesForMarkSession(markSessionModel);
+                await _dependantResourceHandler.MarkResourcesForMarkSession(markSessionModel);
 
                 markSessionModel.State = MarkSessionModel.StateDone;
                 await _markSessionRepository.Update(markSessionModel);
@@ -81,7 +81,7 @@ namespace mars_marking_svc.ResourceTypes.MarkedResource
             );
         }
 
-        public async Task UpdateMarkSession(
+        public async Task UpdateMarkSessionType(
             string markSessionId,
             string markSessionType
         )
@@ -133,7 +133,7 @@ namespace mars_marking_svc.ResourceTypes.MarkedResource
                     await _markSessionRepository.Update(markSessionModel);
                     _loggerService.LogUpdateEvent(markSessionModel.ToString());
 
-                    await _dependantResourceHandler.FreeResourcesForMarkSession(markSessionModel);
+                    await _dependantResourceHandler.UnmarkResourcesForMarkSession(markSessionModel);
 
                     await _markSessionRepository.Delete(markSessionModel);
                     isMarkSessionDeleted = true;

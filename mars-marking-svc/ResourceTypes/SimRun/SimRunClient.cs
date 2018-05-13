@@ -54,7 +54,7 @@ namespace mars_marking_svc.ResourceTypes.SimRun
                 $"http://sim-runner-svc/simrun?simPlanId={simPlanId}&projectid={projectId}"
             );
 
-            response.ThrowExceptionIfNotSuccessfulResponse(
+            response.ThrowExceptionIfNotSuccessfulResponseOrNot404Response(
                 new FailedToGetResourceException(
                     $"Failed to get simRuns for simPlanId: {simPlanId}, projectId: {projectId} from sim-runner-svc!" +
                     await response.IncludeStatusCodeAndMessageFromResponse()
@@ -77,7 +77,7 @@ namespace mars_marking_svc.ResourceTypes.SimRun
                 $"http://sim-runner-svc/simrun?projectid={projectId}"
             );
 
-            response.ThrowExceptionIfNotSuccessfulResponse(
+            response.ThrowExceptionIfNotSuccessfulResponseOrNot404Response(
                 new FailedToGetResourceException(
                     $"Failed to get simRuns for projectId: {projectId} from sim-runner-svc!" +
                     await response.IncludeStatusCodeAndMessageFromResponse()

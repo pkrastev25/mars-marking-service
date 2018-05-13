@@ -54,32 +54,32 @@ namespace mars_marking_svc.DependantResource
             _loggerService = loggerService;
         }
 
-        public async Task GatherResourcesForMarkSession(
+        public async Task MarkResourcesForMarkSession(
             MarkSessionModel markSessionModel
         )
         {
             switch (markSessionModel.ResourceType)
             {
                 case ResourceTypeEnum.Project:
-                    await GatherResourcesForProjectMarkSession(markSessionModel);
+                    await MarkResourcesForProjectMarkSession(markSessionModel);
                     break;
                 case ResourceTypeEnum.Metadata:
-                    await GatherResourcesForMetadataMarkSession(markSessionModel);
+                    await MarkResourcesForMetadataMarkSession(markSessionModel);
                     break;
                 case ResourceTypeEnum.Scenario:
-                    await GatherResourcesForScenarioMarkSession(markSessionModel);
+                    await MarkResourcesForScenarioMarkSession(markSessionModel);
                     break;
                 case ResourceTypeEnum.ResultConfig:
-                    await GatherResourcesForResultConfigMarkSession(markSessionModel);
+                    await MarkResourcesForResultConfigMarkSession(markSessionModel);
                     break;
                 case ResourceTypeEnum.SimPlan:
-                    await GatherResourcesForSimPlanMarkSession(markSessionModel);
+                    await MarkResourcesForSimPlanMarkSession(markSessionModel);
                     break;
                 case ResourceTypeEnum.SimRun:
-                    await GatherResourcesForSimRunMarkSession(markSessionModel);
+                    await MarkResourcesForSimRunMarkSession(markSessionModel);
                     break;
                 case ResourceTypeEnum.ResultData:
-                    await GatherResourcesForResultDataMarkSession(markSessionModel);
+                    await MarkResourcesForResultDataMarkSession(markSessionModel);
                     break;
                 default:
                     throw new UnknownResourceTypeException(
@@ -88,7 +88,7 @@ namespace mars_marking_svc.DependantResource
             }
         }
 
-        public async Task FreeResourcesForMarkSession(
+        public async Task UnmarkResourcesForMarkSession(
             MarkSessionModel markSessionModel
         )
         {
@@ -115,7 +115,7 @@ namespace mars_marking_svc.DependantResource
             await ExecuteTasksThenUpdateMarkSession(taskList, markSessionModel);
         }
 
-        private async Task GatherResourcesForProjectMarkSession(
+        private async Task MarkResourcesForProjectMarkSession(
             MarkSessionModel markSessionModel
         )
         {
@@ -145,7 +145,7 @@ namespace mars_marking_svc.DependantResource
             await MarkResultDataThenUpdateMarkSession(simRunsForProject, markSessionModel);
         }
 
-        private async Task GatherResourcesForMetadataMarkSession(
+        private async Task MarkResourcesForMetadataMarkSession(
             MarkSessionModel markSessionModel
         )
         {
@@ -183,7 +183,7 @@ namespace mars_marking_svc.DependantResource
             await MarkResultDataThenUpdateMarkSession(simRunsForSimPlans, markSessionModel);
         }
 
-        private async Task GatherResourcesForScenarioMarkSession(
+        private async Task MarkResourcesForScenarioMarkSession(
             MarkSessionModel markSessionModel
         )
         {
@@ -209,7 +209,7 @@ namespace mars_marking_svc.DependantResource
             await MarkResultDataThenUpdateMarkSession(simRunsForSimPlans, markSessionModel);
         }
 
-        private async Task GatherResourcesForResultConfigMarkSession(
+        private async Task MarkResourcesForResultConfigMarkSession(
             MarkSessionModel markSessionModel
         )
         {
@@ -243,7 +243,7 @@ namespace mars_marking_svc.DependantResource
             await MarkResultDataThenUpdateMarkSession(simRunsForSimPlans, markSessionModel);
         }
 
-        private async Task GatherResourcesForSimPlanMarkSession(
+        private async Task MarkResourcesForSimPlanMarkSession(
             MarkSessionModel markSessionModel
         )
         {
@@ -260,7 +260,7 @@ namespace mars_marking_svc.DependantResource
             await MarkResultDataThenUpdateMarkSession(simRunsForSimPlan, markSessionModel);
         }
 
-        private async Task GatherResourcesForSimRunMarkSession(
+        private async Task MarkResourcesForSimRunMarkSession(
             MarkSessionModel markSessionModel
         )
         {
@@ -277,7 +277,7 @@ namespace mars_marking_svc.DependantResource
             await _markSessionRepository.Update(markSessionModel);
         }
 
-        private async Task GatherResourcesForResultDataMarkSession(
+        private async Task MarkResourcesForResultDataMarkSession(
             MarkSessionModel markSessionModel
         )
         {
@@ -334,6 +334,11 @@ namespace mars_marking_svc.DependantResource
             MarkSessionModel markSessionModel
         )
         {
+            if (simRunModels == null)
+            {
+                return;
+            }
+
             var taskList = simRunModels.Select(simRunModel => Task.Run(
                 async () =>
                 {
@@ -355,6 +360,11 @@ namespace mars_marking_svc.DependantResource
             MarkSessionModel markSessionModel
         )
         {
+            if (resourceModels == null)
+            {
+                return;
+            }
+
             var taskList = resourceModels.Select(resourceModel => MarkResourceThenAddToMarkSession(
                 resourceModel,
                 projectId,

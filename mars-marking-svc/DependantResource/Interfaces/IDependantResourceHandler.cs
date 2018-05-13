@@ -5,11 +5,11 @@ namespace mars_marking_svc.DependantResource.Interfaces
 {
     public interface IDependantResourceHandler
     {
-        Task GatherResourcesForMarkSession(
+        Task MarkResourcesForMarkSession(
             MarkSessionModel markSessionModel
         );
 
-        Task FreeResourcesForMarkSession(
+        Task UnmarkResourcesForMarkSession(
             MarkSessionModel markSessionModel
         );
     }

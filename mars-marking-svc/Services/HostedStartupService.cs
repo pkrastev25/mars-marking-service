@@ -8,9 +8,6 @@ using mars_marking_svc.Utils;
 
 namespace mars_marking_svc.Services
 {
-    /// <summary>
-    /// Based on https://blog.maartenballiauw.be/post/2017/08/01/building-a-scheduled-cache-updater-in-aspnet-core-2.html
-    /// </summary>
     public class HostedStartupService : AHostedService
     {
         private readonly IMarkSessionRepository _markSessionRepository;

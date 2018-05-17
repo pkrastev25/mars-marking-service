@@ -4,16 +4,13 @@ stages:
   - integrationTests
   - deploy
 
-
 variables:
   DOCKER_HOST: "tcp://localhost:2375"
   DOCKER_REGISTRY: "nexus.informatik.haw-hamburg.de"
   SERVICE_NAME: "marking-svc"
 
-
 cache:
   untracked: true
-
 
 build:
   stage: build

@@ -1,6 +1,7 @@
 stages:
   - build
   - unitTests
+  - integrationTests
   - deploy
 
 
@@ -35,6 +36,19 @@ unitTests:
   script:
    - cd UnitTests
    - dotnet test -c Release -v minimal /maxcpucount
+
+integrationTests:
+  stage: integrationTests
+  image: ${DOCKER_REGISTRY}/microsoft/dotnet:2.0.0-sdk
+  services:
+    - ${DOCKER_REGISTRY}/mongo:3.4.1
+  tags:
+    - k8s
+  script:
+   - cd IntegrationTests
+   - docker-compose up
+   - dotnet test -c Release -v minimal /maxcpucount
+   - docker-compose down
 
 deploy:
   stage: deploy

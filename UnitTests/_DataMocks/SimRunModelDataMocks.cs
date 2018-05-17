@@ -8,9 +8,6 @@ namespace UnitTests._DataMocks
     {
         public static readonly string MockSimRunModelListJson = JsonConvert.SerializeObject(MockSimRunModelList());
 
-        private static readonly string MockMarkedSimRunModelListJson =
-            JsonConvert.SerializeObject(MockMarkedSimRunModelList());
-
         public static SimRunModel MockMarkedSimRunModel()
         {
             return new SimRunModel

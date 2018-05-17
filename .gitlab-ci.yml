@@ -45,10 +45,10 @@ integrationTests:
   tags:
     - k8s
   script:
-   - cd IntegrationTests
-   - docker-compose up
+   - cd IntegrationTests/seed-data
+   - bash seed-data.sh
+   - cd ..
    - dotnet test -c Release -v minimal /maxcpucount
-   - docker-compose down
 
 deploy:
   stage: deploy

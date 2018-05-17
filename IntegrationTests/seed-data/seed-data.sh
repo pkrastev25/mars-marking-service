@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
 # metadata-svc
-mongoimport --host mongodb --port 27017 --db import --collection metadata --type json --file ./metadata.json --jsonArray
+mongoimport --port 27017 --db import --collection metadata --type json --file ./metadata.json --jsonArray

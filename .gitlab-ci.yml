@@ -36,7 +36,7 @@ unitTests:
 
 integrationTests:
   stage: integrationTests
-  image: ${DOCKER_REGISTRY}/microsoft/dotnet:2.0.0-sdk
+  image: ${DOCKER_REGISTRY}/marking-svc-tests-env
   services:
     - ${DOCKER_REGISTRY}/mongo:3.4.1
   tags:

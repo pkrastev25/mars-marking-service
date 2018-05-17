@@ -9,7 +9,4 @@ ADD ./mars-marking-svc/out /out
 # Build and run the program on container startup.
 WORKDIR /out
 
-# Install mongo related utilites, needed for seeding data
-RUN apt-get update && apt-get install -y mongodb
-
 ENTRYPOINT dotnet mars-marking-svc.dll

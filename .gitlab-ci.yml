@@ -39,6 +39,7 @@ integrationTests:
   image: ${DOCKER_REGISTRY}/marking-svc-tests-env
   services:
     - name: ${DOCKER_REGISTRY}/mongo:3.4.1
+      alias: mongodb
     - name: ${DOCKER_REGISTRY}/metadata-svc:22434
       alias: metadata-svc
   tags:

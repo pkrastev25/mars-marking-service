@@ -1,0 +1,112 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "de.haw_hamburg.mars.project.proto";
+option java_outer_classname = "ProjectServiceClient";
+
+package project;
+
+service ProjectService {
+  // project
+  rpc CreateProject(CreateProjectRequest) returns (IdReply) {}
+  rpc GetProject(GetProjectByIdRequest) returns (Project) {}
+  rpc UpdateProject(UpdateProjectRequest) returns (Empty) {}
+  rpc DeleteProject(IdRequest) returns (Empty) {}
+  rpc ListProjects(ProjectFilter) returns (stream Project) {}
+  // member
+  rpc GetMember(MemberRequest) returns (Member) {}
+  rpc ListMembers(MemberFilter) returns (stream Member) {}
+  rpc AddMember(MemberRequest) returns (Member) {}
+  rpc RemoveMember(MemberRequest) returns (Empty) {}
+  rpc GetMemberPermission(MemberPermissionRequest) returns (PermissionValueReply) {}
+  // permissions
+  rpc ListPermissionDefaults(Empty) returns (stream PermissionDefault) {}
+}
+
+message CreateProjectRequest {
+  string owner = 1;
+  string name = 2;
+  string desc = 3;
+}
+
+message GetProjectByIdRequest {
+  string project_id = 1;
+}
+
+message UpdateProjectRequest {
+  string project_id = 1;
+  string to_be_deleted = 2;
+  string is_being_archived = 3;
+  string is_archived = 4;
+}
+
+message MemberRequest {
+  string project_id = 1;
+  string user_id = 2;
+}
+
+message MemberPermissionRequest {
+  string project_id = 1;
+  string user_id = 2;
+  string permission_name = 3;
+}
+
+message ProjectFilter {
+  string user_id = 1;
+}
+
+message MemberFilter {
+  string project_id = 1;
+}
+
+message IdRequest {
+  string id = 1;
+}
+
+message IdReply {
+  string id = 1;
+}
+
+message PermissionValueReply {
+  int32 value = 1;
+}
+
+message Project {
+  string id = 1;
+  int64 created_at = 2;
+  int64 updated_at = 3;
+  string name = 4;
+  string desc = 5;
+  repeated Role roles = 6;
+  bool to_be_deleted = 7;
+  bool is_being_archived = 8;
+  bool is_archived = 9;
+}
+
+message Role {
+  string name = 1;
+  string id = 2;
+  repeated Permission permissions = 3;
+}
+
+message Permission {
+  string name = 1;
+  int32 value = 2;
+  string permission_default_id = 3;
+}
+
+message PermissionDefault {
+  string name = 1;
+  string id = 2;
+  int32 min_value = 3;
+  int32 max_value = 4;
+  int32 default_value = 5;
+}
+
+message Member {
+  string user_id = 1;
+  string role_id = 2;
+  int64 last_access = 3;
+}
+
+message Empty {}

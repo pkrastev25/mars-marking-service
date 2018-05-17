@@ -108,8 +108,8 @@ namespace mars_marking_svc.ResourceTypes.MarkedResource
         )
         {
             var markSessionModel = await FindMarkSessionById(markSessionId);
-            markSessionModel.SourceDependency = null;
             markSessionModel.DependantResources = new List<DependantResourceModel>();
+            await _dependantResourceHandler.UnmarkResourcesForMarkSession(markSessionModel);
 
             await _markSessionRepository.Delete(markSessionModel);
         }

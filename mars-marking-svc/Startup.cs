@@ -11,6 +11,8 @@ using mars_marking_svc.Middlewares;
 using mars_marking_svc.ResourceTypes.MarkedResource;
 using mars_marking_svc.ResourceTypes.Metadata;
 using mars_marking_svc.ResourceTypes.Metadata.Interfaces;
+using mars_marking_svc.ResourceTypes.Project;
+using mars_marking_svc.ResourceTypes.Project.Interfaces;
 using mars_marking_svc.ResourceTypes.ResultConfig;
 using mars_marking_svc.ResourceTypes.ResultConfig.Interfaces;
 using mars_marking_svc.ResourceTypes.ResultData;
@@ -58,13 +60,14 @@ namespace mars_marking_svc
             });
 
             // Services
-            services.AddSingleton<IDbMongoService, DbMongoService>();
-            services.AddSingleton<IHostedService, HostedStartupService>();
+            services.AddScoped<IDbMongoService, DbMongoService>();
+            services.AddScoped<IHostedService, HostedStartupService>();
             services.AddScoped<IHttpService, HttpService>();
             services.AddScoped<ILoggerService, LoggerService>();
 
             // Clients
             services.AddScoped<HttpClient>();
+            services.AddScoped<IProjectClient, ProjectClient>();
             services.AddScoped<IMetadataClient, MetadataClient>();
             services.AddScoped<IScenarioClient, ScenarioClient>();
             services.AddScoped<IResultConfigClient, ResultConfigClient>();

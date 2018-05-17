@@ -8,6 +8,7 @@ using mars_marking_svc.MarkedResource.Models;
 using mars_marking_svc.ResourceTypes;
 using mars_marking_svc.ResourceTypes.Metadata.Interfaces;
 using mars_marking_svc.ResourceTypes.Metadata.Models;
+using mars_marking_svc.ResourceTypes.Project.Interfaces;
 using mars_marking_svc.ResourceTypes.ResultConfig.Interfaces;
 using mars_marking_svc.ResourceTypes.ResultConfig.Models;
 using mars_marking_svc.ResourceTypes.ResultData.Interfaces;
@@ -24,6 +25,7 @@ namespace mars_marking_svc.DependantResource
 {
     public class DependantResourceHandler : IDependantResourceHandler
     {
+        private readonly IProjectClient _projectClient;
         private readonly IMarkSessionRepository _markSessionRepository;
         private readonly IMetadataClient _metadataClient;
         private readonly IScenarioClient _scenarioClient;
@@ -34,6 +36,7 @@ namespace mars_marking_svc.DependantResource
         private readonly ILoggerService _loggerService;
 
         public DependantResourceHandler(
+            IProjectClient projectClient,
             IMarkSessionRepository markSessionRepository,
             IMetadataClient metadataClient,
             IScenarioClient scenarioClient,
@@ -44,6 +47,7 @@ namespace mars_marking_svc.DependantResource
             ILoggerService loggerService
         )
         {
+            _projectClient = projectClient;
             _markSessionRepository = markSessionRepository;
             _metadataClient = metadataClient;
             _scenarioClient = scenarioClient;
@@ -120,6 +124,9 @@ namespace mars_marking_svc.DependantResource
         )
         {
             var projectId = markSessionModel.ProjectId;
+
+            markSessionModel.SourceDependency = await _projectClient.MarkProject(projectId);
+            await _markSessionRepository.Update(markSessionModel);
 
             var metadataForProject = await _metadataClient.GetMetadataForProject(projectId);
             await MarkResourcesThenUpdateMarkSession(metadataForProject, projectId, markSessionModel);
@@ -217,9 +224,7 @@ namespace mars_marking_svc.DependantResource
             var projectId = markSessionModel.ProjectId;
 
             var sourceResultConfig = await _resultConfigClient.GetResultConfig(resultConfigId);
-            var sourceDependantResource =
-                new DependantResourceModel(ResourceTypeEnum.Metadata, sourceResultConfig.ModelId);
-            markSessionModel.SourceDependency = sourceDependantResource;
+            markSessionModel.SourceDependency = await _metadataClient.MarkMetadata(sourceResultConfig.ModelId);
             await _markSessionRepository.Update(markSessionModel);
 
             var markedSourceResultConfig =
@@ -407,6 +412,9 @@ namespace mars_marking_svc.DependantResource
         {
             switch (dependantResourceModel.ResourceType)
             {
+                case ResourceTypeEnum.Project:
+                    await _projectClient.UnmarkProject(dependantResourceModel);
+                    break;
                 case ResourceTypeEnum.Metadata:
                     await _metadataClient.UnmarkMetadata(dependantResourceModel);
                     break;

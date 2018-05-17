@@ -39,6 +39,7 @@ integrationTests:
   image: ${DOCKER_REGISTRY}/marking-svc-tests-env
   services:
     - ${DOCKER_REGISTRY}/mongo:3.4.1
+    - ${DOCKER_REGISTRY}/metadata-svc:22434
   tags:
     - k8s
   script:

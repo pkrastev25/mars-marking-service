@@ -1,4 +1,4 @@
-FROM nexus.informatik.haw-hamburg.de/microsoft/aspnetcore:2.0
+FROM nexus.informatik.haw-hamburg.de/microsoft/dotnet:2.0.0-sdk
 
 # Marking service API runs on port 8080.
 EXPOSE 8080

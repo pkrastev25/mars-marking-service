@@ -28,7 +28,7 @@ namespace mars_marking_svc.ResourceTypes.Metadata
         )
         {
             var response = await _httpService.GetAsync(
-                $"http://metadata-svc:8080/metadata/{metadataId}"
+                $"http://nexus.informatik.haw-hamburg.de-metadata-svc/metadata/{metadataId}"
             );
 
             response.ThrowExceptionIfNotSuccessfulResponse(

@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  mongo-seed:
+    image: nexus.informatik.haw-hamburg.de/mongo:3.4.1
+    volumes:
+      - ./seed-data:/seed-data
+    entrypoint:
+      - "sh"
+    command:
+      - "/seed-data/seed-data.sh"
+    links:
+      - mongodb
+
+  mongodb:
+    image: nexus.informatik.haw-hamburg.de/mongo:3.4.1
+    ports:
+      - "27017:27017"
+
+  metadata-svc:
+    image: nexus.informatik.haw-hamburg.de/metadata-svc:22434
+    ports:
+      - "8080:8080"
+    links:
+      - mongodb

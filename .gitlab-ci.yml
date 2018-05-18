@@ -37,18 +37,13 @@ unitTests:
 integrationTests:
   stage: integrationTests
   image: ${DOCKER_REGISTRY}/marking-svc-tests-env
-  services:
-    - name: ${DOCKER_REGISTRY}/mongo:3.4.1
-    - name: ${DOCKER_REGISTRY}/metadata-svc:22434
   tags:
     - k8s
   script:
    - cd IntegrationTests
-   - bash adjust_hosts.sh
-   - cd seed-data
-   - bash seed-data.sh
-   - cd ..
+   - docker-compose up
    - dotnet test -c Release -v minimal /maxcpucount
+   - docker-compose down
 
 deploy:
   stage: deploy

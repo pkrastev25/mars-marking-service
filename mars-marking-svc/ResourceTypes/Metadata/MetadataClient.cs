@@ -28,7 +28,7 @@ namespace mars_marking_svc.ResourceTypes.Metadata
         )
         {
             var response = await _httpService.GetAsync(
-                $"http://localhost:8080/metadata/{metadataId}"
+                $"http://metadata-svc/metadata/{metadataId}"
             );
 
             response.ThrowExceptionIfNotSuccessfulResponse(

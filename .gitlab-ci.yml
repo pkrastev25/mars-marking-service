@@ -43,7 +43,9 @@ integrationTests:
   tags:
     - k8s
   script:
-   - cd IntegrationTests/seed-data
+   - cd IntegrationTests
+   - bash adjust_hosts.sh
+   - cd seed-data
    - bash seed-data.sh
    - cd ..
    - dotnet test -c Release -v minimal /maxcpucount

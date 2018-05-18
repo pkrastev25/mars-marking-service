@@ -43,6 +43,7 @@ integrationTests:
     - k8s
   script:
    - cd IntegrationTests
+   - docker login -u $NEXUS_USER -p $NEXUS_PW $DOCKER_REGISTRY
    - docker-compose up
    - dotnet test -c Release -v minimal /maxcpucount
    - docker-compose down

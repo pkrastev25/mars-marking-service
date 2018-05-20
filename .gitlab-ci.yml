@@ -44,8 +44,7 @@ integrationTests:
   script:
    - cd IntegrationTests
    - docker login -u $NEXUS_USER -p $NEXUS_PW $DOCKER_REGISTRY
-   - docker-compose up -d
-   - dotnet test -c Release -v minimal /maxcpucount
+   - docker-compose run marking-svc-tests
 
 deploy:
   stage: deploy

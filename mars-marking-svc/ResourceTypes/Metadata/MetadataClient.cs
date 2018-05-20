@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using mars_marking_svc.Exceptions;
 using mars_marking_svc.MarkedResource.Models;
@@ -28,7 +29,7 @@ namespace mars_marking_svc.ResourceTypes.Metadata
         )
         {
             var response = await _httpService.GetAsync(
-                $"http://metadata-svc/metadata/{metadataId}"
+                $"http://{GetBaseUrl()}/metadata/{metadataId}"
             );
 
             response.ThrowExceptionIfNotSuccessfulResponse(
@@ -46,7 +47,7 @@ namespace mars_marking_svc.ResourceTypes.Metadata
         )
         {
             var response = await _httpService.GetAsync(
-                $"http://metadata-svc/metadata?projectId={projectId}"
+                $"http://{GetBaseUrl()}/metadata?projectId={projectId}"
             );
 
             response.ThrowExceptionIfNotSuccessfulResponseOrNot404Response(
@@ -94,7 +95,7 @@ namespace mars_marking_svc.ResourceTypes.Metadata
             }
 
             var response = await _httpService.PutAsync(
-                $"http://metadata-svc/metadata/{metadataModel.DataId}/state?state={MetadataModel.ToBeDeletedState}",
+                $"http://{GetBaseUrl()}/metadata/{metadataModel.DataId}/state?state={MetadataModel.ToBeDeletedState}",
                 ""
             );
 
@@ -119,7 +120,7 @@ namespace mars_marking_svc.ResourceTypes.Metadata
         )
         {
             var response = await _httpService.PutAsync(
-                $"http://metadata-svc/metadata/{dependantResourceModel.ResourceId}/state?state={dependantResourceModel.PreviousState}",
+                $"http://{GetBaseUrl()}/metadata/{dependantResourceModel.ResourceId}/state?state={dependantResourceModel.PreviousState}",
                 ""
             );
 
@@ -131,6 +132,13 @@ namespace mars_marking_svc.ResourceTypes.Metadata
             );
 
             _loggerService.LogUnmarkEvent(dependantResourceModel.ToString());
+        }
+
+        private string GetBaseUrl()
+        {
+            var baseUrl = Environment.GetEnvironmentVariable("METADATA_SVC_URL");
+
+            return string.IsNullOrEmpty(baseUrl) ? "metadata-svc" : baseUrl;
         }
     }
 }

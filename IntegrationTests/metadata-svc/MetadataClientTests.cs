@@ -19,7 +19,7 @@ namespace IntegrationTests
             );
 
             // Act
-            var result = await metadataClient.GetMetadata("5afd545391024a0001fe8db2");
+            var result = await metadataClient.GetMetadata("5d3d9168-5589-4d8c-9bc9-9f2f5ad75373");
 
             // Assert
             Assert.NotNull(result);

@@ -6,20 +6,32 @@ services:
     volumes:
       - ./seed-data:/seed-data
     entrypoint:
-      - "sh"
+      - sh
     command:
-      - "/seed-data/seed-data.sh"
+      - ./seed-data/seed-data.sh
     links:
       - mongodb
 
   mongodb:
     image: nexus.informatik.haw-hamburg.de/mongo:3.4.1
     ports:
-      - "27017:27017"
+      - 27017:27017
 
   metadata-svc:
     image: nexus.informatik.haw-hamburg.de/metadata-svc:22434
     ports:
-      - "8080:8080"
+      - 8080:8080
     links:
       - mongodb
+
+  marking-svc-tests:
+    image: nexus.informatik.haw-hamburg.de/microsoft/dotnet:2.0.0-sdk
+    volumes:
+      - ../:/mars-marking-svc
+    entrypoint:
+      - sh
+    command:
+      - ./mars-marking-svc/IntegrationTests/run_tests.sh
+    links:
+      - mongodb
+      - metadata-svc

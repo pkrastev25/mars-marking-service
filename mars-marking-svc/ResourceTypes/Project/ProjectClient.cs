@@ -76,8 +76,7 @@ namespace mars_marking_svc.ResourceTypes.Project
                     new UpdateProjectRequest
                     {
                         ProjectId = projectModel.Id,
-                        // TODO: Change to true, once the unmarking is fixed in the project-svc
-                        ToBeDeleted = ""
+                        ToBeDeleted = "true"
                     }
                 );
             }

@@ -21,8 +21,6 @@ services:
 
   metadata-svc:
     image: nexus.informatik.haw-hamburg.de/metadata-svc:22434
-    environment:
-      - METADATA_SVC_URL=metadata-svc:8080
     links:
       - mongodb
     depends_on:
@@ -32,6 +30,8 @@ services:
 
   marking-svc-tests:
     image: nexus.informatik.haw-hamburg.de/microsoft/dotnet:2.0.0-sdk
+    environment:
+      - METADATA_SVC_URL=metadata-svc:8080
     volumes:
       - ../:/mars-marking-svc
     entrypoint:

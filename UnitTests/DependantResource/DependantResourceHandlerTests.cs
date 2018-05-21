@@ -42,7 +42,6 @@ namespace UnitTests.DependantResource
             var simPlanClient = new Mock<ISimPlanClient>();
             var simRunClient = new Mock<ISimRunClient>();
             var resultDataClient = new Mock<IResultDataClient>();
-            var loggerService = new Mock<ILoggerService>();
             var dependantResourceHandler = new DependantResourceHandler(
                 projectClient.Object,
                 markSessionRepository.Object,
@@ -51,8 +50,7 @@ namespace UnitTests.DependantResource
                 resultConfigClient.Object,
                 simPlanClient.Object,
                 simRunClient.Object,
-                resultDataClient.Object,
-                loggerService.Object
+                resultDataClient.Object
             );
 
             // Act
@@ -76,7 +74,6 @@ namespace UnitTests.DependantResource
             var simPlanClient = new Mock<ISimPlanClient>();
             var simRunClient = new Mock<ISimRunClient>();
             var resultDataClient = new Mock<IResultDataClient>();
-            var loggerService = new Mock<ILoggerService>();
             var dependantResourceHandler = new DependantResourceHandler(
                 projectClient.Object,
                 markSessionRepository.Object,
@@ -85,8 +82,7 @@ namespace UnitTests.DependantResource
                 resultConfigClient.Object,
                 simPlanClient.Object,
                 simRunClient.Object,
-                resultDataClient.Object,
-                loggerService.Object
+                resultDataClient.Object
             );
 
             // Act

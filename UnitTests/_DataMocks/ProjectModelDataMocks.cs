@@ -6,11 +6,10 @@ namespace UnitTests._DataMocks
     {
         public static ProjectModel MockMarkedProjectModel()
         {
-            return new ProjectModel
-            {
-                Id = "be1cabd5-c121-49a0-9860-824419efb39a",
-                ToBeDeleted = true
-            };
+            return new ProjectModel(
+                "be1cabd5-c121-49a0-9860-824419efb39a",
+                true
+            );
         }
     }
 }

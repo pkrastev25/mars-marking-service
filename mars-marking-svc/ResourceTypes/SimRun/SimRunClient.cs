@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using mars_marking_svc.Exceptions;
@@ -12,16 +13,16 @@ namespace mars_marking_svc.ResourceTypes.SimRun
 {
     public class SimRunClient : ISimRunClient
     {
+        private readonly string _baseUrl;
         private readonly IHttpService _httpService;
-        private readonly ILoggerService _loggerService;
 
         public SimRunClient(
-            IHttpService httpService,
-            ILoggerService loggerService
+            IHttpService httpService
         )
         {
+            var baseUrl = Environment.GetEnvironmentVariable(Constants.Constants.SimRunnerSvcUrlKey);
+            _baseUrl = string.IsNullOrEmpty(baseUrl) ? "sim-runner-svc" : baseUrl;
             _httpService = httpService;
-            _loggerService = loggerService;
         }
 
         public async Task<SimRunModel> GetSimRun(
@@ -30,7 +31,7 @@ namespace mars_marking_svc.ResourceTypes.SimRun
         )
         {
             var response = await _httpService.GetAsync(
-                $"http://sim-runner-svc/simrun?simRunId={simRunId}&projectid={projectId}"
+                $"http://{_baseUrl}/simrun?simRunId={simRunId}&projectid={projectId}"
             );
 
             response.ThrowExceptionIfNotSuccessfulResponse(
@@ -51,7 +52,7 @@ namespace mars_marking_svc.ResourceTypes.SimRun
         )
         {
             var response = await _httpService.GetAsync(
-                $"http://sim-runner-svc/simrun?simPlanId={simPlanId}&projectid={projectId}"
+                $"http://{_baseUrl}/simrun?simPlanId={simPlanId}&projectid={projectId}"
             );
 
             response.ThrowExceptionIfNotSuccessfulResponseOrNot404Response(
@@ -74,7 +75,7 @@ namespace mars_marking_svc.ResourceTypes.SimRun
         )
         {
             var response = await _httpService.GetAsync(
-                $"http://sim-runner-svc/simrun?projectid={projectId}"
+                $"http://{_baseUrl}/simrun?projectid={projectId}"
             );
 
             response.ThrowExceptionIfNotSuccessfulResponseOrNot404Response(
@@ -118,20 +119,17 @@ namespace mars_marking_svc.ResourceTypes.SimRun
             var simRunMarkUpdateModel = new SimRunMarkUpdateModel(simRunModel.Id, true);
 
             var response = await _httpService.PutAsync(
-                "http://sim-runner-svc/simrun/marks",
+                $"http://{_baseUrl}/simrun/marks",
                 simRunMarkUpdateModel
             );
 
             switch (response.StatusCode)
             {
                 case HttpStatusCode.OK:
-                    var markedResource = new DependantResourceModel(ResourceTypeEnum.SimRun, simRunModel.Id);
-                    _loggerService.LogMarkEvent(markedResource.ToString());
-
-                    return markedResource;
+                    return new DependantResourceModel(ResourceTypeEnum.SimRun, simRunModel.Id);
                 case HttpStatusCode.Conflict:
                     throw new CannotMarkResourceException(
-                        $"Cannot mark simRun with id: {simRunModel.Id}, projectId: {projectId} it must be in state: {SimRunModel.StatusFinished} or state: {SimRunModel.StatusAborted} beforehand!" +
+                        $"Cannot mark simRun with id: {simRunModel.Id}, projectId: {projectId} it must be in state: {SimRunModel.StatusFinished}, {SimRunModel.StatusAborted} or {SimRunModel.StatusFailed} beforehand!" +
                         await response.IncludeStatusCodeAndMessageFromResponse()
                     );
                 default:
@@ -147,7 +145,7 @@ namespace mars_marking_svc.ResourceTypes.SimRun
             var simRunMarkUpdateModel = new SimRunMarkUpdateModel(dependantResourceModel.ResourceId, false);
 
             var response = await _httpService.PutAsync(
-                "http://sim-runner-svc/simrun/marks",
+                $"http://{_baseUrl}/simrun/marks",
                 simRunMarkUpdateModel
             );
 
@@ -157,8 +155,6 @@ namespace mars_marking_svc.ResourceTypes.SimRun
                     await response.IncludeStatusCodeAndMessageFromResponse()
                 )
             );
-
-            _loggerService.LogUnmarkEvent(dependantResourceModel.ToString());
         }
     }
 }

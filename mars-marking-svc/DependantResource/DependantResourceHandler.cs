@@ -33,7 +33,6 @@ namespace mars_marking_svc.DependantResource
         private readonly ISimPlanClient _simPlanClient;
         private readonly ISimRunClient _simRunClient;
         private readonly IResultDataClient _resultDataClient;
-        private readonly ILoggerService _loggerService;
 
         public DependantResourceHandler(
             IProjectClient projectClient,
@@ -43,8 +42,7 @@ namespace mars_marking_svc.DependantResource
             IResultConfigClient resultConfigClient,
             ISimPlanClient simPlanClient,
             ISimRunClient simRunClient,
-            IResultDataClient resultDataClient,
-            ILoggerService loggerService
+            IResultDataClient resultDataClient
         )
         {
             _projectClient = projectClient;
@@ -55,7 +53,6 @@ namespace mars_marking_svc.DependantResource
             _simPlanClient = simPlanClient;
             _simRunClient = simRunClient;
             _resultDataClient = resultDataClient;
-            _loggerService = loggerService;
         }
 
         public async Task MarkResourcesForMarkSession(
@@ -422,7 +419,6 @@ namespace mars_marking_svc.DependantResource
                     await _scenarioClient.UnmarkScenario(dependantResourceModel);
                     break;
                 case ResourceTypeEnum.ResultConfig:
-                    _loggerService.LogSkipEvent(dependantResourceModel.ToString());
                     break;
                 case ResourceTypeEnum.SimPlan:
                     await _simPlanClient.UnmarkSimPlan(dependantResourceModel, projectId);

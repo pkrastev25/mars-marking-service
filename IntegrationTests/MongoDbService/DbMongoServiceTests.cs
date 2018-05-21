@@ -1,9 +1,9 @@
 ﻿using mars_marking_svc.Services;
 using Xunit;
 
-namespace UnitTests.Services
+namespace IntegrationTests.MongoDbService
 {
-    public class DbMongoServiceTests
+    public class DbMongoServiceTestscs
     {
         [Fact]
         public void GetMarkSessionCollection_ConnectionExists_ReturnsMarkSessionCollection()

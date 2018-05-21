@@ -1,4 +1,5 @@
-﻿using mars_marking_svc.MarkedResource.Models;
+﻿using System;
+using mars_marking_svc.MarkedResource.Models;
 using mars_marking_svc.Services.Models;
 using MongoDB.Driver;
 
@@ -6,7 +7,11 @@ namespace mars_marking_svc.Services
 {
     public class DbMongoService : IDbMongoService
     {
-        public const string MongoDbConnection = "mongodb://mongodb:27017";
+        public static readonly string MongoDbConnection =
+            string.IsNullOrEmpty(Environment.GetEnvironmentVariable(Constants.Constants.MongoDbSvcUrlKey))
+                ? "mongodb://mongodb:27017"
+                : Environment.GetEnvironmentVariable(Constants.Constants.MongoDbSvcUrlKey);
+
         public const string MongoDbHangfireName = "hangfire-marking-svc";
 
         private const string MongoDbMarkingServiceName = "marking-svc";

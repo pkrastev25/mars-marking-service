@@ -26,8 +26,7 @@ namespace UnitTests.ResourceTypes.SimRun
             httpService
                 .Setup(m => m.GetAsync(It.IsAny<string>()))
                 .ReturnsAsync(httpResponseMessage);
-            var loggerService = new Mock<ILoggerService>();
-            var simRunClient = new SimRunClient(httpService.Object, loggerService.Object);
+            var simRunClient = new SimRunClient(httpService.Object);
 
             // Act
             var result = await simRunClient.GetSimRun(It.IsAny<string>(), It.IsAny<string>());
@@ -49,8 +48,7 @@ namespace UnitTests.ResourceTypes.SimRun
             httpService
                 .Setup(m => m.GetAsync(It.IsAny<string>()))
                 .ReturnsAsync(httpResponseMessage);
-            var loggerService = new Mock<ILoggerService>();
-            var simRunClient = new SimRunClient(httpService.Object, loggerService.Object);
+            var simRunClient = new SimRunClient(httpService.Object);
             Exception exception = null;
 
             try
@@ -80,8 +78,7 @@ namespace UnitTests.ResourceTypes.SimRun
             httpService
                 .Setup(m => m.GetAsync(It.IsAny<string>()))
                 .ReturnsAsync(httpResponseMessage);
-            var loggerService = new Mock<ILoggerService>();
-            var simRunClient = new SimRunClient(httpService.Object, loggerService.Object);
+            var simRunClient = new SimRunClient(httpService.Object);
 
             // Act
             var result = await simRunClient.GetSimRunsForSimPlan(It.IsAny<string>(), It.IsAny<string>());
@@ -103,8 +100,7 @@ namespace UnitTests.ResourceTypes.SimRun
             httpService
                 .Setup(m => m.GetAsync(It.IsAny<string>()))
                 .ReturnsAsync(httpResponseMessage);
-            var loggerService = new Mock<ILoggerService>();
-            var simRunClient = new SimRunClient(httpService.Object, loggerService.Object);
+            var simRunClient = new SimRunClient(httpService.Object);
 
             // Act
             var result = await simRunClient.GetSimRunsForSimPlan(It.IsAny<string>(), It.IsAny<string>());
@@ -126,8 +122,7 @@ namespace UnitTests.ResourceTypes.SimRun
             httpService
                 .Setup(m => m.GetAsync(It.IsAny<string>()))
                 .ReturnsAsync(httpResponseMessage);
-            var loggerService = new Mock<ILoggerService>();
-            var simRunClient = new SimRunClient(httpService.Object, loggerService.Object);
+            var simRunClient = new SimRunClient(httpService.Object);
 
             // Act
             var result = await simRunClient.GetSimRunsForProject(It.IsAny<string>());
@@ -149,8 +144,7 @@ namespace UnitTests.ResourceTypes.SimRun
             httpService
                 .Setup(m => m.GetAsync(It.IsAny<string>()))
                 .ReturnsAsync(httpResponseMessage);
-            var loggerService = new Mock<ILoggerService>();
-            var simRunClient = new SimRunClient(httpService.Object, loggerService.Object);
+            var simRunClient = new SimRunClient(httpService.Object);
 
             // Act
             var result = await simRunClient.GetSimRunsForProject(It.IsAny<string>());
@@ -175,8 +169,7 @@ namespace UnitTests.ResourceTypes.SimRun
             httpService
                 .Setup(m => m.PutAsync(It.IsAny<string>(), It.IsAny<SimRunModel>()))
                 .ReturnsAsync(httpResponseMessage);
-            var loggerService = new Mock<ILoggerService>();
-            var simRunClient = new SimRunClient(httpService.Object, loggerService.Object);
+            var simRunClient = new SimRunClient(httpService.Object);
             Exception exception = null;
 
             try
@@ -206,8 +199,7 @@ namespace UnitTests.ResourceTypes.SimRun
             httpService
                 .Setup(m => m.PutAsync(It.IsAny<string>(), It.IsAny<SimRunMarkUpdateModel>()))
                 .ReturnsAsync(httpResponseMessage);
-            var loggerService = new Mock<ILoggerService>();
-            var simRunClient = new SimRunClient(httpService.Object, loggerService.Object);
+            var simRunClient = new SimRunClient(httpService.Object);
 
             // Act
             var result = await simRunClient.MarkSimRun(SimRunModelDataMocks.MockSimRunModel(), It.IsAny<string>());
@@ -229,8 +221,7 @@ namespace UnitTests.ResourceTypes.SimRun
             httpService
                 .Setup(m => m.PutAsync(It.IsAny<string>(), It.IsAny<SimRunMarkUpdateModel>()))
                 .ReturnsAsync(httpResponseMessage);
-            var loggerService = new Mock<ILoggerService>();
-            var simRunClient = new SimRunClient(httpService.Object, loggerService.Object);
+            var simRunClient = new SimRunClient(httpService.Object);
             Exception exception = null;
 
             try
@@ -260,8 +251,7 @@ namespace UnitTests.ResourceTypes.SimRun
             httpService
                 .Setup(m => m.PutAsync(It.IsAny<string>(), It.IsAny<SimRunMarkUpdateModel>()))
                 .ReturnsAsync(httpResponseMessage);
-            var loggerService = new Mock<ILoggerService>();
-            var simRunClient = new SimRunClient(httpService.Object, loggerService.Object);
+            var simRunClient = new SimRunClient(httpService.Object);
             Exception exception = null;
 
             try

@@ -16,7 +16,11 @@ namespace mars_marking_svc.ResourceTypes.Project
 
         public ProjectClient()
         {
-            _channel = new Channel("project-svc:80", ChannelCredentials.Insecure);
+            var baseUrl =
+                string.IsNullOrEmpty(Environment.GetEnvironmentVariable(Constants.Constants.ProjectSvcUrlKey))
+                    ? "project-svc:80"
+                    : Environment.GetEnvironmentVariable(Constants.Constants.ProjectSvcUrlKey);
+            _channel = new Channel(baseUrl, ChannelCredentials.Insecure);
             _projectServiceClient = new ProjectService.ProjectServiceClient(_channel);
         }
 
@@ -43,11 +47,17 @@ namespace mars_marking_svc.ResourceTypes.Project
                 );
             }
 
-            return new ProjectModel
+            if (project == null)
             {
-                Id = projectId,
-                ToBeDeleted = project.ToBeDeleted
-            };
+                throw new FailedToGetResourceException(
+                    $"Failed to get project for id: {projectId} from project-svc!"
+                );
+            }
+
+            return new ProjectModel(
+                projectId,
+                project.ToBeDeleted
+            );
         }
 
         public async Task<DependantResourceModel> MarkProject(

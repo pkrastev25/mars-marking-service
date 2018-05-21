@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using mars_marking_svc.Exceptions;
@@ -12,16 +13,16 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
 {
     public class SimPlanClient : ISimPlanClient
     {
+        private readonly string _baseUrl;
         private readonly IHttpService _httpService;
-        private readonly ILoggerService _loggerService;
 
         public SimPlanClient(
-            IHttpService httpService,
-            ILoggerService loggerService
+            IHttpService httpService
         )
         {
+            var baseUrl = Environment.GetEnvironmentVariable(Constants.Constants.SimRunnerSvcUrlKey);
+            _baseUrl = string.IsNullOrEmpty(baseUrl) ? "sim-runner-svc" : baseUrl;
             _httpService = httpService;
-            _loggerService = loggerService;
         }
 
         public async Task<SimPlanModel> GetSimPlan(
@@ -30,7 +31,7 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
         )
         {
             var response = await _httpService.GetAsync(
-                $"http://sim-runner-svc/simplan?id={simPlanId}&projectid={projectId}"
+                $"http://{_baseUrl}/simplan?id={simPlanId}&projectid={projectId}"
             );
 
             response.ThrowExceptionIfNotSuccessfulResponse(
@@ -51,7 +52,7 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
         )
         {
             var response = await _httpService.GetAsync(
-                $"http://sim-runner-svc/simplan?scenarioid={scenarioId}&projectid={projectId}"
+                $"http://{_baseUrl}/simplan?scenarioid={scenarioId}&projectid={projectId}"
             );
 
             response.ThrowExceptionIfNotSuccessfulResponseOrNot404Response(
@@ -75,7 +76,7 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
         )
         {
             var response = await _httpService.GetAsync(
-                $"http://sim-runner-svc/simplan?resultconfigid={resultConfigId}&projectid={projectId}"
+                $"http://{_baseUrl}/simplan?resultconfigid={resultConfigId}&projectid={projectId}"
             );
 
             response.ThrowExceptionIfNotSuccessfulResponseOrNot404Response(
@@ -98,7 +99,7 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
         )
         {
             var response = await _httpService.GetAsync(
-                $"http://sim-runner-svc/simplan?projectid={projectId}"
+                $"http://{_baseUrl}/simplan?projectid={projectId}"
             );
 
             response.ThrowExceptionIfNotSuccessfulResponseOrNot404Response(
@@ -142,7 +143,7 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
             simPlanModel.ToBeDeleted = true;
 
             var response = await _httpService.PutAsync(
-                $"http://sim-runner-svc/simplan?id={simPlanModel.Id}&projectid={projectId}",
+                $"http://{_baseUrl}/simplan?id={simPlanModel.Id}&projectid={projectId}",
                 simPlanModel
             );
 
@@ -153,10 +154,10 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
                 )
             );
 
-            var markedResource = new DependantResourceModel(ResourceTypeEnum.SimPlan, simPlanModel.Id);
-            _loggerService.LogMarkEvent(markedResource.ToString());
-
-            return markedResource;
+            return new DependantResourceModel(
+                ResourceTypeEnum.SimPlan,
+                simPlanModel.Id
+            );
         }
 
         public async Task UnmarkSimPlan(
@@ -170,7 +171,7 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
                 simPlanModel.ToBeDeleted = false;
 
                 var response = await _httpService.PutAsync(
-                    $"http://sim-runner-svc/simplan?id={simPlanModel.Id}&projectid={projectId}",
+                    $"http://{_baseUrl}/simplan?id={simPlanModel.Id}&projectid={projectId}",
                     simPlanModel
                 );
 
@@ -181,8 +182,6 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
                     )
                 );
             }
-
-            _loggerService.LogUnmarkEvent(dependantResourceModel.ToString());
         }
 
         private async Task<bool> DoesSimPlanExist(
@@ -191,7 +190,7 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
         )
         {
             var response = await _httpService.GetAsync(
-                $"http://sim-runner-svc/simplan?id={simPlanId}&projectid={projectId}"
+                $"http://{_baseUrl}/simplan?id={simPlanId}&projectid={projectId}"
             );
 
             if (response.IsSuccessStatusCode)

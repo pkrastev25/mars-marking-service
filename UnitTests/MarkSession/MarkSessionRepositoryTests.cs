@@ -34,8 +34,7 @@ namespace UnitTests.MarkSession
             dbMongoService
                 .Setup(m => m.GetMarkSessionCollection())
                 .Returns(markSessionCollection.Object);
-            var loggerService = new Mock<ILoggerService>();
-            var markSessionRepository = new MarkSessionRepository(dbMongoService.Object, loggerService.Object);
+            var markSessionRepository = new MarkSessionRepository(dbMongoService.Object);
             Exception exception = null;
 
             try
@@ -78,8 +77,7 @@ namespace UnitTests.MarkSession
             dbMongoService
                 .Setup(m => m.GetMarkSessionCollection())
                 .Returns(markSessionCollection.Object);
-            var loggerService = new Mock<ILoggerService>();
-            var markSessionRepository = new MarkSessionRepository(dbMongoService.Object, loggerService.Object);
+            var markSessionRepository = new MarkSessionRepository(dbMongoService.Object);
             Exception exception = null;
 
             try
@@ -113,8 +111,7 @@ namespace UnitTests.MarkSession
             dbMongoService
                 .Setup(m => m.GetMarkSessionCollection())
                 .Returns(markSessionCollection.Object);
-            var loggerService = new Mock<ILoggerService>();
-            var markSessionRepository = new MarkSessionRepository(dbMongoService.Object, loggerService.Object);
+            var markSessionRepository = new MarkSessionRepository(dbMongoService.Object);
 
             // Act
             var result = await markSessionRepository.GetForFilter(markSessionFilterDefinition.Object);
@@ -139,8 +136,7 @@ namespace UnitTests.MarkSession
             dbMongoService
                 .Setup(m => m.GetMarkSessionCollection())
                 .Returns(markSessionCollection.Object);
-            var loggerService = new Mock<ILoggerService>();
-            var markSessionRepository = new MarkSessionRepository(dbMongoService.Object, loggerService.Object);
+            var markSessionRepository = new MarkSessionRepository(dbMongoService.Object);
 
             // Act
             var result = await markSessionRepository.GetAll();
@@ -166,8 +162,7 @@ namespace UnitTests.MarkSession
             dbMongoService
                 .Setup(m => m.GetMarkSessionCollection())
                 .Returns(markSessionCollection.Object);
-            var loggerService = new Mock<ILoggerService>();
-            var markSessionRepository = new MarkSessionRepository(dbMongoService.Object, loggerService.Object);
+            var markSessionRepository = new MarkSessionRepository(dbMongoService.Object);
             Exception exception = null;
 
             try
@@ -190,8 +185,7 @@ namespace UnitTests.MarkSession
             // Arrange
             var markSessionModel = MarkSessionModelDataMocks.MockMarkSessionModel();
             var dbMongoService = new Mock<IDbMongoService>();
-            var loggerService = new Mock<ILoggerService>();
-            var markSessionRepository = new MarkSessionRepository(dbMongoService.Object, loggerService.Object);
+            var markSessionRepository = new MarkSessionRepository(dbMongoService.Object);
             Exception exception = null;
 
             try
@@ -225,8 +219,7 @@ namespace UnitTests.MarkSession
             dbMongoService
                 .Setup(m => m.GetMarkSessionCollection())
                 .Returns(markSessionCollection.Object);
-            var loggerService = new Mock<ILoggerService>();
-            var markSessionRepository = new MarkSessionRepository(dbMongoService.Object, loggerService.Object);
+            var markSessionRepository = new MarkSessionRepository(dbMongoService.Object);
             Exception exception = null;
 
             try

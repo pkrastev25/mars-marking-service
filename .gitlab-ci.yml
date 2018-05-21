@@ -51,6 +51,8 @@ integrationTests:
   when: manual
   stage: integrationTests
   image: ${DOCKER_REGISTRY}/marking-svc-test-env
+  services:
+    - ${DOCKER_REGISTRY}/docker:stable-dind
   tags:
     - k8s
   script:
@@ -61,6 +63,8 @@ integrationTests:
 deploy:
   stage: deploy
   image: ${DOCKER_REGISTRY}/docker:stable-dind
+  services:
+    - ${DOCKER_REGISTRY}/docker:stable-dind
   tags:
     - k8s
   only:

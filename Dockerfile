@@ -1,6 +1,6 @@
 FROM nexus.informatik.haw-hamburg.de/microsoft/aspnetcore:2.0
 
-# Reflection service API runs on port 8080.
+# Marking service API runs on port 8080.
 EXPOSE 8080
 
 # Copy the sources into the Docker container.

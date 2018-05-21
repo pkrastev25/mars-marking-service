@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using mars_marking_svc.Exceptions;
@@ -12,16 +13,16 @@ namespace mars_marking_svc.ResourceTypes.ResultConfig
 {
     public class ResultConfigClient : IResultConfigClient
     {
+        private readonly string _baseUrl;
         private readonly IHttpService _httpService;
-        private readonly ILoggerService _loggerService;
 
         public ResultConfigClient(
-            IHttpService httpService,
-            ILoggerService loggerService
+            IHttpService httpService
         )
         {
+            var baseUrl = Environment.GetEnvironmentVariable(Constants.Constants.ResultConfigSvcUrlKey);
+            _baseUrl = string.IsNullOrEmpty(baseUrl) ? "resultcfg-svc" : baseUrl;
             _httpService = httpService;
-            _loggerService = loggerService;
         }
 
         public async Task<ResultConfigModel> GetResultConfig(
@@ -29,7 +30,7 @@ namespace mars_marking_svc.ResourceTypes.ResultConfig
         )
         {
             var response = await _httpService.GetAsync(
-                $"http://resultcfg-svc/api/ResultConfigs/{resultConfigId}"
+                $"http://{_baseUrl}/api/ResultConfigs/{resultConfigId}"
             );
 
             response.ThrowExceptionIfNotSuccessfulResponse(
@@ -49,7 +50,7 @@ namespace mars_marking_svc.ResourceTypes.ResultConfig
         )
         {
             var response = await _httpService.GetAsync(
-                $"http://resultcfg-svc/api/ResultConfigs?modelDataId={metadataId}"
+                $"http://{_baseUrl}/api/ResultConfigs?modelDataId={metadataId}"
             );
 
             response.ThrowExceptionIfNotSuccessfulResponseOrNot404Response(
@@ -84,14 +85,10 @@ namespace mars_marking_svc.ResourceTypes.ResultConfig
             ResultConfigModel resultConfigModel
         )
         {
-            return await Task.Run(() =>
-            {
-                var markedResource =
-                    new DependantResourceModel(ResourceTypeEnum.ResultConfig, resultConfigModel.ConfigId);
-                _loggerService.LogSkipEvent(markedResource.ToString());
-
-                return markedResource;
-            });
+            return await Task.Run(() => new DependantResourceModel(
+                ResourceTypeEnum.ResultConfig,
+                resultConfigModel.ConfigId
+            ));
         }
     }
 }

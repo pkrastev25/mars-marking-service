@@ -1,6 +1,4 @@
-﻿using mars_marking_svc.MarkedResource.Models;
-using mars_marking_svc.Services;
-using MongoDB.Driver;
+﻿using mars_marking_svc.Services;
 using Xunit;
 
 namespace UnitTests.Services
@@ -16,7 +14,7 @@ namespace UnitTests.Services
             var result = dbMongoService.GetMarkSessionCollection();
 
             // Assert
-            Assert.True(result is IMongoCollection<MarkSessionModel>);
+            Assert.NotNull(result);
         }
     }
 }

@@ -48,7 +48,6 @@ namespace mars_marking_svc.ResourceTypes.MarkedResource
 
                 markSessionModel.State = MarkSessionModel.StateDone;
                 await _markSessionRepository.Update(markSessionModel);
-                _loggerService.LogUpdateEvent(markSessionModel.ToString());
             }
             catch (Exception e)
             {
@@ -108,8 +107,8 @@ namespace mars_marking_svc.ResourceTypes.MarkedResource
         )
         {
             var markSessionModel = await FindMarkSessionById(markSessionId);
-            markSessionModel.SourceDependency = null;
             markSessionModel.DependantResources = new List<DependantResourceModel>();
+            await _dependantResourceHandler.UnmarkResourcesForMarkSession(markSessionModel);
 
             await _markSessionRepository.Delete(markSessionModel);
         }
@@ -131,11 +130,9 @@ namespace mars_marking_svc.ResourceTypes.MarkedResource
 
                     markSessionModel.State = MarkSessionModel.StateAborting;
                     await _markSessionRepository.Update(markSessionModel);
-                    _loggerService.LogUpdateEvent(markSessionModel.ToString());
-
                     await _dependantResourceHandler.UnmarkResourcesForMarkSession(markSessionModel);
-
                     await _markSessionRepository.Delete(markSessionModel);
+
                     isMarkSessionDeleted = true;
                 }
                 catch (MarkSessionDoesNotExistException)

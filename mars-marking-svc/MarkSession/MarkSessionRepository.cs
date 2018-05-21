@@ -9,15 +9,12 @@ using MongoDB.Driver;
 public class MarkSessionRepository : IMarkSessionRepository
 {
     private readonly IDbMongoService _dbMongoService;
-    private readonly ILoggerService _loggerService;
 
     public MarkSessionRepository(
-        IDbMongoService dbMongoService,
-        ILoggerService loggerService
+        IDbMongoService dbMongoService
     )
     {
         _dbMongoService = dbMongoService;
-        _loggerService = loggerService;
     }
 
     public async Task Create(
@@ -28,7 +25,6 @@ public class MarkSessionRepository : IMarkSessionRepository
         {
             await EnsureUniqueFieldForMarkSession(MarkSessionModel.BsonElementDefinitionResourceId);
             await _dbMongoService.GetMarkSessionCollection().InsertOneAsync(markSessionModel);
-            _loggerService.LodCreateEvent(markSessionModel.ToString());
         }
         catch (MongoWriteException e)
         {
@@ -113,7 +109,6 @@ public class MarkSessionRepository : IMarkSessionRepository
         await _dbMongoService.GetMarkSessionCollection().DeleteOneAsync(
             GetFilterDefinitionForResourceId(markSessionModel.ResourceId)
         );
-        _loggerService.LogDeleteEvent(markSessionModel.ToString());
     }
 
     private FilterDefinition<MarkSessionModel> GetFilterDefinitionForResourceId(

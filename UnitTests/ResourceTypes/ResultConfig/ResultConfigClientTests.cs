@@ -25,8 +25,7 @@ namespace UnitTests.ResourceTypes.ResultConfig
             httpService
                 .Setup(m => m.GetAsync(It.IsAny<string>()))
                 .ReturnsAsync(httpResponseMessage);
-            var loggerService = new Mock<ILoggerService>();
-            var resultConfigClient = new ResultConfigClient(httpService.Object, loggerService.Object);
+            var resultConfigClient = new ResultConfigClient(httpService.Object);
 
             // Act
             var result = await resultConfigClient.GetResultConfig(It.IsAny<string>());
@@ -48,8 +47,7 @@ namespace UnitTests.ResourceTypes.ResultConfig
             httpService
                 .Setup(m => m.GetAsync(It.IsAny<string>()))
                 .ReturnsAsync(httpResponseMessage);
-            var loggerService = new Mock<ILoggerService>();
-            var resultConfigClient = new ResultConfigClient(httpService.Object, loggerService.Object);
+            var resultConfigClient = new ResultConfigClient(httpService.Object);
             Exception exception = null;
 
             try
@@ -79,8 +77,7 @@ namespace UnitTests.ResourceTypes.ResultConfig
             httpService
                 .Setup(m => m.GetAsync(It.IsAny<string>()))
                 .ReturnsAsync(httpResponseMessage);
-            var loggerService = new Mock<ILoggerService>();
-            var resultConfigClient = new ResultConfigClient(httpService.Object, loggerService.Object);
+            var resultConfigClient = new ResultConfigClient(httpService.Object);
 
             // Act
             var result = await resultConfigClient.GetResultConfigsForMetadata(It.IsAny<string>());
@@ -102,8 +99,7 @@ namespace UnitTests.ResourceTypes.ResultConfig
             httpService
                 .Setup(m => m.GetAsync(It.IsAny<string>()))
                 .ReturnsAsync(httpResponseMessage);
-            var loggerService = new Mock<ILoggerService>();
-            var resultConfigClient = new ResultConfigClient(httpService.Object, loggerService.Object);
+            var resultConfigClient = new ResultConfigClient(httpService.Object);
 
             // Act
             var result = await resultConfigClient.GetResultConfigsForMetadata(It.IsAny<string>());
@@ -125,8 +121,7 @@ namespace UnitTests.ResourceTypes.ResultConfig
             httpService
                 .Setup(m => m.GetAsync(It.IsAny<string>()))
                 .ReturnsAsync(httpResponseMessage);
-            var loggerService = new Mock<ILoggerService>();
-            var resultConfigClient = new ResultConfigClient(httpService.Object, loggerService.Object);
+            var resultConfigClient = new ResultConfigClient(httpService.Object);
 
             // Act
             var result = await resultConfigClient.CreateDependantResultConfigResource(It.IsAny<string>());
@@ -151,8 +146,7 @@ namespace UnitTests.ResourceTypes.ResultConfig
             httpService
                 .Setup(m => m.PutAsync(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(httpResponseMessage);
-            var loggerService = new Mock<ILoggerService>();
-            var resultConfigClient = new ResultConfigClient(httpService.Object, loggerService.Object);
+            var resultConfigClient = new ResultConfigClient(httpService.Object);
 
             // Act
             var result = await resultConfigClient.CreateDependantResultConfigResource(

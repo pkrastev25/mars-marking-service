@@ -26,8 +26,7 @@ namespace UnitTests.ResourceTypes.Scenario
             httpService
                 .Setup(m => m.GetAsync(It.IsAny<string>()))
                 .ReturnsAsync(httpResponseMessage);
-            var loggerService = new Mock<ILoggerService>();
-            var scenarioClient = new ScenarioClient(httpService.Object, loggerService.Object);
+            var scenarioClient = new ScenarioClient(httpService.Object);
 
             // Act
             var result = await scenarioClient.GetScenario(It.IsAny<string>());
@@ -49,8 +48,7 @@ namespace UnitTests.ResourceTypes.Scenario
             httpService
                 .Setup(m => m.GetAsync(It.IsAny<string>()))
                 .ReturnsAsync(httpResponseMessage);
-            var loggerService = new Mock<ILoggerService>();
-            var scenarioClient = new ScenarioClient(httpService.Object, loggerService.Object);
+            var scenarioClient = new ScenarioClient(httpService.Object);
             Exception exception = null;
 
             try
@@ -80,8 +78,7 @@ namespace UnitTests.ResourceTypes.Scenario
             httpService
                 .Setup(m => m.GetAsync(It.IsAny<string>()))
                 .ReturnsAsync(httpResponseMessage);
-            var loggerService = new Mock<ILoggerService>();
-            var scenarioClient = new ScenarioClient(httpService.Object, loggerService.Object);
+            var scenarioClient = new ScenarioClient(httpService.Object);
 
             // Act
             var result = await scenarioClient.GetScenariosForMetadata(It.IsAny<string>());
@@ -103,8 +100,7 @@ namespace UnitTests.ResourceTypes.Scenario
             httpService
                 .Setup(m => m.GetAsync(It.IsAny<string>()))
                 .ReturnsAsync(httpResponseMessage);
-            var loggerService = new Mock<ILoggerService>();
-            var scenarioClient = new ScenarioClient(httpService.Object, loggerService.Object);
+            var scenarioClient = new ScenarioClient(httpService.Object);
 
             // Act
             var result = await scenarioClient.GetScenariosForMetadata(It.IsAny<string>());
@@ -126,8 +122,7 @@ namespace UnitTests.ResourceTypes.Scenario
             httpService
                 .Setup(m => m.GetAsync(It.IsAny<string>()))
                 .ReturnsAsync(httpResponseMessage);
-            var loggerService = new Mock<ILoggerService>();
-            var scenarioClient = new ScenarioClient(httpService.Object, loggerService.Object);
+            var scenarioClient = new ScenarioClient(httpService.Object);
 
             // Act
             var result = await scenarioClient.GetScenariosForProject(It.IsAny<string>());
@@ -149,8 +144,7 @@ namespace UnitTests.ResourceTypes.Scenario
             httpService
                 .Setup(m => m.GetAsync(It.IsAny<string>()))
                 .ReturnsAsync(httpResponseMessage);
-            var loggerService = new Mock<ILoggerService>();
-            var scenarioClient = new ScenarioClient(httpService.Object, loggerService.Object);
+            var scenarioClient = new ScenarioClient(httpService.Object);
 
             // Act
             var result = await scenarioClient.GetScenariosForProject(It.IsAny<string>());
@@ -172,8 +166,7 @@ namespace UnitTests.ResourceTypes.Scenario
             httpService
                 .Setup(m => m.GetAsync(It.IsAny<string>()))
                 .ReturnsAsync(httpResponseMessage);
-            var loggerService = new Mock<ILoggerService>();
-            var scenarioClient = new ScenarioClient(httpService.Object, loggerService.Object);
+            var scenarioClient = new ScenarioClient(httpService.Object);
             Exception exception = null;
 
             try
@@ -203,8 +196,7 @@ namespace UnitTests.ResourceTypes.Scenario
             httpService
                 .Setup(m => m.PatchAsync(It.IsAny<string>(), It.IsAny<ScenarioModel>()))
                 .ReturnsAsync(httpResponseMessage);
-            var loggerService = new Mock<ILoggerService>();
-            var scenarioClient = new ScenarioClient(httpService.Object, loggerService.Object);
+            var scenarioClient = new ScenarioClient(httpService.Object);
 
             // Act
             var result = await scenarioClient.MarkScenario(ScenarioModelDataMocks.MockScenarioModel());
@@ -226,8 +218,7 @@ namespace UnitTests.ResourceTypes.Scenario
             httpService
                 .Setup(m => m.PatchAsync(It.IsAny<string>(), It.IsAny<ScenarioModel>()))
                 .ReturnsAsync(httpResponseMessage);
-            var loggerService = new Mock<ILoggerService>();
-            var scenarioClient = new ScenarioClient(httpService.Object, loggerService.Object);
+            var scenarioClient = new ScenarioClient(httpService.Object);
             Exception exception = null;
 
             try
@@ -257,8 +248,7 @@ namespace UnitTests.ResourceTypes.Scenario
             httpService
                 .Setup(m => m.PatchAsync(It.IsAny<string>(), It.IsAny<ScenarioModel>()))
                 .ReturnsAsync(httpResponseMessage);
-            var loggerService = new Mock<ILoggerService>();
-            var scenarioClient = new ScenarioClient(httpService.Object, loggerService.Object);
+            var scenarioClient = new ScenarioClient(httpService.Object);
             Exception exception = null;
 
             try

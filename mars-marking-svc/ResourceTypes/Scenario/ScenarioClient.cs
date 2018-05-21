@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using mars_marking_svc.Exceptions;
 using mars_marking_svc.MarkedResource.Models;
@@ -11,16 +12,16 @@ namespace mars_marking_svc.ResourceTypes.Scenario
 {
     public class ScenarioClient : IScenarioClient
     {
+        private readonly string _baseUrl;
         private readonly IHttpService _httpService;
-        private readonly ILoggerService _loggerService;
 
         public ScenarioClient(
-            IHttpService httpService,
-            ILoggerService loggerService
+            IHttpService httpService
         )
         {
+            var baseUrl = Environment.GetEnvironmentVariable(Constants.Constants.ScenarioSvcUrlKey);
+            _baseUrl = string.IsNullOrEmpty(baseUrl) ? "scenario-svc" : baseUrl;
             _httpService = httpService;
-            _loggerService = loggerService;
         }
 
         public async Task<ScenarioModel> GetScenario(
@@ -28,7 +29,7 @@ namespace mars_marking_svc.ResourceTypes.Scenario
         )
         {
             var response = await _httpService.GetAsync(
-                $"http://scenario-svc/scenarios/{scenarioId}"
+                $"http://{_baseUrl}/scenarios/{scenarioId}"
             );
 
             response.ThrowExceptionIfNotSuccessfulResponse(
@@ -46,7 +47,7 @@ namespace mars_marking_svc.ResourceTypes.Scenario
         )
         {
             var response = await _httpService.GetAsync(
-                $"http://scenario-svc/scenarios?DataId={metadataId}"
+                $"http://{_baseUrl}/scenarios?DataId={metadataId}"
             );
 
             response.ThrowExceptionIfNotSuccessfulResponseOrNot404Response(
@@ -69,7 +70,7 @@ namespace mars_marking_svc.ResourceTypes.Scenario
         )
         {
             var response = await _httpService.GetAsync(
-                $"http://scenario-svc/scenarios?Project={projectId}"
+                $"http://{_baseUrl}/scenarios?Project={projectId}"
             );
 
             response.ThrowExceptionIfNotSuccessfulResponseOrNot404Response(
@@ -112,7 +113,7 @@ namespace mars_marking_svc.ResourceTypes.Scenario
             scenarioModel.ReadOnly = true;
 
             var response = await _httpService.PatchAsync(
-                $"http://scenario-svc/scenarios/{scenarioModel.ScenarioId}/metadata",
+                $"http://{_baseUrl}/scenarios/{scenarioModel.ScenarioId}/metadata",
                 scenarioModel
             );
 
@@ -123,10 +124,10 @@ namespace mars_marking_svc.ResourceTypes.Scenario
                 )
             );
 
-            var markedResource = new DependantResourceModel(ResourceTypeEnum.Scenario, scenarioModel.ScenarioId);
-            _loggerService.LogMarkEvent(markedResource.ToString());
-
-            return markedResource;
+            return new DependantResourceModel(
+                ResourceTypeEnum.Scenario,
+                scenarioModel.ScenarioId
+            );
         }
 
         public async Task UnmarkScenario(
@@ -141,7 +142,7 @@ namespace mars_marking_svc.ResourceTypes.Scenario
             };
 
             var response = await _httpService.PatchAsync(
-                $"http://scenario-svc/scenarios/{scenarioModel.ScenarioId}/metadata",
+                $"http://{_baseUrl}/scenarios/{scenarioModel.ScenarioId}/metadata",
                 scenarioModel
             );
 
@@ -151,8 +152,6 @@ namespace mars_marking_svc.ResourceTypes.Scenario
                     await response.IncludeStatusCodeAndMessageFromResponse()
                 )
             );
-
-            _loggerService.LogUnmarkEvent(dependantResourceModel.ToString());
         }
     }
 }

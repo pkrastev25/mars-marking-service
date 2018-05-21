@@ -9,5 +9,12 @@ namespace mars_marking_svc.Exceptions
         ) : base(message)
         {
         }
+
+        public FailedToGetResourceException(
+            string message,
+            Exception exception
+        ) : base(message, exception)
+        {
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Threading.Tasks;
 using mars_marking_svc.Exceptions;
 using mars_marking_svc.MarkedResource.Models;
@@ -11,16 +12,16 @@ namespace mars_marking_svc.ResourceTypes.ResultData
 {
     public class ResultDataClient : IResultDataClient
     {
+        private readonly string _baseUrl;
         private readonly IHttpService _httpService;
-        private readonly ILoggerService _loggerService;
 
         public ResultDataClient(
-            IHttpService httpService,
-            ILoggerService loggerService
+            IHttpService httpService
         )
         {
+            var baseUrl = Environment.GetEnvironmentVariable(Constants.Constants.DatabaseUtilitySvcUrlKey);
+            _baseUrl = string.IsNullOrEmpty(baseUrl) ? "database-utility-svc:8090" : baseUrl;
             _httpService = httpService;
-            _loggerService = loggerService;
         }
 
         public async Task<DependantResourceModel> MarkResultData(
@@ -28,17 +29,14 @@ namespace mars_marking_svc.ResourceTypes.ResultData
         )
         {
             var response = await _httpService.PostAsync(
-                $"http://database-utility-svc:8090/resultData/mongodb-result/{resultDataId}/marks",
+                $"http://{_baseUrl}/resultData/mongodb-result/{resultDataId}/marks",
                 ""
             );
 
             switch (response.StatusCode)
             {
                 case HttpStatusCode.OK:
-                    var markedResources = new DependantResourceModel(ResourceTypeEnum.ResultData, resultDataId);
-                    _loggerService.LogMarkEvent(markedResources.ToString());
-
-                    return markedResources;
+                    return new DependantResourceModel(ResourceTypeEnum.ResultData, resultDataId);
                 case HttpStatusCode.Conflict:
                     throw new ResourceAlreadyMarkedException(
                         $"Cannot mark resultData with id: {resultDataId}, it is already marked!"
@@ -61,7 +59,7 @@ namespace mars_marking_svc.ResourceTypes.ResultData
         public async Task UnmarkResultData(DependantResourceModel dependantResourceModel)
         {
             var response = await _httpService.DeleteAsync(
-                $"http://database-utility-svc:8090/resultData/mongodb-result/{dependantResourceModel.ResourceId}/marks"
+                $"http://{_baseUrl}/resultData/mongodb-result/{dependantResourceModel.ResourceId}/marks"
             );
 
             response.ThrowExceptionIfNotSuccessfulResponseOrNot404Response(
@@ -70,8 +68,6 @@ namespace mars_marking_svc.ResourceTypes.ResultData
                     await response.IncludeStatusCodeAndMessageFromResponse()
                 )
             );
-
-            _loggerService.LogUnmarkEvent(dependantResourceModel.ToString());
         }
     }
 }

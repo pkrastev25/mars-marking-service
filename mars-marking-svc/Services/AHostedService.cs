@@ -4,9 +4,6 @@ using Microsoft.Extensions.Hosting;
 
 namespace mars_marking_svc.Services
 {
-    /// <summary>
-    /// Based on https://www.stevejgordon.co.uk/asp-net-core-2-ihostedservice
-    /// </summary>
     public abstract class AHostedService : IHostedService
     {
         private Task _executingTask;

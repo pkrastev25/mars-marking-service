@@ -3,6 +3,7 @@ using mars_marking_svc.DependantResource;
 using mars_marking_svc.MarkedResource.Models;
 using mars_marking_svc.ResourceTypes.Metadata.Interfaces;
 using mars_marking_svc.ResourceTypes.Metadata.Models;
+using mars_marking_svc.ResourceTypes.Project.Interfaces;
 using mars_marking_svc.ResourceTypes.ResultConfig.Interfaces;
 using mars_marking_svc.ResourceTypes.ResultConfig.Models;
 using mars_marking_svc.ResourceTypes.ResultData.Interfaces;
@@ -25,6 +26,7 @@ namespace UnitTests.DependantResource
             var emptyMarkSessionModel = MarkSessionModelDataMocks.MockMarkSessionModel();
             emptyMarkSessionModel.DependantResources = new List<DependantResourceModel>();
             var markSessionRepository = new Mock<IMarkSessionRepository>();
+            var projectClient = new Mock<IProjectClient>();
             var metadataClient = new Mock<IMetadataClient>();
             metadataClient
                 .Setup(m => m.GetMetadataForProject(It.IsAny<string>()))
@@ -40,16 +42,15 @@ namespace UnitTests.DependantResource
             var simPlanClient = new Mock<ISimPlanClient>();
             var simRunClient = new Mock<ISimRunClient>();
             var resultDataClient = new Mock<IResultDataClient>();
-            var loggerService = new Mock<ILoggerService>();
             var dependantResourceHandler = new DependantResourceHandler(
+                projectClient.Object,
                 markSessionRepository.Object,
                 metadataClient.Object,
                 scenarioClient.Object,
                 resultConfigClient.Object,
                 simPlanClient.Object,
                 simRunClient.Object,
-                resultDataClient.Object,
-                loggerService.Object
+                resultDataClient.Object
             );
 
             // Act
@@ -66,22 +67,22 @@ namespace UnitTests.DependantResource
             // Arrange
             var markSessionModel = MarkSessionModelDataMocks.MockMarkSessionModel();
             var markSessionRepository = new Mock<IMarkSessionRepository>();
+            var projectClient = new Mock<IProjectClient>();
             var metadataClient = new Mock<IMetadataClient>();
             var scenarioClient = new Mock<IScenarioClient>();
             var resultConfigClient = new Mock<IResultConfigClient>();
             var simPlanClient = new Mock<ISimPlanClient>();
             var simRunClient = new Mock<ISimRunClient>();
             var resultDataClient = new Mock<IResultDataClient>();
-            var loggerService = new Mock<ILoggerService>();
             var dependantResourceHandler = new DependantResourceHandler(
+                projectClient.Object,
                 markSessionRepository.Object,
                 metadataClient.Object,
                 scenarioClient.Object,
                 resultConfigClient.Object,
                 simPlanClient.Object,
                 simRunClient.Object,
-                resultDataClient.Object,
-                loggerService.Object
+                resultDataClient.Object
             );
 
             // Act

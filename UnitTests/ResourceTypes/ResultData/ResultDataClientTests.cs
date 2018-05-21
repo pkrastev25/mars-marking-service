@@ -25,8 +25,7 @@ namespace UnitTests.ResourceTypes.ResultData
             httpService
                 .Setup(m => m.PostAsync(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(httpResponseMessage);
-            var loggerService = new Mock<ILoggerService>();
-            var resultDataClient = new ResultDataClient(httpService.Object, loggerService.Object);
+            var resultDataClient = new ResultDataClient(httpService.Object);
 
             // Act
             var result = await resultDataClient.MarkResultData(It.IsAny<string>());
@@ -48,8 +47,7 @@ namespace UnitTests.ResourceTypes.ResultData
             httpService
                 .Setup(m => m.PostAsync(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(httpResponseMessage);
-            var loggerService = new Mock<ILoggerService>();
-            var resultDataClient = new ResultDataClient(httpService.Object, loggerService.Object);
+            var resultDataClient = new ResultDataClient(httpService.Object);
             Exception exception = null;
 
             try
@@ -79,8 +77,7 @@ namespace UnitTests.ResourceTypes.ResultData
             httpService
                 .Setup(m => m.DeleteAsync(It.IsAny<string>()))
                 .ReturnsAsync(httpResponseMessage);
-            var loggerService = new Mock<ILoggerService>();
-            var resultDataClient = new ResultDataClient(httpService.Object, loggerService.Object);
+            var resultDataClient = new ResultDataClient(httpService.Object);
             Exception exception = null;
 
             try
@@ -110,8 +107,7 @@ namespace UnitTests.ResourceTypes.ResultData
             httpService
                 .Setup(m => m.DeleteAsync(It.IsAny<string>()))
                 .ReturnsAsync(httpResponseMessage);
-            var loggerService = new Mock<ILoggerService>();
-            var resultDataClient = new ResultDataClient(httpService.Object, loggerService.Object);
+            var resultDataClient = new ResultDataClient(httpService.Object);
             Exception exception = null;
 
             try

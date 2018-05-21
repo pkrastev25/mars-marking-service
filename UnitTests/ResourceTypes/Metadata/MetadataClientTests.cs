@@ -25,8 +25,7 @@ namespace UnitTests.ResourceTypes.Metadata
             httpService
                 .Setup(m => m.GetAsync(It.IsAny<string>()))
                 .ReturnsAsync(httpResponseMessage);
-            var loggerService = new Mock<ILoggerService>();
-            var metadataClient = new MetadataClient(httpService.Object, loggerService.Object);
+            var metadataClient = new MetadataClient(httpService.Object);
 
             // Act
             var result = await metadataClient.GetMetadata(It.IsAny<string>());
@@ -48,8 +47,7 @@ namespace UnitTests.ResourceTypes.Metadata
             httpService
                 .Setup(m => m.GetAsync(It.IsAny<string>()))
                 .ReturnsAsync(httpResponseMessage);
-            var loggerService = new Mock<ILoggerService>();
-            var metadataClient = new MetadataClient(httpService.Object, loggerService.Object);
+            var metadataClient = new MetadataClient(httpService.Object);
             Exception exception = null;
 
             try
@@ -79,8 +77,7 @@ namespace UnitTests.ResourceTypes.Metadata
             httpService
                 .Setup(m => m.GetAsync(It.IsAny<string>()))
                 .ReturnsAsync(httpResponseMessage);
-            var loggerService = new Mock<ILoggerService>();
-            var metadataClient = new MetadataClient(httpService.Object, loggerService.Object);
+            var metadataClient = new MetadataClient(httpService.Object);
 
             // Act
             var result = await metadataClient.GetMetadataForProject(It.IsAny<string>());
@@ -102,8 +99,7 @@ namespace UnitTests.ResourceTypes.Metadata
             httpService
                 .Setup(m => m.GetAsync(It.IsAny<string>()))
                 .ReturnsAsync(httpResponseMessage);
-            var loggerService = new Mock<ILoggerService>();
-            var metadataClient = new MetadataClient(httpService.Object, loggerService.Object);
+            var metadataClient = new MetadataClient(httpService.Object);
 
             // Act
             var result = await metadataClient.GetMetadataForProject(It.IsAny<string>());
@@ -125,8 +121,7 @@ namespace UnitTests.ResourceTypes.Metadata
             httpService
                 .Setup(m => m.GetAsync(It.IsAny<string>()))
                 .ReturnsAsync(httpResponseMessage);
-            var loggerService = new Mock<ILoggerService>();
-            var metadataClient = new MetadataClient(httpService.Object, loggerService.Object);
+            var metadataClient = new MetadataClient(httpService.Object);
             Exception exception = null;
 
             try
@@ -156,8 +151,7 @@ namespace UnitTests.ResourceTypes.Metadata
             httpService
                 .Setup(m => m.PutAsync(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(httpResponseMessage);
-            var loggerService = new Mock<ILoggerService>();
-            var metadataClient = new MetadataClient(httpService.Object, loggerService.Object);
+            var metadataClient = new MetadataClient(httpService.Object);
 
             // Act
             var result = await metadataClient.MarkMetadata(MetadataModelDataMocks.MockFinishedMetadataModel());
@@ -179,8 +173,7 @@ namespace UnitTests.ResourceTypes.Metadata
             httpService
                 .Setup(m => m.PutAsync(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(httpResponseMessage);
-            var loggerService = new Mock<ILoggerService>();
-            var metadataClient = new MetadataClient(httpService.Object, loggerService.Object);
+            var metadataClient = new MetadataClient(httpService.Object);
             Exception exception = null;
 
             try
@@ -210,8 +203,7 @@ namespace UnitTests.ResourceTypes.Metadata
             httpService
                 .Setup(m => m.PutAsync(It.IsAny<string>(), It.IsAny<string>()))
                 .ReturnsAsync(httpResponseMessage);
-            var loggerService = new Mock<ILoggerService>();
-            var metadataClient = new MetadataClient(httpService.Object, loggerService.Object);
+            var metadataClient = new MetadataClient(httpService.Object);
             Exception exception = null;
 
             try

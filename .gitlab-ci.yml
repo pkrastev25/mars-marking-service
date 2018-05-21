@@ -1,7 +1,10 @@
 stages:
   - build
   - unitTests
-  - integrationTests
+  # Use only if the marking-svc-tests-env is not available
+  #- createMarkingSvcTestEnvironment
+  # The Gitlab CI pipeline is very slow for running these tests. Better run them locally and manually
+  #- integrationTests
   - deploy
 
 variables:
@@ -21,7 +24,6 @@ build:
     - dotnet clean -c Release -v minimal /maxcpucount
     - dotnet build -c Release -v minimal /maxcpucount
     - dotnet publish -o ./out -v minimal /maxcpucount
-
   artifacts:
     untracked: true
 
@@ -34,37 +36,39 @@ unitTests:
    - cd UnitTests
    - dotnet test -c Release -v minimal /maxcpucount
 
+createMarkingSvcTestEnvironment:
+  stage: createMarkingSvcTestEnvironment
+  image: ${DOCKER_REGISTRY}/docker:stable-dind
+  tags:
+    - k8s
+  script:
+    - docker login -u $NEXUS_USER -p $NEXUS_PW $DOCKER_REGISTRY
+    - cd MarkingSvcTestEnvironment
+    - sh ./start.sh
+
 integrationTests:
   stage: integrationTests
-  image: ${DOCKER_REGISTRY}/marking-svc-tests-env
-  services:
-    - ${DOCKER_REGISTRY}/docker:stable-dind
+  image: ${DOCKER_REGISTRY}/marking-svc-test-env
   tags:
     - k8s
   script:
    - cd IntegrationTests
    - docker login -u $NEXUS_USER -p $NEXUS_PW $DOCKER_REGISTRY
-   - docker-compose run marking-svc-tests
+   - docker-compose run marking-svc-tests /maxcpucount
 
 deploy:
   stage: deploy
   image: ${DOCKER_REGISTRY}/docker:stable-dind
-  services:
-    - ${DOCKER_REGISTRY}/docker:stable-dind
   tags:
     - k8s
   only:
     - master
   script:
-    # Log in to Nexus Docker registry and push the image.
     - docker login -u $NEXUS_USER -p $NEXUS_PW $DOCKER_REGISTRY
     - docker build -t $SERVICE_NAME:latest .
-
-    # Set three tags: 'latest' (to identify newest build), version number und commit ID.
     - docker tag $SERVICE_NAME:latest $DOCKER_REGISTRY/$SERVICE_NAME:latest
     - docker tag $SERVICE_NAME:latest $DOCKER_REGISTRY/$SERVICE_NAME:$CI_PIPELINE_ID
     - docker tag $SERVICE_NAME:latest $DOCKER_REGISTRY/$SERVICE_NAME:$CI_COMMIT_SHA
-
     - docker push $DOCKER_REGISTRY/$SERVICE_NAME:latest
     - docker push $DOCKER_REGISTRY/$SERVICE_NAME:$CI_PIPELINE_ID    
     - docker push $DOCKER_REGISTRY/$SERVICE_NAME:$CI_COMMIT_SHA

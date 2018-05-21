@@ -12,16 +12,16 @@ namespace mars_marking_svc.ResourceTypes.Metadata
 {
     public class MetadataClient : IMetadataClient
     {
+        private readonly string _baseUrl;
         private readonly IHttpService _httpService;
-        private readonly ILoggerService _loggerService;
 
         public MetadataClient(
-            IHttpService httpService,
-            ILoggerService loggerService
+            IHttpService httpService
         )
         {
+            var baseUrl = Environment.GetEnvironmentVariable(Constants.Constants.MetadataSvcUrlKey);
+            _baseUrl = string.IsNullOrEmpty(baseUrl) ? "metadata-svc" : baseUrl;
             _httpService = httpService;
-            _loggerService = loggerService;
         }
 
         public async Task<MetadataModel> GetMetadata(
@@ -29,7 +29,7 @@ namespace mars_marking_svc.ResourceTypes.Metadata
         )
         {
             var response = await _httpService.GetAsync(
-                $"http://{GetBaseUrl()}/metadata/{metadataId}"
+                $"http://{_baseUrl}/metadata/{metadataId}"
             );
 
             response.ThrowExceptionIfNotSuccessfulResponse(
@@ -47,7 +47,7 @@ namespace mars_marking_svc.ResourceTypes.Metadata
         )
         {
             var response = await _httpService.GetAsync(
-                $"http://{GetBaseUrl()}/metadata?projectId={projectId}"
+                $"http://{_baseUrl}/metadata?projectId={projectId}"
             );
 
             response.ThrowExceptionIfNotSuccessfulResponseOrNot404Response(
@@ -95,7 +95,7 @@ namespace mars_marking_svc.ResourceTypes.Metadata
             }
 
             var response = await _httpService.PutAsync(
-                $"http://{GetBaseUrl()}/metadata/{metadataModel.DataId}/state?state={MetadataModel.ToBeDeletedState}",
+                $"http://{_baseUrl}/metadata/{metadataModel.DataId}/state?state={MetadataModel.ToBeDeletedState}",
                 ""
             );
 
@@ -110,7 +110,6 @@ namespace mars_marking_svc.ResourceTypes.Metadata
             {
                 PreviousState = metadataModel.State
             };
-            _loggerService.LogMarkEvent(markedResource.ToString());
 
             return markedResource;
         }
@@ -120,7 +119,7 @@ namespace mars_marking_svc.ResourceTypes.Metadata
         )
         {
             var response = await _httpService.PutAsync(
-                $"http://{GetBaseUrl()}/metadata/{dependantResourceModel.ResourceId}/state?state={dependantResourceModel.PreviousState}",
+                $"http://{_baseUrl}/metadata/{dependantResourceModel.ResourceId}/state?state={dependantResourceModel.PreviousState}",
                 ""
             );
 
@@ -130,15 +129,6 @@ namespace mars_marking_svc.ResourceTypes.Metadata
                     await response.IncludeStatusCodeAndMessageFromResponse()
                 )
             );
-
-            _loggerService.LogUnmarkEvent(dependantResourceModel.ToString());
-        }
-
-        private string GetBaseUrl()
-        {
-            var baseUrl = Environment.GetEnvironmentVariable("METADATA_SVC_URL");
-
-            return string.IsNullOrEmpty(baseUrl) ? "metadata-svc" : baseUrl;
         }
     }
 }

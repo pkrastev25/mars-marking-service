@@ -4,11 +4,11 @@ services:
   mongo-seed:
     image: nexus.informatik.haw-hamburg.de/mongo:3.4.1
     volumes:
-      - ./seed-data:/seed-data
+      - ./SeedData:/SeedData
     entrypoint:
       - sh
     command:
-      - ./seed-data/seed-data.sh
+      - ./SeedData/seed_data.sh
     links:
       - mongodb
     depends_on:
@@ -37,10 +37,11 @@ services:
     entrypoint:
       - sh
     command:
-      - ./mars-marking-svc/IntegrationTests/run_tests.sh
+      - ./mars-marking-svc/IntegrationTests/docker_tests_entrypoint.sh
     links:
       - mongodb
       - metadata-svc
     depends_on:
+      - mongo-seed
       - mongodb
       - metadata-svc

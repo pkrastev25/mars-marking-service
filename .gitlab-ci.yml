@@ -2,9 +2,9 @@ stages:
   - build
   - unitTests
   # Use only if the marking-svc-tests-env is not available
-  #- createMarkingSvcTestEnvironment
-  # The Gitlab CI pipeline is very slow for running these tests. Better run them locally and manually
-  #- integrationTests
+  - createMarkingSvcTestEnvironment
+  # The Gitlab CI pipeline is very slow for running these tests. Better run them locally
+  - integrationTests
   - deploy
 
 variables:
@@ -37,6 +37,7 @@ unitTests:
    - dotnet test -c Release -v minimal /maxcpucount
 
 createMarkingSvcTestEnvironment:
+  when: manual
   stage: createMarkingSvcTestEnvironment
   image: ${DOCKER_REGISTRY}/docker:stable-dind
   tags:
@@ -47,6 +48,7 @@ createMarkingSvcTestEnvironment:
     - sh ./start.sh
 
 integrationTests:
+  when: manual
   stage: integrationTests
   image: ${DOCKER_REGISTRY}/marking-svc-test-env
   tags:

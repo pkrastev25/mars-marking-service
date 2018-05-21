@@ -13,7 +13,7 @@ services:
       - mongodb
     depends_on:
       - mongodb
-      
+
   result-mongo-seed:
     image: nexus.informatik.haw-hamburg.de/mongo:3.4.1
     volumes:
@@ -36,7 +36,7 @@ services:
     image: nexus.informatik.haw-hamburg.de/mongo:3.4.1
     expose:
       - 27017
-        
+
   project-postgres:
     image: nexus.informatik.haw-hamburg.de/postgres:9.6-alpine
     environment:
@@ -45,7 +45,7 @@ services:
       - POSTGRES_PASSWORD=mariokart102
     expose:
       - 5432
-      
+
   project-svc:
     # TODO: Change image tag once merged
     image: nexus.informatik.haw-hamburg.de/project-svc:dev
@@ -68,7 +68,7 @@ services:
       - mongodb
     expose:
       - 8080
-  
+
   scenario-svc:
     # TODO: Change image tag once merged
     image: nexus.informatik.haw-hamburg.de/scenario-svc:dev
@@ -78,7 +78,7 @@ services:
       - mongodb
     expose:
       - 8080
-      
+
   resultcfg-svc:
     image: nexus.informatik.haw-hamburg.de/resultcfg-svc:latest
     links:
@@ -87,7 +87,7 @@ services:
       - mongodb
     expose:
       - 8080
-      
+
   sim-runner-svc:
     image: nexus.informatik.haw-hamburg.de/sim-runner-svc:latest
     links:
@@ -96,10 +96,12 @@ services:
       - mongodb
     expose:
       - 8080
-      
+
   database-utility-svc:
     # TODO: Change image tag once merged
     image: nexus.informatik.haw-hamburg.de/database-utility-service:dev
+    volumes:
+      - ./_MountVolumes/database-utility-svc:/config
     links:
       - result-mongodb
     depends_on:
@@ -122,7 +124,7 @@ services:
     entrypoint:
       - sh
     command:
-      - ./mars-marking-svc/IntegrationTests/docker_tests_entrypoint.sh
+      - ./mars-marking-svc/IntegrationTests/_MountVolumes/marking-svc-tests/run_tests.sh
     links:
       - mongodb
       - project-svc

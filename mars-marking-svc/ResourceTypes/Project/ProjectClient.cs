@@ -18,7 +18,7 @@ namespace mars_marking_svc.ResourceTypes.Project
         {
             var baseUrl =
                 string.IsNullOrEmpty(Environment.GetEnvironmentVariable(Constants.Constants.ProjectSvcUrlKey))
-                    ? "project-svc:80"
+                    ? "project-svc"
                     : Environment.GetEnvironmentVariable(Constants.Constants.ProjectSvcUrlKey);
             _channel = new Channel(baseUrl, ChannelCredentials.Insecure);
             _projectServiceClient = new ProjectService.ProjectServiceClient(_channel);

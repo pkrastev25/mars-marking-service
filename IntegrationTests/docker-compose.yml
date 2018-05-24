@@ -47,8 +47,7 @@ services:
       - 5432
 
   project-svc:
-    # TODO: Change image tag once merged
-    image: nexus.informatik.haw-hamburg.de/project-svc:dev
+    image: nexus.informatik.haw-hamburg.de/project-svc:latest
     environment:
       - POSTGRES_DB=project
       - POSTGRES_USER=projectsvc
@@ -58,7 +57,7 @@ services:
     depends_on:
       - project-postgres
     expose:
-      - 80
+      - 8080
 
   metadata-svc:
     image: nexus.informatik.haw-hamburg.de/metadata-svc:latest
@@ -70,8 +69,7 @@ services:
       - 8080
 
   scenario-svc:
-    # TODO: Change image tag once merged
-    image: nexus.informatik.haw-hamburg.de/scenario-svc:dev
+    image: nexus.informatik.haw-hamburg.de/scenario-svc:latest
     links:
       - mongodb
     depends_on:
@@ -80,7 +78,8 @@ services:
       - 8080
 
   resultcfg-svc:
-    image: nexus.informatik.haw-hamburg.de/resultcfg-svc:latest
+    # TODO: Change once bug is fixed
+    image: nexus.informatik.haw-hamburg.de/resultcfg-svc:2.0.3
     links:
       - mongodb
     depends_on:
@@ -98,8 +97,7 @@ services:
       - 8080
 
   database-utility-svc:
-    # TODO: Change image tag once merged
-    image: nexus.informatik.haw-hamburg.de/database-utility-service:dev
+    image: nexus.informatik.haw-hamburg.de/database-utility-service:latest
     volumes:
       - ./_MountVolumes/database-utility-svc:/config
     links:
@@ -112,7 +110,7 @@ services:
   marking-svc-tests:
     image: nexus.informatik.haw-hamburg.de/microsoft/dotnet:2.0.0-sdk
     environment:
-      - PROJECT_SVC_URL=project-svc:80
+      - PROJECT_SVC_URL=project-svc:8080
       - METADATA_SVC_URL=metadata-svc:8080
       - SCENARIO_SVC_URL=scenario-svc:8080
       - RESULT_CONFIG_SVC_URL=resultcfg-svc:8080

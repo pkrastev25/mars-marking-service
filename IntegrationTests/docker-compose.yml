@@ -85,7 +85,7 @@ services:
     depends_on:
       - mongodb
     expose:
-      - 8080
+      - 80
 
   sim-runner-svc:
     image: nexus.informatik.haw-hamburg.de/sim-runner-svc:latest
@@ -113,7 +113,7 @@ services:
       - PROJECT_SVC_URL=project-svc:8080
       - METADATA_SVC_URL=metadata-svc:8080
       - SCENARIO_SVC_URL=scenario-svc:8080
-      - RESULT_CONFIG_SVC_URL=resultcfg-svc:8080
+      - RESULT_CONFIG_SVC_URL=resultcfg-svc:80
       - SIM_RUNNER_SVC_URL=sim-runner-svc:8080
       - DATABASE_UTILITY_SVC_URL=database-utility-svc:8090
       - MONGO_DB_SVC_URL=mongodb://mongodb:27017

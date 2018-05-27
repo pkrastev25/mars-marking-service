@@ -4,6 +4,7 @@ using mars_marking_svc.MarkedResource.Models;
 using mars_marking_svc.ResourceTypes;
 using mars_marking_svc.ResourceTypes.MarkedResource.Enums;
 using mars_marking_svc.Services;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using Xunit;
 
@@ -45,7 +46,7 @@ namespace IntegrationTests.MongoDbService
             // Arrange
             var filterDefinition = Builders<MarkSessionModel>.Filter.Eq(
                 MarkSessionModel.BsomElementDefinitionId,
-                "5b07decf7aa54a0007b3db51"
+                new ObjectId("5b07decf7aa54a0007b3db51")
             );
             var dbMongoService = new DbMongoService();
             var markSessionRepository = new MarkSessionRepository(dbMongoService);
@@ -97,7 +98,10 @@ namespace IntegrationTests.MongoDbService
                 "2085eb4c-7a94-4cc8-9c46-58f5166d3c82",
                 ResourceTypeEnum.Project,
                 MarkSessionTypeEnum.ToBeArchived
-            );
+            )
+            {
+                Id = new ObjectId("5b07def67aa54a0007b3db53")
+            };
             var dbMongoService = new DbMongoService();
             var markSessionRepository = new MarkSessionRepository(dbMongoService);
             Exception exception = null;
@@ -117,7 +121,7 @@ namespace IntegrationTests.MongoDbService
         }
 
         [Fact]
-        public async void Delete_MissingProjectId_ExceptionThrown()
+        public async void Delete_MarkSessionModelExists_NoExceptionThrown()
         {
             // Arrange
             var markSessionModel = new MarkSessionModel(
@@ -125,7 +129,10 @@ namespace IntegrationTests.MongoDbService
                 "f05725ff-7da3-4dbe-83ce-184a585f47df",
                 ResourceTypeEnum.Project,
                 MarkSessionTypeEnum.ToBeDeleted
-            );
+            )
+            {
+                Id = new ObjectId("5b07dee57aa54a0007b3db52")
+            };
             var dbMongoService = new DbMongoService();
             var markSessionRepository = new MarkSessionRepository(dbMongoService);
             Exception exception = null;
@@ -141,7 +148,7 @@ namespace IntegrationTests.MongoDbService
             }
 
             // Assert
-            Assert.NotNull(exception);
+            Assert.Null(exception);
         }
     }
 }

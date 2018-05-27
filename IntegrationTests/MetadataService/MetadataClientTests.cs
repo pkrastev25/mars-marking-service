@@ -3,6 +3,7 @@ using System.Net.Http;
 using mars_marking_svc.MarkedResource.Models;
 using mars_marking_svc.ResourceTypes;
 using mars_marking_svc.ResourceTypes.Metadata;
+using mars_marking_svc.ResourceTypes.Metadata.Models;
 using mars_marking_svc.Services;
 using Xunit;
 
@@ -68,7 +69,10 @@ namespace IntegrationTests.MetadataService
             var dependantResourceModel = new DependantResourceModel(
                 ResourceTypeEnum.Metadata,
                 "c9de8a5e-1ab1-431f-a759-f44d7eef4e19"
-            );
+            )
+            {
+                PreviousState = MetadataModel.FinishedState
+            };
             var httpService = new HttpService(new HttpClient());
             var metadataClient = new MetadataClient(
                 httpService

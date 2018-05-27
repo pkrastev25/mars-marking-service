@@ -11,7 +11,7 @@ namespace IntegrationTests.ResultConfigClientTests
         public async void GetResultConfig_ValidResultConfigId_ReturnsReultConfigModel()
         {
             // Arrange
-            var resultConfigId = "b94284d47-7725-4554-9dac-b37a422b6aa1";
+            var resultConfigId = "2462a6b6-5e07-48b4-b3e3-b3b207d55f4e";
             var httpService = new HttpService(new HttpClient());
             var resultConfigClient = new ResultConfigClient(
                 httpService
@@ -28,7 +28,7 @@ namespace IntegrationTests.ResultConfigClientTests
         public async void GetResultConfigsForMetadata_ValidMetadataId_ReturnsReultConfigModelList()
         {
             // Arrange
-            var metadataId = "5d3d9168-5589-4d8c-9bc9-9f2f5ad75373";
+            var metadataId = "4439722e-a6d0-4f7a-9d33-0cc5a2a66da0";
             var httpService = new HttpService(new HttpClient());
             var resultConfigClient = new ResultConfigClient(
                 httpService
@@ -45,7 +45,7 @@ namespace IntegrationTests.ResultConfigClientTests
         public async void CreateDependantResultConfigResource_ValidResultConfigId_ReturnsDependantResourceModel()
         {
             // Arrange
-            var resultConfigId = "b4dcbee9-5e19-4117-9cb8-5d3a41016b1e";
+            var resultConfigId = "2462a6b6-5e07-48b4-b3e3-b3b207d55f4e";
             var httpService = new HttpService(new HttpClient());
             var resultConfigClient = new ResultConfigClient(
                 httpService

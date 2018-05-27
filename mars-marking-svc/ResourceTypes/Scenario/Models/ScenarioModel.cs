@@ -12,5 +12,10 @@ namespace mars_marking_svc.ResourceTypes.Scenario.Models
 
         [JsonProperty("ReadOnly")]
         public bool ReadOnly { get; set; }
+
+        public override string ToString()
+        {
+            return $"scenario model with id: {ScenarioId}";
+        }
     }
 }

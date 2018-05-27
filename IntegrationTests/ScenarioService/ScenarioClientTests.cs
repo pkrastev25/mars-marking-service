@@ -14,7 +14,7 @@ namespace IntegrationTests.ScenarioService
         public async void GetScenario_ValidScenarioId_ReturnsScenarioModel()
         {
             // Assert
-            var scenarioId = "30ce974b-b743-41bb-81a3-a89cad1cf37a";
+            var scenarioId = "6c40eb45-1e21-435e-81c8-895e55c6c5d8";
             var httpService = new HttpService(new HttpClient());
             var scenarioClient = new ScenarioClient(
                 httpService
@@ -31,7 +31,7 @@ namespace IntegrationTests.ScenarioService
         public async void GetScenariosForProject_ValidProjectId_ReturnsScenarioModelList()
         {
             // Assert
-            var projectId = "e580ff4f-a3b3-4252-81c4-ad88a01cac03";
+            var projectId = "623be379-ed40-49f3-bdd8-416f8cd0faa6";
             var httpService = new HttpService(new HttpClient());
             var scenarioClient = new ScenarioClient(
                 httpService
@@ -48,7 +48,7 @@ namespace IntegrationTests.ScenarioService
         public async void MarkScenario_UnmarkedScenarioModel_ReturnsDependantResourceModel()
         {
             // Assert
-            var scenarioId = "7e41561a-21fd-4522-a645-4fd5d434650c";
+            var scenarioId = "ae7b7512-4233-476b-b3d7-6651aeae6518";
             var httpService = new HttpService(new HttpClient());
             var scenarioClient = new ScenarioClient(
                 httpService
@@ -67,7 +67,7 @@ namespace IntegrationTests.ScenarioService
             // Assert
             var dependantResourceModel = new DependantResourceModel(
                 ResourceTypeEnum.Scenario,
-                "f5120e41-fb2e-491a-a9b3-bf8eb3c89aff"
+                "aad965db-fceb-4ee2-bd06-c89ab182ca4c"
             );
             var httpService = new HttpService(new HttpClient());
             var scenarioClient = new ScenarioClient(

@@ -14,7 +14,7 @@ namespace IntegrationTests.MetadataService
         public async void GetMetadata_ValidMetadataId_ReturnsMetadataModel()
         {
             // Arrange
-            var metadataId = "5d3d9168-5589-4d8c-9bc9-9f2f5ad75373";
+            var metadataId = "4439722e-a6d0-4f7a-9d33-0cc5a2a66da0";
             var httpService = new HttpService(new HttpClient());
             var metadataClient = new MetadataClient(
                 httpService
@@ -31,7 +31,7 @@ namespace IntegrationTests.MetadataService
         public async void GetMetadataForProject_ValidProjectId_ReturnsMetadataModelList()
         {
             // Arrange
-            var projectId = "e580ff4f-a3b3-4252-81c4-ad88a01cac03";
+            var projectId = "623be379-ed40-49f3-bdd8-416f8cd0faa6";
             var httpService = new HttpService(new HttpClient());
             var metadataClient = new MetadataClient(
                 httpService
@@ -48,7 +48,7 @@ namespace IntegrationTests.MetadataService
         public async void MarkMetadata_UnmarkedMetadataModel_ReturnsDependantResourceModel()
         {
             // Arrange
-            var metadataId = "b63ef2dd-05ba-4b7a-8e9a-e41047b540aa";
+            var metadataId = "45db3205-83be-42a1-af14-6a03df9d9536";
             var httpService = new HttpService(new HttpClient());
             var metadataClient = new MetadataClient(
                 httpService
@@ -62,12 +62,12 @@ namespace IntegrationTests.MetadataService
         }
 
         [Fact]
-        public async void MarkMetadata_MarkedMetadataModel_NoExceptionThrown()
+        public async void UnmarkMetadata_MarkedMetadataModel_NoExceptionThrown()
         {
             // Arrange
             var dependantResourceModel = new DependantResourceModel(
                 ResourceTypeEnum.Metadata,
-                "14574c26-7ebd-4468-8daf-89dc5058c352"
+                "c9de8a5e-1ab1-431f-a759-f44d7eef4e19"
             );
             var httpService = new HttpService(new HttpClient());
             var metadataClient = new MetadataClient(

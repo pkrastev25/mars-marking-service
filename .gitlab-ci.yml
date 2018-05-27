@@ -48,7 +48,6 @@ createMarkingSvcTestEnvironment:
     - sh ./start.sh
 
 integrationTests:
-  when: manual
   stage: integrationTests
   image: ${DOCKER_REGISTRY}/marking-svc-test-env
   services:

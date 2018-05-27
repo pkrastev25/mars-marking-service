@@ -16,8 +16,8 @@ namespace IntegrationTests.MongoDbService
         {
             // Arrange
             var existingMarkSessionModel = new MarkSessionModel(
-                "e580ff4f-a3b3-4252-81c4-ad88a01cac03",
-                "e580ff4f-a3b3-4252-81c4-ad88a01cac03",
+                "be69cb8c-45e4-4d80-8d55-419984aa2151",
+                "be69cb8c-45e4-4d80-8d55-419984aa2151",
                 ResourceTypeEnum.Project,
                 MarkSessionTypeEnum.ToBeDeleted
             );
@@ -45,7 +45,7 @@ namespace IntegrationTests.MongoDbService
             // Arrange
             var filterDefinition = Builders<MarkSessionModel>.Filter.Eq(
                 MarkSessionModel.BsomElementDefinitionId,
-                "5b02c41fd3b6f3000710485c"
+                "5b07decf7aa54a0007b3db51"
             );
             var dbMongoService = new DbMongoService();
             var markSessionRepository = new MarkSessionRepository(dbMongoService);
@@ -93,8 +93,8 @@ namespace IntegrationTests.MongoDbService
         {
             // Arrange
             var markSessionModel = new MarkSessionModel(
-                "e43ee0d6-ffdf-4e5d-933a-7bd238e4fc38",
-                "e43ee0d6-ffdf-4e5d-933a-7bd238e4fc38",
+                "2085eb4c-7a94-4cc8-9c46-58f5166d3c82",
+                "2085eb4c-7a94-4cc8-9c46-58f5166d3c82",
                 ResourceTypeEnum.Project,
                 MarkSessionTypeEnum.ToBeArchived
             );
@@ -117,12 +117,12 @@ namespace IntegrationTests.MongoDbService
         }
 
         [Fact]
-        public async void Delete_MarkSessionModelsExist_NoExceptionThrown()
+        public async void Delete_MissingProjectId_ExceptionThrown()
         {
             // Arrange
             var markSessionModel = new MarkSessionModel(
-                "184d54e3-368a-48b8-9e45-dd04ede83913",
-                "184d54e3-368a-48b8-9e45-dd04ede83913",
+                "f05725ff-7da3-4dbe-83ce-184a585f47df",
+                "f05725ff-7da3-4dbe-83ce-184a585f47df",
                 ResourceTypeEnum.Project,
                 MarkSessionTypeEnum.ToBeDeleted
             );
@@ -141,7 +141,7 @@ namespace IntegrationTests.MongoDbService
             }
 
             // Assert
-            Assert.Null(exception);
+            Assert.NotNull(exception);
         }
     }
 }

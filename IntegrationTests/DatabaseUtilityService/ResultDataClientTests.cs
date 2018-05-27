@@ -14,7 +14,7 @@ namespace IntegrationTests.DatabaseUtilityService
         public async void MarkResultData_UnmarkedResultDataModel_ReturnsDependantResourceModel()
         {
             // Arrange
-            var resultDataId = "75d46f68-ea8c-4227-afd8-cbfb15c4da7b";
+            var resultDataId = "4439722e-a6d0-4f7a-9d33-0cc5a2a66da0";
             var httpService = new HttpService(new HttpClient());
             var resultDataClient = new ResultDataClient(
                 httpService
@@ -33,7 +33,7 @@ namespace IntegrationTests.DatabaseUtilityService
             // Arrange
             var dependantResourceModel = new DependantResourceModel(
                 ResourceTypeEnum.ResultData,
-                "c36d4764-86fd-4217-b66e-84190e7460d0"
+                "c9de8a5e-1ab1-431f-a759-f44d7eef4e19"
             );
             var httpService = new HttpService(new HttpClient());
             var resultDataClient = new ResultDataClient(

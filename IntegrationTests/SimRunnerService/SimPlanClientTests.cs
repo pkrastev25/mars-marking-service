@@ -14,8 +14,8 @@ namespace IntegrationTests.SimRunnerService
         public async void GetSimPlan_ValidSimPlanIdAndProjectId_ReturnsSimPlanModel()
         {
             // Arrange
-            var simPlanId = "5afd54b895c5e500013bc74d";
-            var projectId = "e580ff4f-a3b3-4252-81c4-ad88a01cac03";
+            var simPlanId = "5b06abe652e35100015f04d9";
+            var projectId = "623be379-ed40-49f3-bdd8-416f8cd0faa6";
             var httpService = new HttpService(new HttpClient());
             var simPlanClient = new SimPlanClient(
                 httpService
@@ -32,7 +32,7 @@ namespace IntegrationTests.SimRunnerService
         public async void GetSimPlansForProject_ValidProjectId_ReturnsSimPlanModelList()
         {
             // Arrange
-            var projectId = "e580ff4f-a3b3-4252-81c4-ad88a01cac03";
+            var projectId = "623be379-ed40-49f3-bdd8-416f8cd0faa6";
             var httpService = new HttpService(new HttpClient());
             var simPlanClient = new SimPlanClient(
                 httpService
@@ -49,8 +49,8 @@ namespace IntegrationTests.SimRunnerService
         public async void MarkSimPlan_UnmarkedSimPlanModel_ReturnsDependantResourceModel()
         {
             // Arrange
-            var simPlanId = "5b028f6095c5e500013bc74f";
-            var projectId = "e580ff4f-a3b3-4252-81c4-ad88a01cac03";
+            var simPlanId = "5b06b85652e35100015f04db";
+            var projectId = "73fcb3bf-bc8b-4c8b-801f-8a90d92bf9c2";
             var httpService = new HttpService(new HttpClient());
             var simPlanClient = new SimPlanClient(
                 httpService
@@ -69,9 +69,9 @@ namespace IntegrationTests.SimRunnerService
             // Arrange
             var dependantResourceModel = new DependantResourceModel(
                 ResourceTypeEnum.SimPlan,
-                "5b028f6795c5e500013bc750"
+                "5b07ddcf52e35100015f04e3"
             );
-            var projectId = "580ff4f-a3b3-4252-81c4-ad88a01cac03";
+            var projectId = "be69cb8c-45e4-4d80-8d55-419984aa2151";
             var httpService = new HttpService(new HttpClient());
             var simPlanClient = new SimPlanClient(
                 httpService

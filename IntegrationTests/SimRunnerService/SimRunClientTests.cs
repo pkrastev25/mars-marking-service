@@ -14,8 +14,8 @@ namespace IntegrationTests.SimRunnerService
         public async void GetSimRun_ValidSimRunIdAndProjectId_ReturnsSimRunModel()
         {
             // Arrange
-            var simRunId = "5afd54ba95c5e500013bc74e";
-            var projectId = "e580ff4f-a3b3-4252-81c4-ad88a01cac03";
+            var simRunId = "5b06acef52e35100015f04da";
+            var projectId = "623be379-ed40-49f3-bdd8-416f8cd0faa6";
             var httpService = new HttpService(new HttpClient());
             var simRunClient = new SimRunClient(
                 httpService
@@ -32,7 +32,7 @@ namespace IntegrationTests.SimRunnerService
         public async void GetSimRunsForProject_ValidProjectId_ReturnsSimRunModelList()
         {
             // Arrange
-            var projectId = "e580ff4f-a3b3-4252-81c4-ad88a01cac03";
+            var projectId = "623be379-ed40-49f3-bdd8-416f8cd0faa6";
             var httpService = new HttpService(new HttpClient());
             var simRunClient = new SimRunClient(
                 httpService
@@ -49,8 +49,8 @@ namespace IntegrationTests.SimRunnerService
         public async void MarkSimRun_UnmarkedSimRunModel_ReturnsDependantResourceModel()
         {
             // Arrange
-            var simRunId = "5b02975b95c5e500013bc751";
-            var projectId = "e580ff4f-a3b3-4252-81c4-ad88a01cac03";
+            var simRunId = "5b06b85752e35100015f04dc";
+            var projectId = "73fcb3bf-bc8b-4c8b-801f-8a90d92bf9c2";
             var httpService = new HttpService(new HttpClient());
             var simRunClient = new SimRunClient(
                 httpService
@@ -69,7 +69,7 @@ namespace IntegrationTests.SimRunnerService
             // Arrange
             var dependantResourceModel = new DependantResourceModel(
                 ResourceTypeEnum.SimRun,
-                "5b02976395c5e500013bc752"
+                "5b07ddd052e35100015f04e4"
             );
             var httpService = new HttpService(new HttpClient());
             var simRunClient = new SimRunClient(

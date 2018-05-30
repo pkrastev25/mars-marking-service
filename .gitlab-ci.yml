@@ -44,6 +44,8 @@ createMarkingSvcTestEnvironment:
   when: manual
   stage: createMarkingSvcTestEnvironment
   image: $NEXUS_CACHE/docker:icc-dind
+  services:
+    - $NEXUS_CACHE/docker:icc-dind
   tags:
     - k8s
   script:

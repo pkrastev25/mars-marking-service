@@ -2,8 +2,11 @@
 # Used to build the docker container which contains all dependencies needed to run integration and end-to-end tests
 # Then it pushed it to the Nexus
 
-DOCKER_REGISTRY="nexus.informatik.haw-hamburg.de"
+GITLAB_REGISTRY="docker-hub.informatik.haw-hamburg.de"
+PROJECT="mars/mars-marking-svc"
 SERVICE_NAME="marking-svc-test-env"
 
-docker build -t ${DOCKER_REGISTRY}/${SERVICE_NAME} .
-docker push ${DOCKER_REGISTRY}/${SERVICE_NAME}
+# In order to push images from your local machine, use:
+#docker login -u HAW_USER_NAME -p HAW_PASSWORD
+docker build -t ${GITLAB_REGISTRY}/${PROJECT}/${SERVICE_NAME} .
+docker push ${GITLAB_REGISTRY}/${PROJECT}/${SERVICE_NAME}

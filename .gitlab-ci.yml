@@ -43,7 +43,7 @@ unitTests:
 createMarkingSvcTestEnvironment:
   when: manual
   stage: createMarkingSvcTestEnvironment
-  image: $NEXUS_CACHE/docker:icc-dind
+  image: $NEXUS_CACHE/docker:stable-dind
   tags:
     - k8s
   script:
@@ -55,7 +55,7 @@ integrationTests:
   stage: integrationTests
   image: $NEXUS_CACHE/marking-svc-test-env
   services:
-    - $NEXUS_CACHE/docker:icc-dind
+    - $NEXUS_CACHE/docker:stable-dind
   tags:
     - k8s
   script:
@@ -65,9 +65,9 @@ integrationTests:
 
 deploy:
   stage: deploy
-  image: $NEXUS_CACHE/docker:icc-dind
+  image: $NEXUS_CACHE/docker:stable-dind
   services:
-    - $NEXUS_CACHE/docker:icc-dind
+    - $NEXUS_CACHE/docker:stable-dind
   tags:
     - k8s
   only:

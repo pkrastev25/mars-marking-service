@@ -47,6 +47,13 @@ namespace mars_marking_svc.ResourceTypes.Project
                 );
             }
 
+            if (project == null)
+            {
+                throw new FailedToGetResourceException(
+                    $"Failed to get project for id: {projectId} from project-svc!"
+                );
+            }
+
             return new ProjectModel(
                 projectId,
                 project.ToBeDeleted

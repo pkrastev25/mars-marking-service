@@ -126,7 +126,7 @@ namespace mars_marking_svc.ResourceTypes.Project
 
         public async void Dispose()
         {
-            await _channel.ShutdownAsync();
+            //await _channel.ShutdownAsync();
         }
     }
 }

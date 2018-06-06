@@ -66,7 +66,7 @@ namespace mars_marking_svc
             services.AddScoped<ILoggerService, LoggerService>();
 
             // Clients
-            services.AddScoped<HttpClient>();
+            services.AddSingleton<HttpClient>();
             services.AddScoped<IProjectClient, ProjectClient>();
             services.AddScoped<IMetadataClient, MetadataClient>();
             services.AddScoped<IScenarioClient, ScenarioClient>();

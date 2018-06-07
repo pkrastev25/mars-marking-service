@@ -26,7 +26,7 @@ namespace UnitTests._DataMocks
             )
             {
                 Id = new ObjectId("5ae86f68b90b230007d7ea34"),
-                State = MarkSessionModel.StateDone,
+                State = MarkSessionModel.StateComplete,
                 LatestUpdateTimestampInTicks = DateTime.Now.Ticks,
                 SourceDependency = null,
                 DependantResources = new List<DependantResourceModel>

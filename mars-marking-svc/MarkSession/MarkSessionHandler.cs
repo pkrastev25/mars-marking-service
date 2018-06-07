@@ -46,7 +46,7 @@ namespace mars_marking_svc.ResourceTypes.MarkedResource
                 await _markSessionRepository.Create(markSessionModel);
                 await _dependantResourceHandler.MarkResourcesForMarkSession(markSessionModel);
 
-                markSessionModel.State = MarkSessionModel.StateDone;
+                markSessionModel.State = MarkSessionModel.StateComplete;
                 await _markSessionRepository.Update(markSessionModel);
             }
             catch (Exception e)
@@ -75,7 +75,7 @@ namespace mars_marking_svc.ResourceTypes.MarkedResource
         {
             return await _markSessionRepository.GetAllForFilter(
                 Builders<MarkSessionModel>.Filter.Where(entry =>
-                    entry.MarkSessionType == markSessionType && entry.State == MarkSessionModel.StateDone
+                    entry.MarkSessionType == markSessionType && entry.State == MarkSessionModel.StateComplete
                 )
             );
         }
@@ -128,7 +128,7 @@ namespace mars_marking_svc.ResourceTypes.MarkedResource
 
                     var markSessionModel = await FindMarkSessionById(markSessionId);
 
-                    markSessionModel.State = MarkSessionModel.StateAborting;
+                    markSessionModel.State = MarkSessionModel.StateUnmarking;
                     await _markSessionRepository.Update(markSessionModel);
                     await _dependantResourceHandler.UnmarkResourcesForMarkSession(markSessionModel);
                     await _markSessionRepository.Delete(markSessionModel);

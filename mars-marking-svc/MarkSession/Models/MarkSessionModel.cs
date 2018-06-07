@@ -8,8 +8,8 @@ namespace mars_marking_svc.MarkedResource.Models
     public class MarkSessionModel
     {
         public const string StateMarking = "Marking";
-        public const string StateAborting = "Aborting";
-        public const string StateDone = "Done";
+        public const string StateUnmarking = "Unmarking";
+        public const string StateComplete = "Complete";
 
         public const string BsomElementDefinitionId = "_id";
         public const string BsonElementDefinitionResourceId = "resourceId";

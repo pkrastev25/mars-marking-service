@@ -36,8 +36,9 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
 
             response.ThrowExceptionIfNotSuccessfulResponse(
                 new FailedToGetResourceException(
-                    $"Failed to get simPlan with id: {simPlanId}, projectId: {projectId} from sim-runner-svc!" +
-                    await response.IncludeStatusCodeAndMessageFromResponse()
+                    await response.FormatRequestAndResponse(
+                        $"Failed to get simPlan with id: {simPlanId}, projectId: {projectId} from sim-runner-svc!"
+                    )
                 )
             );
 
@@ -57,8 +58,9 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
 
             response.ThrowExceptionIfNotSuccessfulResponseOrNot404Response(
                 new FailedToGetResourceException(
-                    $"Failed to get simPlans for scenarioId: {scenarioId}, projectId: {projectId} from sim-runner-svc!" +
-                    await response.IncludeStatusCodeAndMessageFromResponse()
+                    await response.FormatRequestAndResponse(
+                        $"Failed to get simPlans for scenarioId: {scenarioId}, projectId: {projectId} from sim-runner-svc!"
+                    )
                 )
             );
 
@@ -81,8 +83,9 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
 
             response.ThrowExceptionIfNotSuccessfulResponseOrNot404Response(
                 new FailedToGetResourceException(
-                    $"Failed to get simPlans for resultConfigId: {resultConfigId}, projectId: {projectId} from sim-runner-svc!" +
-                    await response.IncludeStatusCodeAndMessageFromResponse()
+                    await response.FormatRequestAndResponse(
+                        $"Failed to get simPlans for resultConfigId: {resultConfigId}, projectId: {projectId} from sim-runner-svc!"
+                    )
                 )
             );
 
@@ -104,8 +107,9 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
 
             response.ThrowExceptionIfNotSuccessfulResponseOrNot404Response(
                 new FailedToGetResourceException(
-                    $"Failed to get simPlans for projectId: {projectId} from sim-runner-svc!" +
-                    await response.IncludeStatusCodeAndMessageFromResponse()
+                    await response.FormatRequestAndResponse(
+                        $"Failed to get simPlans for projectId: {projectId} from sim-runner-svc!"
+                    )
                 )
             );
 
@@ -149,8 +153,9 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
 
             response.ThrowExceptionIfNotSuccessfulResponse(
                 new FailedToUpdateResourceException(
-                    $"Failed to update simPlan with id: {simPlanModel.Id}, projectId: {projectId} from sim-runner-svc!" +
-                    await response.IncludeStatusCodeAndMessageFromResponse()
+                    await response.FormatRequestAndResponse(
+                        $"Failed to update simPlan with id: {simPlanModel.Id}, projectId: {projectId} from sim-runner-svc!"
+                    )
                 )
             );
 
@@ -177,8 +182,9 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
 
                 response.ThrowExceptionIfNotSuccessfulResponse(
                     new FailedToUpdateResourceException(
-                        $"Failed to update simPlan with id: {simPlanModel.Id}, projectId: {projectId} from sim-runner-svc!" +
-                        await response.IncludeStatusCodeAndMessageFromResponse()
+                        await response.FormatRequestAndResponse(
+                            $"Failed to update simPlan with id: {simPlanModel.Id}, projectId: {projectId} from sim-runner-svc!"
+                        )
                     )
                 );
             }
@@ -204,8 +210,9 @@ namespace mars_marking_svc.ResourceTypes.SimPlan
             }
 
             throw new FailedToGetResourceException(
-                $"Failed to get simPlan with id: {simPlanId}, projectId: {projectId} from sim-runner-svc!" +
-                await response.IncludeStatusCodeAndMessageFromResponse()
+                await response.FormatRequestAndResponse(
+                    $"Failed to get simPlan with id: {simPlanId}, projectId: {projectId} from sim-runner-svc!"
+                )
             );
         }
     }

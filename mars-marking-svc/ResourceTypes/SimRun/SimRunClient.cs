@@ -36,8 +36,9 @@ namespace mars_marking_svc.ResourceTypes.SimRun
 
             response.ThrowExceptionIfNotSuccessfulResponse(
                 new FailedToGetResourceException(
-                    $"Failed to get simRun with id: {simRunId}, projectId: {projectId} from sim-runner-svc!" +
-                    await response.IncludeStatusCodeAndMessageFromResponse()
+                    await response.FormatRequestAndResponse(
+                        $"Failed to get simRun with id: {simRunId}, projectId: {projectId} from sim-runner-svc!"
+                    )
                 )
             );
 
@@ -57,8 +58,9 @@ namespace mars_marking_svc.ResourceTypes.SimRun
 
             response.ThrowExceptionIfNotSuccessfulResponseOrNot404Response(
                 new FailedToGetResourceException(
-                    $"Failed to get simRuns for simPlanId: {simPlanId}, projectId: {projectId} from sim-runner-svc!" +
-                    await response.IncludeStatusCodeAndMessageFromResponse()
+                    await response.FormatRequestAndResponse(
+                        $"Failed to get simRuns for simPlanId: {simPlanId}, projectId: {projectId} from sim-runner-svc!"
+                    )
                 )
             );
 
@@ -80,8 +82,9 @@ namespace mars_marking_svc.ResourceTypes.SimRun
 
             response.ThrowExceptionIfNotSuccessfulResponseOrNot404Response(
                 new FailedToGetResourceException(
-                    $"Failed to get simRuns for projectId: {projectId} from sim-runner-svc!" +
-                    await response.IncludeStatusCodeAndMessageFromResponse()
+                    await response.FormatRequestAndResponse(
+                        $"Failed to get simRuns for projectId: {projectId} from sim-runner-svc!"
+                    )
                 )
             );
 
@@ -129,13 +132,15 @@ namespace mars_marking_svc.ResourceTypes.SimRun
                     return new DependantResourceModel(ResourceTypeEnum.SimRun, simRunModel.Id);
                 case HttpStatusCode.Conflict:
                     throw new CannotMarkResourceException(
-                        $"Cannot mark simRun with id: {simRunModel.Id}, projectId: {projectId} it must be in state: {SimRunModel.StatusFinished}, {SimRunModel.StatusAborted} or {SimRunModel.StatusFailed} beforehand!" +
-                        await response.IncludeStatusCodeAndMessageFromResponse()
+                        await response.FormatRequestAndResponse(
+                            $"Cannot mark simRun with id: {simRunModel.Id}, projectId: {projectId} it must be in state: {SimRunModel.StatusSucceeded}, {SimRunModel.StatusAborted} or {SimRunModel.StatusFailed} beforehand!"
+                        )
                     );
                 default:
                     throw new FailedToUpdateResourceException(
-                        $"Failed to update simRun with id: {simRunModel.Id}, projectId: {projectId} from sim-runner-svc!" +
-                        await response.IncludeStatusCodeAndMessageFromResponse()
+                        await response.FormatRequestAndResponse(
+                            $"Failed to update simRun with id: {simRunModel.Id}, projectId: {projectId} from sim-runner-svc!"
+                        )
                     );
             }
         }
@@ -151,8 +156,9 @@ namespace mars_marking_svc.ResourceTypes.SimRun
 
             response.ThrowExceptionIfNotSuccessfulResponseOrNot404Response(
                 new FailedToUpdateResourceException(
-                    $"Failed to update simRun with id: {dependantResourceModel.ResourceId} from sim-runner-svc!" +
-                    await response.IncludeStatusCodeAndMessageFromResponse()
+                    await response.FormatRequestAndResponse(
+                        $"Failed to update simRun with id: {dependantResourceModel.ResourceId} from sim-runner-svc!"
+                    )
                 )
             );
         }

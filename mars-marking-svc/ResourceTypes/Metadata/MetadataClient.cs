@@ -34,8 +34,9 @@ namespace mars_marking_svc.ResourceTypes.Metadata
 
             response.ThrowExceptionIfNotSuccessfulResponse(
                 new FailedToGetResourceException(
-                    $"Failed to get metadata with id: {metadataId} from metadata-svc!" +
-                    await response.IncludeStatusCodeAndMessageFromResponse()
+                    await response.FormatRequestAndResponse(
+                        $"Failed to get metadata with id: {metadataId} from metadata-svc!"
+                    )
                 )
             );
 
@@ -52,8 +53,9 @@ namespace mars_marking_svc.ResourceTypes.Metadata
 
             response.ThrowExceptionIfNotSuccessfulResponseOrNot404Response(
                 new FailedToGetResourceException(
-                    $"Failed to get metadata for projectId: {projectId} from metadata-svc!" +
-                    await response.IncludeStatusCodeAndMessageFromResponse()
+                    await response.FormatRequestAndResponse(
+                        $"Failed to get metadata for projectId: {projectId} from metadata-svc!"
+                    )
                 )
             );
 
@@ -101,8 +103,9 @@ namespace mars_marking_svc.ResourceTypes.Metadata
 
             response.ThrowExceptionIfNotSuccessfulResponse(
                 new FailedToUpdateResourceException(
-                    $"Failed to update metadata with id: {metadataModel.DataId} from metadata-svc!" +
-                    await response.IncludeStatusCodeAndMessageFromResponse()
+                    await response.FormatRequestAndResponse(
+                        $"Failed to update metadata with id: {metadataModel.DataId} from metadata-svc!"
+                    )
                 )
             );
 
@@ -125,8 +128,9 @@ namespace mars_marking_svc.ResourceTypes.Metadata
 
             response.ThrowExceptionIfNotSuccessfulResponseOrNot404Response(
                 new FailedToUpdateResourceException(
-                    $"Failed to update {dependantResourceModel} from metadata-svc!" +
-                    await response.IncludeStatusCodeAndMessageFromResponse()
+                    await response.FormatRequestAndResponse(
+                        $"Failed to update {dependantResourceModel} from metadata-svc!"
+                    )
                 )
             );
         }

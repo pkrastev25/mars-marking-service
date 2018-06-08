@@ -4,7 +4,7 @@ namespace mars_marking_svc.ResourceTypes.SimRun.Models
 {
     public class SimRunModel
     {
-        public const string StatusFinished = "Finished";
+        public const string StatusSucceeded = "Succeeded";
         public const string StatusFailed = "Failed";
         public const string StatusAborted = "Aborted";
 

@@ -8,7 +8,7 @@ namespace UnitTests.Services
     public class LoggerServiceTests
     {
         [Fact]
-        public void LodCreateEvent_StringMessage_StringMessageIsWrittenToTheConsole()
+        public void LogInfoEvent_StringMessage_StringMessageIsWrittenToTheConsole()
         {
             // Arrange
             var messageToWriteToConsole = "Some message to the console!";
@@ -17,7 +17,7 @@ namespace UnitTests.Services
             using (var consoleOutputHelperMocks = new ConsoleHelperMocks(Console.Out))
             {
                 // Act
-                loggerService.LodCreateEvent(messageToWriteToConsole);
+                loggerService.LogInfoEvent(messageToWriteToConsole);
 
                 // Asser
                 Assert.Contains(messageToWriteToConsole, consoleOutputHelperMocks.GetOuput());
@@ -25,101 +25,85 @@ namespace UnitTests.Services
         }
 
         [Fact]
-        public void LogUpdateEvent_StringMessage_StringMessageIsWrittenToTheConsole()
+        public void LogInforWithErrorEvent_StringMessage_StringMessageIsWrittenToTheConsole()
         {
             // Arrange
             var messageToWriteToConsole = "Some message to the console!";
-            var loggerService = new LoggerService();
-
-            using (var consoleOutputHelperMocks = new ConsoleHelperMocks(Console.Out))
-            {
-                // Act
-                loggerService.LogUpdateEvent(messageToWriteToConsole);
-
-                // Asser
-                Assert.Contains(messageToWriteToConsole, consoleOutputHelperMocks.GetOuput());
-            }
-        }
-
-        [Fact]
-        public void LogDeleteEvent_StringMessage_StringMessageIsWrittenToTheConsole()
-        {
-            // Arrange
-            var messageToWriteToConsole = "Some message to the console!";
-            var loggerService = new LoggerService();
-
-            using (var consoleOutputHelperMocks = new ConsoleHelperMocks(Console.Out))
-            {
-                // Act
-                loggerService.LogDeleteEvent(messageToWriteToConsole);
-
-                // Asser
-                Assert.Contains(messageToWriteToConsole, consoleOutputHelperMocks.GetOuput());
-            }
-        }
-
-        [Fact]
-        public void LogMarkEvent_StringMessage_StringMessageIsWrittenToTheConsole()
-        {
-            // Arrange
-            var messageToWriteToConsole = "Some message to the console!";
-            var loggerService = new LoggerService();
-
-            using (var consoleOutputHelperMocks = new ConsoleHelperMocks(Console.Out))
-            {
-                // Act
-                loggerService.LogMarkEvent(messageToWriteToConsole);
-
-                // Asser
-                Assert.Contains(messageToWriteToConsole, consoleOutputHelperMocks.GetOuput());
-            }
-        }
-
-        [Fact]
-        public void LogUnmarkEvent_StringMessage_StringMessageIsWrittenToTheConsole()
-        {
-            // Arrange
-            var messageToWriteToConsole = "Some message to the console!";
-            var loggerService = new LoggerService();
-
-            using (var consoleOutputHelperMocks = new ConsoleHelperMocks(Console.Out))
-            {
-                // Act
-                loggerService.LogUnmarkEvent(messageToWriteToConsole);
-
-                // Asser
-                Assert.Contains(messageToWriteToConsole, consoleOutputHelperMocks.GetOuput());
-            }
-        }
-
-        [Fact]
-        public void LogSkipEvent_StringMessage_StringMessageIsWrittenToTheConsole()
-        {
-            // Arrange
-            var messageToWriteToConsole = "Some message to the console!";
-            var loggerService = new LoggerService();
-
-            using (var consoleOutputHelperMocks = new ConsoleHelperMocks(Console.Out))
-            {
-                // Act
-                loggerService.LogSkipEvent(messageToWriteToConsole);
-
-                // Asser
-                Assert.Contains(messageToWriteToConsole, consoleOutputHelperMocks.GetOuput());
-            }
-        }
-
-        [Fact]
-        public void LogErrorEvent_StringMessage_StringMessageIsWrittenToTheConsole()
-        {
-            // Arrange
-            var messageToWriteToConsole = "Some error has occurred!";
+            var exception = new Exception("The cause of the error!");
             var loggerService = new LoggerService();
 
             using (var consoleOutputHelperMocks = new ConsoleHelperMocks(Console.Error))
             {
                 // Act
-                loggerService.LogErrorEvent(new Exception(messageToWriteToConsole));
+                loggerService.LogInfoWithErrorEvent(messageToWriteToConsole, exception);
+
+                // Asser
+                Assert.Contains(messageToWriteToConsole, consoleOutputHelperMocks.GetOuput());
+            }
+        }
+
+        [Fact]
+        public void LogBackgroundJobInfoEvent_StringMessage_StringMessageIsWrittenToTheConsole()
+        {
+            // Arrange
+            var messageToWriteToConsole = "Some message to the console!";
+            var loggerService = new LoggerService();
+
+            using (var consoleOutputHelperMocks = new ConsoleHelperMocks(Console.Out))
+            {
+                // Act
+                loggerService.LogBackgroundJobInfoEvent(messageToWriteToConsole);
+
+                // Asser
+                Assert.Contains(messageToWriteToConsole, consoleOutputHelperMocks.GetOuput());
+            }
+        }
+
+        [Fact]
+        public void LogBackgroundJobErrorEvent_StringMessage_StringMessageIsWrittenToTheConsole()
+        {
+            // Arrange
+            var messageToWriteToConsole = "Some message to the console!";
+            var loggerService = new LoggerService();
+
+            using (var consoleOutputHelperMocks = new ConsoleHelperMocks(Console.Error))
+            {
+                // Act
+                loggerService.LogBackgroundJobErrorEvent(new Exception(messageToWriteToConsole));
+
+                // Asser
+                Assert.Contains(messageToWriteToConsole, consoleOutputHelperMocks.GetOuput());
+            }
+        }
+
+        [Fact]
+        public void LogStartupInfoEvent_StringMessage_StringMessageIsWrittenToTheConsole()
+        {
+            // Arrange
+            var messageToWriteToConsole = "Some message to the console!";
+            var loggerService = new LoggerService();
+
+            using (var consoleOutputHelperMocks = new ConsoleHelperMocks(Console.Out))
+            {
+                // Act
+                loggerService.LogStartupInfoEvent(messageToWriteToConsole);
+
+                // Asser
+                Assert.Contains(messageToWriteToConsole, consoleOutputHelperMocks.GetOuput());
+            }
+        }
+
+        [Fact]
+        public void LogStartupErrorEvent_StringMessage_StringMessageIsWrittenToTheConsole()
+        {
+            // Arrange
+            var messageToWriteToConsole = "Some message to the console!";
+            var loggerService = new LoggerService();
+
+            using (var consoleOutputHelperMocks = new ConsoleHelperMocks(Console.Error))
+            {
+                // Act
+                loggerService.LogStartupErrorEvent(new Exception(messageToWriteToConsole));
 
                 // Asser
                 Assert.Contains(messageToWriteToConsole, consoleOutputHelperMocks.GetOuput());

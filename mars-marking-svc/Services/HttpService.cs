@@ -1,5 +1,4 @@
-﻿using System;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using mars_marking_svc.Services.Models;
@@ -18,20 +17,19 @@ namespace mars_marking_svc.Services
             _httpClient = httpClient;
         }
 
-        public async Task<HttpResponseMessage> PostAsync<T>(string requestUri, T newModel)
+        public async Task<HttpResponseMessage> PostAsync<T>(
+            string requestUri,
+            T newModel
+        )
         {
-            return await ExecuteRequestAndFormatExceptionIfThrown(
-                _httpClient.PostAsync(requestUri, CreateStringContent(newModel))
-            );
+            return await _httpClient.PostAsync(requestUri, CreateStringContent(newModel));
         }
 
         public async Task<HttpResponseMessage> GetAsync(
             string requestUri
         )
         {
-            return await ExecuteRequestAndFormatExceptionIfThrown(
-                _httpClient.GetAsync(requestUri)
-            );
+            return await _httpClient.GetAsync(requestUri);
         }
 
         public async Task<HttpResponseMessage> PutAsync<T>(
@@ -39,9 +37,7 @@ namespace mars_marking_svc.Services
             T updatedModel
         )
         {
-            return await ExecuteRequestAndFormatExceptionIfThrown(
-                _httpClient.PutAsync(requestUri, CreateStringContent(updatedModel))
-            );
+            return await _httpClient.PutAsync(requestUri, CreateStringContent(updatedModel));
         }
 
         public async Task<HttpResponseMessage> PatchAsync<T>(
@@ -55,16 +51,14 @@ namespace mars_marking_svc.Services
                 Content = CreateStringContent(updatedModel)
             };
 
-            return await ExecuteRequestAndFormatExceptionIfThrown(
-                _httpClient.SendAsync(request)
-            );
+            return await _httpClient.SendAsync(request);
         }
 
-        public async Task<HttpResponseMessage> DeleteAsync(string requestUri)
+        public async Task<HttpResponseMessage> DeleteAsync(
+            string requestUri
+        )
         {
-            return await ExecuteRequestAndFormatExceptionIfThrown(
-                _httpClient.DeleteAsync(requestUri)
-            );
+            return await _httpClient.DeleteAsync(requestUri);
         }
 
         private StringContent CreateStringContent<T>(
@@ -76,28 +70,6 @@ namespace mars_marking_svc.Services
                 Encoding.UTF8,
                 "application/json"
             );
-        }
-
-        private async Task<HttpResponseMessage> ExecuteRequestAndFormatExceptionIfThrown(
-            Task<HttpResponseMessage> request
-        )
-        {
-            try
-            {
-                return await request;
-            }
-            catch (Exception e)
-            {
-                if (!string.IsNullOrEmpty(e.InnerException?.Message))
-                {
-                    throw new Exception(
-                        $"{e.Message} {e.InnerException.Message}",
-                        e
-                    );
-                }
-
-                throw;
-            }
         }
     }
 }

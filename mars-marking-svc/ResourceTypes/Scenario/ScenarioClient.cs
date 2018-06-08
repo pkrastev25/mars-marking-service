@@ -34,8 +34,9 @@ namespace mars_marking_svc.ResourceTypes.Scenario
 
             response.ThrowExceptionIfNotSuccessfulResponse(
                 new FailedToGetResourceException(
-                    $"Failed to get scenario with id: {scenarioId} from scenario-svc!" +
-                    await response.IncludeStatusCodeAndMessageFromResponse()
+                    await response.FormatRequestAndResponse(
+                        $"Failed to get scenario with id: {scenarioId} from scenario-svc!"
+                    )
                 )
             );
 
@@ -52,8 +53,9 @@ namespace mars_marking_svc.ResourceTypes.Scenario
 
             response.ThrowExceptionIfNotSuccessfulResponseOrNot404Response(
                 new FailedToGetResourceException(
-                    $"Failed to get scenarios for metadataId: {metadataId} from scenario-svc!" +
-                    await response.IncludeStatusCodeAndMessageFromResponse()
+                    await response.FormatRequestAndResponse(
+                        $"Failed to get scenarios for metadataId: {metadataId} from scenario-svc!"
+                    )
                 )
             );
 
@@ -75,8 +77,9 @@ namespace mars_marking_svc.ResourceTypes.Scenario
 
             response.ThrowExceptionIfNotSuccessfulResponseOrNot404Response(
                 new FailedToGetResourceException(
-                    $"Failed to get scenarios for projectId: {projectId} from scenario-svc!" +
-                    await response.IncludeStatusCodeAndMessageFromResponse()
+                    await response.FormatRequestAndResponse(
+                        $"Failed to get scenarios for projectId: {projectId} from scenario-svc!"
+                    )
                 )
             );
 
@@ -119,8 +122,9 @@ namespace mars_marking_svc.ResourceTypes.Scenario
 
             response.ThrowExceptionIfNotSuccessfulResponse(
                 new FailedToUpdateResourceException(
-                    $"Failed to update scenario {scenarioModel} from scenario-svc!" +
-                    await response.IncludeStatusCodeAndMessageFromResponse()
+                    await response.FormatRequestAndResponse(
+                        $"Failed to update scenario {scenarioModel} from scenario-svc!"
+                    )
                 )
             );
 
@@ -148,8 +152,9 @@ namespace mars_marking_svc.ResourceTypes.Scenario
 
             response.ThrowExceptionIfNotSuccessfulResponseOrNot404Response(
                 new FailedToUpdateResourceException(
-                    $"Failed to update {dependantResourceModel} from scenario-svc!" +
-                    await response.IncludeStatusCodeAndMessageFromResponse()
+                    await response.FormatRequestAndResponse(
+                        $"Failed to update {dependantResourceModel} from scenario-svc!"
+                    )
                 )
             );
         }

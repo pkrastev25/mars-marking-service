@@ -39,12 +39,15 @@ namespace mars_marking_svc.ResourceTypes.ResultData
                     return new DependantResourceModel(ResourceTypeEnum.ResultData, resultDataId);
                 case HttpStatusCode.Conflict:
                     throw new ResourceAlreadyMarkedException(
-                        $"Cannot mark resultData with id: {resultDataId}, it is already marked!"
+                        await response.FormatRequestAndResponse(
+                            $"Cannot mark resultData with id: {resultDataId}, it is already marked!"
+                        )
                     );
                 default:
                     throw new FailedToUpdateResourceException(
-                        $"Failed to update resultData with id: {resultDataId} from database-utility-svc!" +
-                        await response.IncludeStatusCodeAndMessageFromResponse()
+                        await response.FormatRequestAndResponse(
+                            $"Failed to update resultData with id: {resultDataId} from database-utility-svc!"
+                        )
                     );
             }
         }
@@ -64,8 +67,9 @@ namespace mars_marking_svc.ResourceTypes.ResultData
 
             response.ThrowExceptionIfNotSuccessfulResponseOrNot404Response(
                 new FailedToUpdateResourceException(
-                    $"Failed to update resultData with id: {dependantResourceModel.ResourceId} from database-utility-svc!" +
-                    await response.IncludeStatusCodeAndMessageFromResponse()
+                    await response.FormatRequestAndResponse(
+                        $"Failed to update resultData with id: {dependantResourceModel.ResourceId} from database-utility-svc!"
+                    )
                 )
             );
         }

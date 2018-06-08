@@ -35,8 +35,9 @@ namespace mars_marking_svc.ResourceTypes.ResultConfig
 
             response.ThrowExceptionIfNotSuccessfulResponse(
                 new FailedToGetResourceException(
-                    $"Failed to get resultConfig with id: {resultConfigId} from resultcfg-svc!" +
-                    await response.IncludeStatusCodeAndMessageFromResponse()
+                    await response.FormatRequestAndResponse(
+                        $"Failed to get resultConfig with id: {resultConfigId} from resultcfg-svc!"
+                    )
                 )
             );
 
@@ -55,8 +56,9 @@ namespace mars_marking_svc.ResourceTypes.ResultConfig
 
             response.ThrowExceptionIfNotSuccessfulResponseOrNot404Response(
                 new FailedToGetResourceException(
-                    $"Failed to get resultConfigs for metadataId: {metadataId} from resultcfg-svc!" +
-                    await response.IncludeStatusCodeAndMessageFromResponse()
+                    await response.FormatRequestAndResponse(
+                        $"Failed to get resultConfigs for metadataId: {metadataId} from resultcfg-svc!"
+                    )
                 )
             );
 

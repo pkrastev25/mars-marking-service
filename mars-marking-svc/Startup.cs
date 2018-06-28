@@ -62,7 +62,7 @@ namespace mars_marking_svc
             // Services
             services.AddScoped<IDbMongoService, DbMongoService>();
             services.AddScoped<IHostedService, HostedStartupService>();
-            services.AddScoped<IHttpService, HttpService>();
+            services.AddTransient<IHttpService, HttpService>();
             services.AddScoped<ILoggerService, LoggerService>();
 
             // Clients

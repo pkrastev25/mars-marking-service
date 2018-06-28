@@ -26,7 +26,7 @@ namespace UnitTests.Middlewares
             // Act
             await errorHandlerMiddleware.Invoke(httpContext);
 
-            // Asset
+            // Assert
             Assert.Equal((int) HttpStatusCode.Conflict, httpContext.Response.StatusCode);
         }
 
@@ -44,7 +44,7 @@ namespace UnitTests.Middlewares
             // Act
             await errorHandlerMiddleware.Invoke(httpContext);
 
-            // Asset
+            // Assert
             Assert.Equal((int) HttpStatusCode.InternalServerError, httpContext.Response.StatusCode);
         }
     }

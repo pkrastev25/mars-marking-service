@@ -16,7 +16,7 @@ namespace UnitTests.Utils
             // Act
             var result = EnumUtil.DoesResourceTypeExist(resourceType);
 
-            // Asset
+            // Assert
             Assert.True(result);
         }
 
@@ -29,7 +29,7 @@ namespace UnitTests.Utils
             // Act
             var result = EnumUtil.DoesResourceTypeExist(resourceType);
 
-            // Asset
+            // Assert
             Assert.False(result);
         }
 
@@ -42,7 +42,7 @@ namespace UnitTests.Utils
             // Act
             var result = EnumUtil.DoesMarkSessionTypeExist(markSessionType);
 
-            // Asset
+            // Assert
             Assert.True(result);
         }
 
@@ -55,7 +55,7 @@ namespace UnitTests.Utils
             // Act
             var result = EnumUtil.DoesMarkSessionTypeExist(markSessionType);
 
-            // Asset
+            // Assert
             Assert.False(result);
         }
     }

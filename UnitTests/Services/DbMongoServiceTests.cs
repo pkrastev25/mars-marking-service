@@ -8,6 +8,7 @@ namespace UnitTests.Services
         [Fact]
         public void GetMarkSessionCollection_ConnectionExists_ReturnsMarkSessionCollection()
         {
+            // Arrange
             var dbMongoService = new DbMongoService();
 
             // Act

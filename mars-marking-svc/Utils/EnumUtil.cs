@@ -3,7 +3,7 @@ using mars_marking_svc.ResourceTypes.MarkedResource.Enums;
 
 namespace mars_marking_svc.Utils
 {
-    public class EnumUtil
+    public static class EnumUtil
     {
         public static bool DoesResourceTypeExist(
             string resourceType

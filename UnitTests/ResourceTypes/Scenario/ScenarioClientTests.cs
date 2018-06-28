@@ -194,7 +194,7 @@ namespace UnitTests.ResourceTypes.Scenario
             };
             var httpService = new Mock<IHttpService>();
             httpService
-                .Setup(m => m.PatchAsync(It.IsAny<string>(), It.IsAny<ScenarioModel>()))
+                .Setup(m => m.PutAsync(It.IsAny<string>(), It.IsAny<ScenarioModel>()))
                 .ReturnsAsync(httpResponseMessage);
             var scenarioClient = new ScenarioClient(httpService.Object);
 
@@ -216,7 +216,7 @@ namespace UnitTests.ResourceTypes.Scenario
             };
             var httpService = new Mock<IHttpService>();
             httpService
-                .Setup(m => m.PatchAsync(It.IsAny<string>(), It.IsAny<ScenarioModel>()))
+                .Setup(m => m.PutAsync(It.IsAny<string>(), It.IsAny<ScenarioModel>()))
                 .ReturnsAsync(httpResponseMessage);
             var scenarioClient = new ScenarioClient(httpService.Object);
             Exception exception = null;
@@ -246,7 +246,7 @@ namespace UnitTests.ResourceTypes.Scenario
             };
             var httpService = new Mock<IHttpService>();
             httpService
-                .Setup(m => m.PatchAsync(It.IsAny<string>(), It.IsAny<ScenarioModel>()))
+                .Setup(m => m.PutAsync(It.IsAny<string>(), It.IsAny<ScenarioModel>()))
                 .ReturnsAsync(httpResponseMessage);
             var scenarioClient = new ScenarioClient(httpService.Object);
             Exception exception = null;

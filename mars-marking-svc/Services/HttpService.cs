@@ -40,20 +40,6 @@ namespace mars_marking_svc.Services
             return await _httpClient.PutAsync(requestUri, CreateStringContent(updatedModel));
         }
 
-        public async Task<HttpResponseMessage> PatchAsync<T>(
-            string requestUri,
-            T updatedModel
-        )
-        {
-            var method = new HttpMethod("PATCH");
-            var request = new HttpRequestMessage(method, requestUri)
-            {
-                Content = CreateStringContent(updatedModel)
-            };
-
-            return await _httpClient.SendAsync(request);
-        }
-
         public async Task<HttpResponseMessage> DeleteAsync(
             string requestUri
         )

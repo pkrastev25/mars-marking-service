@@ -115,8 +115,8 @@ namespace mars_marking_svc.ResourceTypes.Scenario
             scenarioModel.ToBeDeleted = true;
             scenarioModel.ReadOnly = true;
 
-            var response = await _httpService.PatchAsync(
-                $"http://{_baseUrl}/scenarios/{scenarioModel.ScenarioId}/metadata",
+            var response = await _httpService.PutAsync(
+                $"http://{_baseUrl}/scenarios/{scenarioModel.ScenarioId}/marks",
                 scenarioModel
             );
 
@@ -145,8 +145,8 @@ namespace mars_marking_svc.ResourceTypes.Scenario
                 ReadOnly = false
             };
 
-            var response = await _httpService.PatchAsync(
-                $"http://{_baseUrl}/scenarios/{scenarioModel.ScenarioId}/metadata",
+            var response = await _httpService.PutAsync(
+                $"http://{_baseUrl}/scenarios/{scenarioModel.ScenarioId}/marks",
                 scenarioModel
             );
 

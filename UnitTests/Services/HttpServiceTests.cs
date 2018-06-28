@@ -61,22 +61,6 @@ namespace UnitTests.Services
         }
 
         [Fact]
-        public async void PatchAsync_InternalServerErrorStatusCode_ReturnsInternalServerErrorStatusCode()
-        {
-            // Arrange
-            var httpService = new Mock<IHttpService>();
-            httpService
-                .Setup(m => m.PatchAsync(It.IsAny<string>(), It.IsAny<string>()))
-                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.InternalServerError));
-
-            // Act
-            var result = await httpService.Object.PatchAsync(It.IsAny<string>(), It.IsAny<string>());
-
-            // Assert
-            Assert.Equal(HttpStatusCode.InternalServerError, result.StatusCode);
-        }
-
-        [Fact]
         public async void DeleteAsync_NotFoundStatusCode_ReturnsNotFoundStatusCode()
         {
             // Arrange

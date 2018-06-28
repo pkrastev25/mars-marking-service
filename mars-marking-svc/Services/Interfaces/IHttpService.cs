@@ -19,11 +19,6 @@ namespace mars_marking_svc.Services.Models
             T updatedModel
         );
 
-        Task<HttpResponseMessage> PatchAsync<T>(
-            string requestUri,
-            T updatedModel
-        );
-
         Task<HttpResponseMessage> DeleteAsync(
             string requestUri
         );

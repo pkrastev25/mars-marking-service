@@ -47,8 +47,11 @@ services:
       - POSTGRES_DB=project
       - POSTGRES_USER=projectsvc
       - POSTGRES_PASSWORD=mariokart102
+      - PGDATA=/var/lib/postgresql/data/pgdata
     expose:
       - 5432
+    ports:
+      - 5432:5432
 
   project-svc:
     image: nexus.informatik.haw-hamburg.de/project-svc:latest
@@ -86,7 +89,7 @@ services:
 
   # The actual scenario-svc
   scenario-service:
-    image: nexus.informatik.haw-hamburg.de/scenario-svc:latest
+    image: docker-hub.informatik.haw-hamburg.de/mars/mars-scenario-svc/scenario-svc:latest
     links:
       - mongodb
     depends_on:
@@ -101,7 +104,6 @@ services:
   
   # The actual resultcfg-svc
   resultcfg-service:
-    # TODO: Change once bug is fixed
     image: nexus.informatik.haw-hamburg.de/resultcfg-svc:2.0.3
     links:
       - resultcfg-svc

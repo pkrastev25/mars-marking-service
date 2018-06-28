@@ -52,7 +52,7 @@ namespace mars_marking_svc.Middlewares
         )
         {
             return
-                $"{httpContext.Request.Method} {httpContext.Request.Path.Value}{httpContext.Request.QueryString.Value} {httpContext.Response.StatusCode}";
+                $"{httpContext.Response.StatusCode} {httpContext.Request.Method} {httpContext.Request.Path.Value}{httpContext.Request.QueryString.Value}";
         }
 
         private Task HandleException(

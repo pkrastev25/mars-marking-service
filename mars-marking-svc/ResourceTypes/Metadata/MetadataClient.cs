@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using mars_marking_svc.Exceptions;
 using mars_marking_svc.MarkedResource.Models;
 using mars_marking_svc.ResourceTypes.Metadata.Interfaces;
 using mars_marking_svc.ResourceTypes.Metadata.Models;
+using mars_marking_svc.Services;
 using mars_marking_svc.Services.Models;
 using mars_marking_svc.Utils;
 
@@ -101,6 +104,14 @@ namespace mars_marking_svc.ResourceTypes.Metadata
                 ""
             );
 
+            if (response.StatusCode == HttpStatusCode.MethodNotAllowed)
+            {
+                response = await new HttpService(new HttpClient()).PutAsync(
+                    $"http://{_baseUrl}/metadata/{metadataModel.DataId}/state?state={MetadataModel.ToBeDeletedState}",
+                    ""
+                );
+            }
+
             response.ThrowExceptionIfNotSuccessfulResponse(
                 new FailedToUpdateResourceException(
                     await response.FormatRequestAndResponse(
@@ -125,6 +136,14 @@ namespace mars_marking_svc.ResourceTypes.Metadata
                 $"http://{_baseUrl}/metadata/{dependantResourceModel.ResourceId}/state?state={dependantResourceModel.PreviousState}",
                 ""
             );
+            
+            if (response.StatusCode == HttpStatusCode.MethodNotAllowed)
+            {
+                response = await new HttpService(new HttpClient()).PutAsync(
+                    $"http://{_baseUrl}/metadata/{dependantResourceModel.ResourceId}/state?state={dependantResourceModel.PreviousState}",
+                    ""
+                );
+            }
 
             response.ThrowExceptionIfNotSuccessfulResponseOrNot404Response(
                 new FailedToUpdateResourceException(

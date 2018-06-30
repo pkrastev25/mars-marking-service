@@ -88,7 +88,7 @@ services:
 
   # The actual scenario-svc
   scenario-service:
-    image: docker-hub.informatik.haw-hamburg.de/mars/mars-scenario-svc/scenario-svc:30924
+    image: docker-hub.informatik.haw-hamburg.de/mars/mars-scenario-svc/scenario-svc:latest
     links:
       - mongodb
     depends_on:

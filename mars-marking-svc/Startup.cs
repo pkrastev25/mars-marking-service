@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
 using AutoMapper;
 using Hangfire;
 using Hangfire.Mongo;
@@ -51,11 +52,17 @@ namespace mars_marking_svc
             services.AddAutoMapper();
 
             // Hangfire config
+            var hangfireStorageOptions = new MongoStorageOptions
+            {
+                // The time interval after which Hangfire will re-enqueue aborted or failed jobs if the server dies unexpectedly
+                InvisibilityTimeout = TimeSpan.FromMinutes(1)
+            };
             services.AddHangfire(configuration =>
             {
                 configuration.UseMongoStorage(
                     DbMongoService.MongoDbConnection,
-                    DbMongoService.MongoDbHangfireName
+                    DbMongoService.MongoDbHangfireName,
+                    hangfireStorageOptions
                 );
             });
 

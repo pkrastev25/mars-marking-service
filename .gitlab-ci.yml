@@ -55,6 +55,7 @@ createMarkingSvcTestEnvironment:
     - sh ./start.sh
 
 integrationTests:
+  when: manual
   stage: integrationTests
   image: $NEXUS_CACHE/marking-svc-test-env
   services:

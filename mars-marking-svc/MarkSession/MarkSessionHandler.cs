@@ -95,8 +95,6 @@ namespace mars_marking_svc.ResourceTypes.MarkedResource
             string markSessionId
         )
         {
-            await FindMarkSessionById(markSessionId);
-
             return await _backgroundJobsHandler.CreateBackgroundJob(
                 () => StartDeletionProcess(markSessionId)
             );
@@ -126,7 +124,7 @@ namespace mars_marking_svc.ResourceTypes.MarkedResource
                 try
                 {
                     _loggerService.LogBackgroundJobInfoEvent(
-                        $"Job for mark session with id: {markSessionId} will start in {taskExecutionDelayInSeconds} second/s, restart count: {restartCount}"
+                        $"Unmarking job for mark session with id: {markSessionId} will start in {taskExecutionDelayInSeconds} second/s, restart count: {restartCount}"
                     );
                     await Task.Delay(TimeSpan.FromSeconds(taskExecutionDelayInSeconds));
 
@@ -152,7 +150,7 @@ namespace mars_marking_svc.ResourceTypes.MarkedResource
             }
 
             _loggerService.LogBackgroundJobInfoEvent(
-                $"Job for mark session with id: {markSessionId} completed!"
+                $"Unmarking job for mark session with id: {markSessionId} completed!"
             );
         }
 

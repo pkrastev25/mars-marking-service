@@ -104,6 +104,10 @@ namespace mars_marking_svc.ResourceTypes.Metadata
                 ""
             );
 
+            /**
+             * Sometimes the HttpClient gets corrupted and it sends a malformed request to the metadata-svc only.
+             * Because of the time limitation, a workaround has been made which creates a new client for this request only.
+             */
             if (response.StatusCode == HttpStatusCode.MethodNotAllowed)
             {
                 response = await new HttpService(new HttpClient()).PutAsync(
@@ -137,6 +141,10 @@ namespace mars_marking_svc.ResourceTypes.Metadata
                 ""
             );
             
+            /**
+             * Sometimes the HttpClient gets corrupted and it sends a malformed request to the metadata-svc only.
+             * Because of the time limitation, a workaround has been made which creates a new client for this request only.
+             */
             if (response.StatusCode == HttpStatusCode.MethodNotAllowed)
             {
                 response = await new HttpService(new HttpClient()).PutAsync(

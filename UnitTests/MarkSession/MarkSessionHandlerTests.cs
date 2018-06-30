@@ -307,6 +307,9 @@ namespace UnitTests.MarkSession
             var markSessionRepository = new Mock<IMarkSessionRepository>();
             var dependantResourceHandler = new Mock<IDependantResourceHandler>();
             var backgroundJobsHandler = new Mock<IBackgroundJobsHandler>();
+            backgroundJobsHandler
+                .Setup(m => m.CreateBackgroundJob(It.IsAny<Expression<Func<Task>>>()))
+                .Throws(new MarkSessionDoesNotExistException(""));
             var loggerService = new Mock<ILoggerService>();
             var markSessionHandler = new MarkSessionHandler(
                 markSessionRepository.Object,
@@ -384,7 +387,7 @@ namespace UnitTests.MarkSession
             try
             {
                 // Act
-                await markSessionHandler.DeleteMarkSession(markSessionId);
+                await markSessionHandler.DeleteEmptyMarkSession(markSessionId);
             }
             catch (MarkSessionDoesNotExistException e)
             {

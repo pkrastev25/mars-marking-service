@@ -6,13 +6,15 @@ namespace mars_marking_svc.Services
     public class LoggerService : ILoggerService
     {
         public void LogInfoEvent(
+            double performanceMetricInSeconds,
             string message
         )
         {
-            Console.WriteLine($"{IncludeTimestamp()} [INFO] {message}");
+            Console.WriteLine($"{IncludeTimestamp()} {IncludePerformanceMetric(performanceMetricInSeconds)} [INFO] {message}");
         }
 
         public void LogInfoWithErrorEvent(
+            double performanceMetricInSeconds,
             string message,
             Exception error
         )
@@ -20,7 +22,16 @@ namespace mars_marking_svc.Services
             var errorMessage = error.InnerException == null
                 ? $"[ERROR] {error.Message}\n{error.StackTrace}"
                 : $"[ERROR] {error.Message} {error.InnerException.Message}\n{error.StackTrace}";
-            Console.Error.WriteLine($"{IncludeTimestamp()} [INFO] {message}\n{errorMessage}");
+            Console.Error.WriteLine(
+                $"{IncludeTimestamp()} {IncludePerformanceMetric(performanceMetricInSeconds)} [INFO] {message}\n{errorMessage}");
+        }
+
+        public void LogBackgroundJobInfoEvent(
+            double performanceMetricInSeconds,
+            string message
+        )
+        {
+            Console.WriteLine($"{IncludeTimestamp()} {IncludePerformanceMetric(performanceMetricInSeconds)} [JOB][INFO] {message}");
         }
 
         public void LogBackgroundJobInfoEvent(
@@ -31,13 +42,14 @@ namespace mars_marking_svc.Services
         }
 
         public void LogBackgroundJobErrorEvent(
+            double performanceMetricInSeconds,
             Exception error
         )
         {
             Console.Error.WriteLine(
                 error.InnerException == null
-                    ? $"{IncludeTimestamp()} [JOB][ERROR] {error.Message}\n{error.StackTrace}"
-                    : $"{IncludeTimestamp()} [JOB][ERROR] {error.Message} {error.InnerException.Message}\n{error.StackTrace}"
+                    ? $"{IncludeTimestamp()} {IncludePerformanceMetric(performanceMetricInSeconds)} [JOB][ERROR] {error.Message}\n{error.StackTrace}"
+                    : $"{IncludeTimestamp()} {IncludePerformanceMetric(performanceMetricInSeconds)} [JOB][ERROR] {error.Message} {error.InnerException.Message}\n{error.StackTrace}"
             );
         }
 
@@ -62,6 +74,13 @@ namespace mars_marking_svc.Services
         private string IncludeTimestamp()
         {
             return $"- {DateTime.Now} -";
+        }
+
+        private string IncludePerformanceMetric(
+            double performanceMetricInSeconds
+        )
+        {
+            return $"{performanceMetricInSeconds}s";
         }
     }
 }

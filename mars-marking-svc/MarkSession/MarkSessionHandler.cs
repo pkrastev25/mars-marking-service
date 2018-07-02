@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using mars_marking_svc.ArchiveService.Interfaces;
 using mars_marking_svc.BackgroundJobs.Interfaces;
 using mars_marking_svc.DependantResource.Interfaces;
 using mars_marking_svc.Exceptions;
@@ -17,18 +18,21 @@ namespace mars_marking_svc.ResourceTypes.MarkedResource
     {
         private const int MaxDelayForJobInSeconds = 60;
 
+        private readonly IArchiveServiceClient _archiveServiceClient;
         private readonly IMarkSessionRepository _markSessionRepository;
         private readonly IDependantResourceHandler _dependantResourceHandler;
         private readonly IBackgroundJobsHandler _backgroundJobsHandler;
         private readonly ILoggerService _loggerService;
 
         public MarkSessionHandler(
+            IArchiveServiceClient archiveServiceClient,
             IMarkSessionRepository markSessionRepository,
             IDependantResourceHandler dependantResourceHandler,
             IBackgroundJobsHandler backgroundJobsHandler,
             ILoggerService loggerService
         )
         {
+            _archiveServiceClient = archiveServiceClient;
             _markSessionRepository = markSessionRepository;
             _dependantResourceHandler = dependantResourceHandler;
             _backgroundJobsHandler = backgroundJobsHandler;
@@ -42,6 +46,8 @@ namespace mars_marking_svc.ResourceTypes.MarkedResource
             string markSessionType
         )
         {
+            await _archiveServiceClient.EnsureArchiveRestoreIsNotRunning(projectId);
+
             var markSessionModel = new MarkSessionModel(resourceId, projectId, resourceType, markSessionType);
 
             try

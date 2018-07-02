@@ -4,6 +4,7 @@ namespace mars_marking_svc.Constants
 {
     public static class Constants
     {
+        public const string ArchiveSvcUrlKey = "ARCHIVE_SVC_URL";
         public const string ProjectSvcUrlKey = "PROJECT_SVC_URL";
         public const string MetadataSvcUrlKey = "METADATA_SVC_URL";
         public const string ScenarioSvcUrlKey = "SCENARIO_SVC_URL";

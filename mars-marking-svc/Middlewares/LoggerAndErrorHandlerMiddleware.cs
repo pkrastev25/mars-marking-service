@@ -32,11 +32,11 @@ namespace mars_marking_svc.Middlewares
         )
         {
             var stopwatch = Stopwatch.StartNew();
-            
+
             try
             {
                 await _requestDelegate(httpContext);
-                
+
                 stopwatch.Stop();
                 _loggerService.LogInfoEvent(
                     stopwatch.Elapsed.TotalSeconds,
@@ -46,7 +46,7 @@ namespace mars_marking_svc.Middlewares
             catch (Exception e)
             {
                 stopwatch.Stop();
-                
+
                 await HandleException(httpContext, e);
                 _loggerService.LogInfoWithErrorEvent(
                     stopwatch.Elapsed.TotalSeconds,
@@ -89,6 +89,7 @@ namespace mars_marking_svc.Middlewares
                 case CannotMarkResourceException _:
                 case MarkSessionAlreadyExistsException _:
                 case ResourceAlreadyMarkedException _:
+                case ArchiveRestoreForProjectIsRunningException _:
                     return StatusCodeConflict;
             }
 

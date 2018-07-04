@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using mars_marking_svc.ArchiveService.Interfaces;
 using mars_marking_svc.BackgroundJobs.Interfaces;
 using mars_marking_svc.DependantResource.Interfaces;
 using mars_marking_svc.Exceptions;
@@ -23,10 +22,6 @@ namespace UnitTests.MarkSession
         public async void CreateMarkSession_NewMarkSession_ReturnsMarkSessionModel()
         {
             // Arrange
-            var archiveServiceClient = new Mock<IArchiveServiceClient>();
-            archiveServiceClient
-                .Setup(m => m.EnsureArchiveRestoreIsNotRunning(It.IsAny<string>()))
-                .Returns(Task.CompletedTask);
             var markSessionRepository = new Mock<IMarkSessionRepository>();
             markSessionRepository
                 .Setup(m => m.Create(It.IsAny<MarkSessionModel>()))
@@ -41,7 +36,6 @@ namespace UnitTests.MarkSession
             var backgroundJobsHandler = new Mock<IBackgroundJobsHandler>();
             var loggerService = new Mock<ILoggerService>();
             var markSessionHandler = new MarkSessionHandler(
-                archiveServiceClient.Object,
                 markSessionRepository.Object,
                 dependantResourceHandler.Object,
                 backgroundJobsHandler.Object,
@@ -64,10 +58,6 @@ namespace UnitTests.MarkSession
         public async void CreateMarkSession_MarkSessionAlreadyExists_ThrowsException()
         {
             // Arrange
-            var archiveServiceClient = new Mock<IArchiveServiceClient>();
-            archiveServiceClient
-                .Setup(m => m.EnsureArchiveRestoreIsNotRunning(It.IsAny<string>()))
-                .Returns(Task.CompletedTask);
             var markSessionRepository = new Mock<IMarkSessionRepository>();
             markSessionRepository
                 .Setup(m => m.Create(It.IsAny<MarkSessionModel>()))
@@ -82,7 +72,6 @@ namespace UnitTests.MarkSession
             var backgroundJobsHandler = new Mock<IBackgroundJobsHandler>();
             var loggerService = new Mock<ILoggerService>();
             var markSessionHandler = new MarkSessionHandler(
-                archiveServiceClient.Object,
                 markSessionRepository.Object,
                 dependantResourceHandler.Object,
                 backgroundJobsHandler.Object,
@@ -113,17 +102,12 @@ namespace UnitTests.MarkSession
         public async void GetMarkSessionById_InvalidMarkSessionId_ThrowsException()
         {
             // Arrange
-            var archiveServiceClient = new Mock<IArchiveServiceClient>();
-            archiveServiceClient
-                .Setup(m => m.EnsureArchiveRestoreIsNotRunning(It.IsAny<string>()))
-                .Returns(Task.CompletedTask);
             var markSessionId = "";
             var markSessionRepository = new Mock<IMarkSessionRepository>();
             var dependantResourceHandler = new Mock<IDependantResourceHandler>();
             var backgroundJobsHandler = new Mock<IBackgroundJobsHandler>();
             var loggerService = new Mock<ILoggerService>();
             var markSessionHandler = new MarkSessionHandler(
-                archiveServiceClient.Object,
                 markSessionRepository.Object,
                 dependantResourceHandler.Object,
                 backgroundJobsHandler.Object,
@@ -149,10 +133,6 @@ namespace UnitTests.MarkSession
         public async void GetMarkSessionById_ValidMarkSessionId_ThrowsException()
         {
             // Arrange
-            var archiveServiceClient = new Mock<IArchiveServiceClient>();
-            archiveServiceClient
-                .Setup(m => m.EnsureArchiveRestoreIsNotRunning(It.IsAny<string>()))
-                .Returns(Task.CompletedTask);
             var markSessionId = "5ae86f68b90b230007d7ea34";
             var markSessionRepository = new Mock<IMarkSessionRepository>();
             markSessionRepository
@@ -162,7 +142,6 @@ namespace UnitTests.MarkSession
             var backgroundJobsHandler = new Mock<IBackgroundJobsHandler>();
             var loggerService = new Mock<ILoggerService>();
             var markSessionHandler = new MarkSessionHandler(
-                archiveServiceClient.Object,
                 markSessionRepository.Object,
                 dependantResourceHandler.Object,
                 backgroundJobsHandler.Object,
@@ -180,10 +159,6 @@ namespace UnitTests.MarkSession
         public async void GetMarkSessionsByMarkSessionType_ValidMarkSessionType_ReturnsMarkSessionModelList()
         {
             // Arrange
-            var archiveServiceClient = new Mock<IArchiveServiceClient>();
-            archiveServiceClient
-                .Setup(m => m.EnsureArchiveRestoreIsNotRunning(It.IsAny<string>()))
-                .Returns(Task.CompletedTask);
             var markSessionType = MarkSessionTypeEnum.ToBeDeleted;
             var markSessionRepository = new Mock<IMarkSessionRepository>();
             markSessionRepository
@@ -193,7 +168,6 @@ namespace UnitTests.MarkSession
             var backgroundJobsHandler = new Mock<IBackgroundJobsHandler>();
             var loggerService = new Mock<ILoggerService>();
             var markSessionHandler = new MarkSessionHandler(
-                archiveServiceClient.Object,
                 markSessionRepository.Object,
                 dependantResourceHandler.Object,
                 backgroundJobsHandler.Object,
@@ -211,10 +185,6 @@ namespace UnitTests.MarkSession
         public async void GetMarkSessionsByMarkSessionType_InvalidMarkSessionType_ReturnsEmptyList()
         {
             // Arrange
-            var archiveServiceClient = new Mock<IArchiveServiceClient>();
-            archiveServiceClient
-                .Setup(m => m.EnsureArchiveRestoreIsNotRunning(It.IsAny<string>()))
-                .Returns(Task.CompletedTask);
             var markSessionType = "";
             var markSessionRepository = new Mock<IMarkSessionRepository>();
             markSessionRepository
@@ -224,7 +194,6 @@ namespace UnitTests.MarkSession
             var backgroundJobsHandler = new Mock<IBackgroundJobsHandler>();
             var loggerService = new Mock<ILoggerService>();
             var markSessionHandler = new MarkSessionHandler(
-                archiveServiceClient.Object,
                 markSessionRepository.Object,
                 dependantResourceHandler.Object,
                 backgroundJobsHandler.Object,
@@ -242,10 +211,6 @@ namespace UnitTests.MarkSession
         public async void UpdateMarkSessionType_ValidMarkSessionId_ReturnsUpdatedMarkSessionModel()
         {
             // Arrange
-            var archiveServiceClient = new Mock<IArchiveServiceClient>();
-            archiveServiceClient
-                .Setup(m => m.EnsureArchiveRestoreIsNotRunning(It.IsAny<string>()))
-                .Returns(Task.CompletedTask);
             var markSessionId = "5ae86f68b90b230007d7ea34";
             var markSessionType = MarkSessionTypeEnum.ToBeArchived;
             var markSessionModel = MarkSessionModelDataMocks.MockMarkSessionModel();
@@ -260,7 +225,6 @@ namespace UnitTests.MarkSession
             var backgroundJobsHandler = new Mock<IBackgroundJobsHandler>();
             var loggerService = new Mock<ILoggerService>();
             var markSessionHandler = new MarkSessionHandler(
-                archiveServiceClient.Object,
                 markSessionRepository.Object,
                 dependantResourceHandler.Object,
                 backgroundJobsHandler.Object,
@@ -278,17 +242,12 @@ namespace UnitTests.MarkSession
         public async void UpdateMarkSessionType_InvalidMarkSessionId_ThrowsException()
         {
             // Arrange
-            var archiveServiceClient = new Mock<IArchiveServiceClient>();
-            archiveServiceClient
-                .Setup(m => m.EnsureArchiveRestoreIsNotRunning(It.IsAny<string>()))
-                .Returns(Task.CompletedTask);
             var markSessionId = "";
             var markSessionRepository = new Mock<IMarkSessionRepository>();
             var dependantResourceHandler = new Mock<IDependantResourceHandler>();
             var backgroundJobsHandler = new Mock<IBackgroundJobsHandler>();
             var loggerService = new Mock<ILoggerService>();
             var markSessionHandler = new MarkSessionHandler(
-                archiveServiceClient.Object,
                 markSessionRepository.Object,
                 dependantResourceHandler.Object,
                 backgroundJobsHandler.Object,
@@ -314,10 +273,6 @@ namespace UnitTests.MarkSession
         public async void DeleteMarkSession_ValidMarkSessionId_ReturnsUpdatedMarkSessionModel()
         {
             // Arrange
-            var archiveServiceClient = new Mock<IArchiveServiceClient>();
-            archiveServiceClient
-                .Setup(m => m.EnsureArchiveRestoreIsNotRunning(It.IsAny<string>()))
-                .Returns(Task.CompletedTask);
             var backgroundJobId = "1234";
             var markSessionId = "5ae86f68b90b230007d7ea34";
             var markSessionRepository = new Mock<IMarkSessionRepository>();
@@ -331,7 +286,6 @@ namespace UnitTests.MarkSession
                 .ReturnsAsync(backgroundJobId);
             var loggerService = new Mock<ILoggerService>();
             var markSessionHandler = new MarkSessionHandler(
-                archiveServiceClient.Object,
                 markSessionRepository.Object,
                 dependantResourceHandler.Object,
                 backgroundJobsHandler.Object,
@@ -349,17 +303,12 @@ namespace UnitTests.MarkSession
         public async void DeleteMarkSession_InvalidMarkSessionId_ThrowsException()
         {
             // Arrange
-            var archiveServiceClient = new Mock<IArchiveServiceClient>();
-            archiveServiceClient
-                .Setup(m => m.EnsureArchiveRestoreIsNotRunning(It.IsAny<string>()))
-                .Returns(Task.CompletedTask);
             var markSessionId = "";
             var markSessionRepository = new Mock<IMarkSessionRepository>();
             var dependantResourceHandler = new Mock<IDependantResourceHandler>();
             var backgroundJobsHandler = new Mock<IBackgroundJobsHandler>();
             var loggerService = new Mock<ILoggerService>();
             var markSessionHandler = new MarkSessionHandler(
-                archiveServiceClient.Object,
                 markSessionRepository.Object,
                 dependantResourceHandler.Object,
                 backgroundJobsHandler.Object,
@@ -385,10 +334,6 @@ namespace UnitTests.MarkSession
         public async void DeleteEmptyMarkSession_ValidMarkSessionId_NoExceptionThrown()
         {
             // Arrange
-            var archiveServiceClient = new Mock<IArchiveServiceClient>();
-            archiveServiceClient
-                .Setup(m => m.EnsureArchiveRestoreIsNotRunning(It.IsAny<string>()))
-                .Returns(Task.CompletedTask);
             var markSessionId = "5ae86f68b90b230007d7ea34";
             var markSessionRepository = new Mock<IMarkSessionRepository>();
             markSessionRepository
@@ -398,7 +343,6 @@ namespace UnitTests.MarkSession
             var backgroundJobsHandler = new Mock<IBackgroundJobsHandler>();
             var loggerService = new Mock<ILoggerService>();
             var markSessionHandler = new MarkSessionHandler(
-                archiveServiceClient.Object,
                 markSessionRepository.Object,
                 dependantResourceHandler.Object,
                 backgroundJobsHandler.Object,
@@ -424,17 +368,12 @@ namespace UnitTests.MarkSession
         public async void DeleteEmptyMarkSession_InvalidMarkSessionId_ThrowsException()
         {
             // Arrange
-            var archiveServiceClient = new Mock<IArchiveServiceClient>();
-            archiveServiceClient
-                .Setup(m => m.EnsureArchiveRestoreIsNotRunning(It.IsAny<string>()))
-                .Returns(Task.CompletedTask);
             var markSessionId = "";
             var markSessionRepository = new Mock<IMarkSessionRepository>();
             var dependantResourceHandler = new Mock<IDependantResourceHandler>();
             var backgroundJobsHandler = new Mock<IBackgroundJobsHandler>();
             var loggerService = new Mock<ILoggerService>();
             var markSessionHandler = new MarkSessionHandler(
-                archiveServiceClient.Object,
                 markSessionRepository.Object,
                 dependantResourceHandler.Object,
                 backgroundJobsHandler.Object,
@@ -460,10 +399,6 @@ namespace UnitTests.MarkSession
         public async void StartDeletionProcess_ValidMarkSessionId_NoExceptionThrown()
         {
             // Arrange
-            var archiveServiceClient = new Mock<IArchiveServiceClient>();
-            archiveServiceClient
-                .Setup(m => m.EnsureArchiveRestoreIsNotRunning(It.IsAny<string>()))
-                .Returns(Task.CompletedTask);
             var markSessionId = "5ae86f68b90b230007d7ea34";
             var markSessionRepository = new Mock<IMarkSessionRepository>();
             markSessionRepository
@@ -473,7 +408,6 @@ namespace UnitTests.MarkSession
             var backgroundJobsHandler = new Mock<IBackgroundJobsHandler>();
             var loggerService = new Mock<ILoggerService>();
             var markSessionHandler = new MarkSessionHandler(
-                archiveServiceClient.Object,
                 markSessionRepository.Object,
                 dependantResourceHandler.Object,
                 backgroundJobsHandler.Object,
@@ -499,17 +433,12 @@ namespace UnitTests.MarkSession
         public async void StartDeletionProcess_InvalidMarkSessionId_NoExceptionThrown()
         {
             // Arrange
-            var archiveServiceClient = new Mock<IArchiveServiceClient>();
-            archiveServiceClient
-                .Setup(m => m.EnsureArchiveRestoreIsNotRunning(It.IsAny<string>()))
-                .Returns(Task.CompletedTask);
             var markSessionId = "";
             var markSessionRepository = new Mock<IMarkSessionRepository>();
             var dependantResourceHandler = new Mock<IDependantResourceHandler>();
             var backgroundJobsHandler = new Mock<IBackgroundJobsHandler>();
             var loggerService = new Mock<ILoggerService>();
             var markSessionHandler = new MarkSessionHandler(
-                archiveServiceClient.Object,
                 markSessionRepository.Object,
                 dependantResourceHandler.Object,
                 backgroundJobsHandler.Object,

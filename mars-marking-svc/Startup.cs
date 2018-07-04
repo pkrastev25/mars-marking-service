@@ -3,8 +3,6 @@ using System.Net.Http;
 using AutoMapper;
 using Hangfire;
 using Hangfire.Mongo;
-using mars_marking_svc.ArchiveService;
-using mars_marking_svc.ArchiveService.Interfaces;
 using mars_marking_svc.BackgroundJobs;
 using mars_marking_svc.BackgroundJobs.Interfaces;
 using mars_marking_svc.DependantResource;
@@ -76,7 +74,6 @@ namespace mars_marking_svc
 
             // Clients
             services.AddScoped<HttpClient>();
-            services.AddScoped<IArchiveServiceClient, ArchiveServiceClient>();
             services.AddScoped<IProjectClient, ProjectClient>();
             services.AddScoped<IMetadataClient, MetadataClient>();
             services.AddScoped<IScenarioClient, ScenarioClient>();

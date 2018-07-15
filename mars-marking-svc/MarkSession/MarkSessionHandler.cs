@@ -142,8 +142,8 @@ namespace mars_marking_svc.ResourceTypes.MarkedResource
                     await _dependantResourceHandler.UnmarkResourcesForMarkSession(markSessionModel);
                     await _markSessionRepository.Delete(markSessionModel);
 
-                    isMarkSessionDeleted = true;
                     stopwatch.Stop();
+                    isMarkSessionDeleted = true;
                 }
                 catch (MarkSessionDoesNotExistException)
                 {

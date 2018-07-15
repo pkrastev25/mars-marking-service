@@ -3,7 +3,6 @@ using Newtonsoft.Json;
 
 namespace mars_marking_svc.MarkedResource.Models
 {
-    // TODO: Consider splitting into a DTO
     public class DependantResourceModel
     {
         [JsonProperty("resourceType")]

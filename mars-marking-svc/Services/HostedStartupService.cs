@@ -53,7 +53,14 @@ namespace mars_marking_svc.Services
                         !markSessionModel.IsMarkSessionRecentlyUpdated()
                     )
                     {
-                        await _markSessionHandler.DeleteMarkSession(markSessionModel.Id.ToString());
+                        try
+                        {
+                            await _markSessionHandler.DeleteMarkSession(markSessionModel.Id.ToString());
+                        }
+                        catch (Exception e)
+                        {
+                            _loggerService.LogStartupErrorEvent(e);
+                        }
                     }
                 }
             }

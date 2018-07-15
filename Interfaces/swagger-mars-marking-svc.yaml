@@ -1,0 +1,269 @@
+swagger: "2.0"
+info:
+  title: marking-svc REST API
+  version: "1.0"
+
+host: marking-svc
+schemes:
+  - http
+
+paths:
+  /api/marksession/{resourceType}/{resourceId}:
+    post:
+      description: >
+        Attempts to mark the resource specified with resourceType and resourceId, together with all dependent resources. Since the marks empose restrictions on the usability of the resources, please, delete the mark session once your service is done with the requested functionality.
+      parameters:
+        - name: resourceType
+          in: path
+          required: true
+          type: string
+          enum: [project, metadata, scenario, resultConfig, simPlan, simRun, resultData]
+        - name: resourceId
+          in: path
+          required: true
+          type: string
+          format: UUID
+        - name: markSessionType
+          in: query
+          required: true
+          type: string
+          enum: [TO_BE_DELETED, TO_BE_ARCHIVED]
+        - name: projectId
+          in: query
+          required: true
+          type: string
+          format: UUID
+      responses:
+        200:
+          description: >
+            The requested resources have successfully been found and marked.
+          schema:
+            $ref: "#/definitions/MarksessionModel"
+        400:
+          description: >
+            Missing or wrong input parameters have been supplied to the request (e.g. resourceType, resourceId, projectId)
+          schema:
+            title: message
+            type: string
+        409:
+          description: >
+            The marking process could not take place. Reasons could be some of the following
+            1. Someone else is already manipulating the same resources
+            2. Someone else is already manipulating part of the dependent resources
+          schema:
+            $ref: "#/definitions/ErrorMessageModel"
+        500:
+          description: >
+            Some error occurred within the service
+          schema:
+            $ref: "#/definitions/ErrorMessageModel"
+            
+  /api/marksession:
+    get:
+      description: >
+        Retreives all mark sessions that have the specified markSessionType.
+      parameters:
+        - name: markSessionType
+          in: query
+          required: true
+          type: string
+          enum: [TO_BE_DELETED, TO_BE_ARCHIVED]
+      responses:
+        200:
+          description: >
+            Mark sessions gathered for the specified markSessionType.
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/MarksessionModel"
+        500:
+          description: >
+            Some error occurred within the service
+          schema:
+            $ref: "#/definitions/ErrorMessageModel"
+  
+  /api/marksession/{markSessionId}:
+    get:
+      description: >
+        Retreives a mark session by markSessionId.
+      parameters:
+        - name: markSessionId
+          in: path
+          required: true
+          type: string
+          format: UUID
+      responses:
+        200:
+          description: >
+            Mark session is successfully found.
+          schema:
+            $ref: "#/definitions/MarksessionModel"
+        404:
+          description: >
+            No mark session was found with the specified markSessionId
+          schema:
+            $ref: "#/definitions/ErrorMessageModel"
+        500:
+          description: >
+            Some error occurred within the service
+          schema:
+            $ref: "#/definitions/ErrorMessageModel"
+
+    put:
+      description: >
+        Changes the ownership of the mark session by altering the markSessionType.
+      parameters:
+        - name: markSessionId
+          in: path
+          required: true
+          type: string
+          format: UUID
+        - name: markSessionType
+          in: query
+          required: true
+          type: string
+          enum: [TO_BE_DELETED, TO_BE_ARCHIVED]
+      responses:
+        200:
+          description: >
+            The markSessionType type has been successfully altered
+        404:
+          description: >
+            No mark session was found with the specified markSessionId
+          schema:
+            $ref: "#/definitions/ErrorMessageModel"
+        500:
+          description: >
+            Some error occurred within the service
+          schema:
+            $ref: "#/definitions/ErrorMessageModel"
+    
+    delete:
+      description: >
+        Starts a background job for unmarking all dependent resources for the mark session specified by markSessionId. Once the all dependent resources are unmarked, the mark session is deleted.
+      parameters:
+        - name: markSessionId
+          in: path
+          required: true
+          type: string
+          format: UUID
+      responses:
+        202:
+          description: >
+            A background job has been successfully scheduled to unmark all dependent resources. The backgroundJobId is returned.
+          schema:
+            title: backgroundJobId
+            type: string
+            format: UUID
+        404:
+          description: >
+            No mark session was found with the specified markSessionId
+          schema:
+            $ref: "#/definitions/ErrorMessageModel"
+        500:
+          description: >
+            Some error occurred within the service
+          schema:
+            $ref: "#/definitions/ErrorMessageModel"
+    
+  
+  /api/marksession/{markSessionId}/emptysession:
+    delete:
+      description: >
+        Removes the mark session from the database. This endpoint should be used by the deletion service or any other which deleted all dependent resources belonging to a mark session
+      parameters:
+        - name: markSessionId
+          in: path
+          required: true
+          type: string
+          format: UUID
+      responses:
+        200:
+          description: >
+            The mark session is successfully removed from the database
+        404:
+          description: >
+            No mark session was found with the specified markSessionId
+          schema:
+            $ref: "#/definitions/ErrorMessageModel"
+        500:
+          description: >
+            Some error occurred within the service
+          schema:
+            $ref: "#/definitions/ErrorMessageModel"
+    
+  /api/backgroundjob/{backgroundJobId}/status:
+    get:
+      description: >
+        Retrieves the state information for a background job.
+      parameters: 
+        - name: backgroundJobId
+          in: path
+          required: true
+          type: string
+          format: UUID
+      responses:
+        200:
+          description: >
+            Successfully retrived the state information about a background job.
+          schema:
+            title: state
+            enum: [Processing, Done]
+            type: string
+        204:
+          description: >
+            There is no information about the background job. The assumption can be made that the background job completed.
+        500:
+          description: >
+            Some error occurred within the service
+          schema:
+            $ref: "#/definitions/ErrorMessageModel"
+    
+  /healthz:
+    get:
+      description: >
+        Use to check the availability of the marking service. This could be also used internally by Kubernetes.
+      responses:
+        200:
+          description: OK
+          schema:
+            title: message
+            type: string
+        500:
+          description: >
+            Some error occurred within the service
+          schema:
+            $ref: "#/definitions/ErrorMessageModel"
+
+definitions:
+  MarksessionModel:
+    type: object
+    properties:
+      markSessionId:
+        type: string
+        format: UUID
+      projectId:
+        type: string
+        format: UUID
+      dependantResources:
+        type: array
+        items: 
+          $ref: "#/definitions/DependantResourceModel"
+        
+  DependantResourceModel:
+    type: object
+    properties:
+      resourceType:
+        type: string
+        enum: [project, metadata, scenario, resultConfig, simPlan, simRun, resultData]
+      resourceId:
+        type: string
+        format: UUID
+
+  ErrorMessageModel:
+    type: object
+    properties:
+      error:
+        title: message
+        type: string
+        description: Contains the error message

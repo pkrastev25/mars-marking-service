@@ -89,7 +89,6 @@ namespace mars_marking_svc.Middlewares
                 case CannotMarkResourceException _:
                 case MarkSessionAlreadyExistsException _:
                 case ResourceAlreadyMarkedException _:
-                case ArchiveRestoreForProjectIsRunningException _:
                     return StatusCodeConflict;
             }
 

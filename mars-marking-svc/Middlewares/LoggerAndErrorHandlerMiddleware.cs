@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Threading.Tasks;
 using mars_marking_svc.Exceptions;
+using mars_marking_svc.Middlewares.Models;
 using mars_marking_svc.Services.Models;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
@@ -14,6 +15,8 @@ namespace mars_marking_svc.Middlewares
         private const int StatusCodeNotFound = 404;
         private const int StatusCodeConflict = 409;
         private const int StatusCodeInternalServerError = 500;
+
+        private const string ContentTypeJson = "application/json";
 
         private readonly RequestDelegate _requestDelegate;
         private readonly ILoggerService _loggerService;
@@ -69,8 +72,8 @@ namespace mars_marking_svc.Middlewares
             Exception exception
         )
         {
-            var result = JsonConvert.SerializeObject(new {error = exception.Message});
-            httpContext.Response.ContentType = "application/json";
+            var result = JsonConvert.SerializeObject(new ErrorMessageModel(exception.Message));
+            httpContext.Response.ContentType = ContentTypeJson;
             httpContext.Response.StatusCode = GetStatusCodeForError(exception);
 
             return httpContext.Response.WriteAsync(result);
@@ -90,9 +93,9 @@ namespace mars_marking_svc.Middlewares
                 case MarkSessionAlreadyExistsException _:
                 case ResourceAlreadyMarkedException _:
                     return StatusCodeConflict;
+                default:
+                    return StatusCodeInternalServerError;
             }
-
-            return StatusCodeInternalServerError;
         }
     }
 }
